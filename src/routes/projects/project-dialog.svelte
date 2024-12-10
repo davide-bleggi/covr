@@ -10,21 +10,28 @@
 
      export let open=false;
     export let form: SuperValidated<Infer<FormSchema>>;
+
+    let projectForm;
+
+    async function handleSubmit(){
+       await projectForm.submit()
+    }
+
 </script>
 
 <Dialog.Root bind:open={open}>
     <Dialog.Content class="sm:max-w-[425px]">
         <Dialog.Header>
-            <Dialog.Title>Edit profile</Dialog.Title>
+            <Dialog.Title>Crea Progetto</Dialog.Title>
             <Dialog.Description>
-                Make changes to your profile here. Click save when you're done.
+                Crea un nuovo progetto.
             </Dialog.Description>
         </Dialog.Header>
         <div class="grid gap-4 py-4">
-            <ProjectForm data={form}></ProjectForm>
+            <ProjectForm bind:data={form} bind:formEl={projectForm}></ProjectForm>
         </div>
         <Dialog.Footer>
-            <Button type="submit">Save changes</Button>
+            <Button on:click={handleSubmit}>Salva</Button>
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>

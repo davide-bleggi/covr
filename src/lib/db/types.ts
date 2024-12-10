@@ -1,0 +1,3 @@
+export enum ProjectStatus {
+	"MANTAINED" = "MANTENIMENTO", "ORPHAN" = "ORFANO", "NEVER RELEASED" = "MAI RILASCIATO"
+}

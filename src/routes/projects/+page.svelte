@@ -10,7 +10,7 @@
 <div class="flex flex-row p-4 w-full justify-end">
     <ProjectDialog bind:open form="{data.form}">
     </ProjectDialog>
-    <Button on:click={open=true}>
+    <Button on:click={()=>{open=true}}>
         Crea Progetto
     </Button>
 </div>
