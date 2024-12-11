@@ -1,22 +1,24 @@
 <script lang="ts">
     import {
-        Button,
-        buttonVariants
+        Button
     } from "$lib/components/ui/button/index.js";
     import * as Dialog from "$lib/components/ui/dialog/index.js";
     import {ProjectForm} from "./index";
     import type {FormSchema} from "./schema";
-    import type {Infer, SuperValidated} from "sveltekit-superforms";
+    import { type Infer, type SuperValidated } from 'sveltekit-superforms';
 
-     export let open=false;
+    export let open=true;
     export let form: SuperValidated<Infer<FormSchema>>;
 
-    let projectForm;
+    let submit: any;
+    let validateForm: any;
 
-    async function handleSubmit(){
-       await projectForm.submit()
+    async function handleSubmit() {
+        submit();
+        if ((await validateForm()).valid) {
+            open = false
+        }
     }
-
 </script>
 
 <Dialog.Root bind:open={open}>
@@ -28,7 +30,7 @@
             </Dialog.Description>
         </Dialog.Header>
         <div class="grid gap-4 py-4">
-            <ProjectForm bind:data={form} bind:formEl={projectForm}></ProjectForm>
+            <ProjectForm data={form} bind:validateForm={validateForm} bind:submit={submit}></ProjectForm>
         </div>
         <Dialog.Footer>
             <Button on:click={handleSubmit}>Salva</Button>

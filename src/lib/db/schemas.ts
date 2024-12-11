@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '$lib/db/sequelize';
 import { ProjectStatus } from '$lib/db/types';
+import { projectStatusOptions } from '$lib/db/enums';
 
 export const User = sequelize.define('User', {
 		id: {
@@ -32,16 +33,20 @@ export const Project = sequelize.define('Project', {
 			type: DataTypes.STRING,
 			allowNull: false
 		},
+		description: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
 		code: {
 			type: DataTypes.STRING,
 			allowNull: false
 		},
 		status: {
-			type: DataTypes.ENUM(...Object.values(ProjectStatus)),
+			type: DataTypes.ENUM(...projectStatusOptions.map(opt=>opt.value))
+			,
 			allowNull: false
-		}
-
+		},
 	},
 	{
-		timestamps: false // Disable `createdAt` and `updatedAt`
+		timestamps: true // Disable `createdAt` and `updatedAt`
 	});
