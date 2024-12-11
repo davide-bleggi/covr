@@ -22,4 +22,3 @@ export const connectToDatabase = async () => {
     }
 };
 
-export { User };
