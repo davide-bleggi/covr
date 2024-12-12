@@ -10,8 +10,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Select from '$lib/components/ui/select';
-	import { ProjectStatus } from '$lib/db/types';
-	import { projectStatusOptions } from '$lib/db/enums';
+	import { ProjectStatusOptions } from '$lib/db/types';
 
 	export let data: SuperValidated<Infer<FormSchema>>;
 
@@ -23,11 +22,11 @@
 	export const { validateForm, submit } = form;
 
 	$: status = $formData.status
-		? projectStatusOptions.find(option => option.value === $formData.status)
+		? ProjectStatusOptions.find(option => option.value === $formData.status)
 		: undefined;
 </script>
 
-<SuperDebug data={$formData}></SuperDebug>
+<!--<SuperDebug data={$formData}></SuperDebug>-->
 
 <form method="POST" use:enhance>
 	<Form.Field {form} name="name">
@@ -63,7 +62,7 @@
 					<Select.Value placeholder="Stato attuale" />
 				</Select.Trigger>
 				<Select.Content>
-					{#each projectStatusOptions as {value, label}}
+					{#each ProjectStatusOptions as {value, label}}
 						<Select.Item value={value} label={label}>
 							{label}
 						</Select.Item>
