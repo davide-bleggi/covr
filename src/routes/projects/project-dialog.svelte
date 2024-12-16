@@ -1,11 +1,12 @@
 <script lang="ts">
-    import {
-        Button
-    } from "$lib/components/ui/button/index.js";
-    import * as Dialog from "$lib/components/ui/dialog/index.js";
-    import {ProjectForm} from "./index";
-    import type {FormSchema} from "./schema";
-    import { type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import {
+		Button
+	} from '$lib/components/ui/button/index.js';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { ProjectForm } from './index';
+	import type { FormSchema } from './schema';
+	import { type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import { toast } from 'svelte-sonner';
 
     export let open=true;
     export let form: SuperValidated<Infer<FormSchema>>;
@@ -30,7 +31,7 @@
             </Dialog.Description>
         </Dialog.Header>
         <div class="grid gap-4 py-4">
-            <ProjectForm data={form} bind:validateForm={validateForm} bind:submit={submit}></ProjectForm>
+            <ProjectForm data={form} bind:validateForm bind:submit={submit}></ProjectForm>
         </div>
         <Dialog.Footer>
             <Button on:click={handleSubmit}>Salva</Button>

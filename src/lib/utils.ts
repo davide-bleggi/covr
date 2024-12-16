@@ -60,10 +60,3 @@ export const flyAndScale = (
 		easing: cubicOut
 	};
 };
-
-export function getEnumLabel<E extends Record<string, string>>(enumType: E, key: string): string | undefined {
-	if (key in enumType) {
-		return enumType[key as keyof E];
-	}
-	return undefined; // Return undefined if the key is not found
-}

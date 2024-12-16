@@ -11,24 +11,30 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Select from '$lib/components/ui/select';
 	import { ProjectStatusOptions } from '$lib/db/types';
-
+	import { invalidate } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { createEventDispatcher } from 'svelte';
 	export let data: SuperValidated<Infer<FormSchema>>;
 
+
 	const form = superForm(data, {
-		validators: zodClient(formSchema)
+		validators: zodClient(formSchema),
 	});
 
-	const { form: formData, enhance } = form;
-	export const { validateForm, submit } = form;
+	const { form: formData, enhance,  } = form;
+	export const { submit, validateForm } = form;
 
 	$: status = $formData.status
 		? ProjectStatusOptions.find(option => option.value === $formData.status)
 		: undefined;
+
+	$: $formData.code = $formData.code.toUpperCase();
 </script>
 
-<!--<SuperDebug data={$formData}></SuperDebug>-->
+<SuperDebug data={$formData}></SuperDebug>
 
 <form method="POST" use:enhance>
+	<input type="hidden" name="id" bind:value={$formData.id} />
 	<Form.Field {form} name="name">
 		<Form.Control let:attrs>
 			<Form.Label>Nome Progetto</Form.Label>
@@ -62,7 +68,7 @@
 					<Select.Value placeholder="Stato attuale" />
 				</Select.Trigger>
 				<Select.Content>
-					{#each ProjectStatusOptions as {value, label}}
+					{#each ProjectStatusOptions as { value, label }}
 						<Select.Item value={value} label={label}>
 							{label}
 						</Select.Item>

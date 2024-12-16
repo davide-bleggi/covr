@@ -9,7 +9,7 @@
 
 
 </script>
-<a href="{`/versions/${project.code}`}">
+<a href="{`projects/${project.code}`}">
 	<div class="flex flex-col p-4 rounded-xl shadow-md border gap-2">
 		<div class="flex flex-row justify-between">
 			<div class="flex flex-row gap-1 items-center">
