@@ -16,13 +16,21 @@
 	import { createEventDispatcher } from 'svelte';
 	export let data: SuperValidated<Infer<FormSchema>>;
 
+	const dispatch  = createEventDispatcher()
 
 	const form = superForm(data, {
 		validators: zodClient(formSchema),
+		onResult: ({result})=>{
+			if(result.type === 'failure' || result.type === 'error'){
+				dispatch('error');
+				return
+			}
+			dispatch('success')
+		}
 	});
 
-	const { form: formData, enhance,  } = form;
-	export const { submit, validateForm } = form;
+	const { form: formData, enhance } = form;
+	export const { submit } = form;
 
 	$: status = $formData.status
 		? ProjectStatusOptions.find(option => option.value === $formData.status)

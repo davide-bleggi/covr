@@ -1,6 +1,6 @@
 import type { PageServerLoad, Actions } from './$types.js';
 import { fail, error } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
+import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema';
 import prisma from '$lib/prisma';
@@ -28,7 +28,11 @@ export const actions: Actions = {
 			});
 		}
 		if(!form.data.id) {
-			await prisma.project.create({ data: form.data });
+			try {
+				await prisma.project.create({ data: form.data });
+			}catch{
+				return setError(form, 'code', 'codice già esitente')
+			}
 		}
 		return {
 			form

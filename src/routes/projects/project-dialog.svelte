@@ -12,13 +12,9 @@
     export let form: SuperValidated<Infer<FormSchema>>;
 
     let submit: any;
-    let validateForm: any;
 
     async function handleSubmit() {
         submit();
-        if ((await validateForm()).valid) {
-            open = false
-        }
     }
 </script>
 
@@ -31,7 +27,7 @@
             </Dialog.Description>
         </Dialog.Header>
         <div class="grid gap-4 py-4">
-            <ProjectForm data={form} bind:validateForm bind:submit={submit}></ProjectForm>
+            <ProjectForm data={form} on:success={()=>open=false} bind:submit={submit}></ProjectForm>
         </div>
         <Dialog.Footer>
             <Button on:click={handleSubmit}>Salva</Button>
