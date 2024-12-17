@@ -3,12 +3,10 @@
 	import { Button } from '$lib/components/ui/button';
 	import { PencilIcon } from 'lucide-svelte';
 	import { ProjectDialog } from '../index';
+	import type { PageData } from './$types.js';
 
-	let { data } = $props();
-	let open = $state(false);
-
-	const project: Project | null = data.project;
-
+	export let data: PageData;
+	let open = false;
 
 </script>
 
@@ -19,6 +17,6 @@
 		<PencilIcon size={16} />
 	</Button>
 	<h1 class="font-bold text-lg">
-		{project?.name.toUpperCase()}
+		{JSON.stringify(data.project)}
 	</h1>
 </div>

@@ -1,6 +1,6 @@
 import prisma from '$lib/prisma';
-import { error, fail } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
+import { error, fail, redirect } from '@sveltejs/kit';
+import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from '../schema';
 import type { Actions } from '../../../../.svelte-kit/types/src/routes/projects/$types';
@@ -41,22 +41,28 @@ export const actions: Actions = {
 			});
 		}
 		if (form.data.id) {
-			const project = await prisma.project.update({
-				where: {
-					id: form.data.id
-				},
-				data: {...form.data, id: undefined}
-			});
-			console.log(project);
-			return {
-				project,
-				form,
-			};
+			let project;
+			try {
+				project = await prisma.project.update({
+					where: {
+						id: form.data.id
+					},
+					data: { ...form.data, id: undefined }
+				});
+			} catch (err) {
+				console.log(err);
+				return setError(form, 'code', 'codice già in uso');
+			}
+
+			if (project) {
+				console.log(project)
+				throw redirect(303, `/projects/${project.code}`);
+			}
 		}
 
 		return {
 			form
-		}
+		};
 
 	}
 };

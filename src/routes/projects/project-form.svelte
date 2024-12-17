@@ -35,7 +35,6 @@
 	$: status = $formData.status
 		? ProjectStatusOptions.find(option => option.value === $formData.status)
 		: undefined;
-
 	$: $formData.code = $formData.code.toUpperCase();
 </script>
 
