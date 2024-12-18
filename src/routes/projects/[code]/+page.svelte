@@ -17,6 +17,6 @@
 		<PencilIcon size={16} />
 	</Button>
 	<h1 class="font-bold text-lg">
-		{JSON.stringify(data.project)}
+		{data.project.name.toUpperCase()}
 	</h1>
 </div>

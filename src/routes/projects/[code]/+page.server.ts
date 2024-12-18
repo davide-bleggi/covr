@@ -33,7 +33,7 @@ export async function load({ params }) {
 }
 
 export const actions: Actions = {
-	default: async (event) => {
+	update: async (event) => {
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) {
 			return fail(400, {
@@ -64,5 +64,15 @@ export const actions: Actions = {
 			form
 		};
 
+	},
+	delete: async (event) => {
+		const form = await superValidate(event, zod(formSchema));
+
+		await prisma.project.delete({
+			where: {
+				id: form.data.id
+			}
+		})
+		return { success: true, message: 'Item deleted successfully' };
 	}
 };

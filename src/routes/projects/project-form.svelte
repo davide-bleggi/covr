@@ -13,34 +13,37 @@
 	import { ProjectStatusOptions } from '$lib/db/types';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { createEventDispatcher } from 'svelte';
+	import { writable } from 'svelte/store';
+
 	export let data: SuperValidated<Infer<FormSchema>>;
 
-	const dispatch  = createEventDispatcher()
-
-	const form = superForm(data, {
+	const form = superForm<Infer<FormSchema>>(data, {
 		validators: zodClient(formSchema),
-		onResult: ({result})=>{
-			if(result.type === 'failure' || result.type === 'error'){
-				dispatch('error');
-				return
+		onResult: ({ result }) => {
+			if (result.type === 'failure' || result.type === 'error') {
+				return;
 			}
-			dispatch('success')
 		}
 	});
 
+
 	const { form: formData, enhance } = form;
 	export const { submit } = form;
+	let formElement: HTMLFormElement;
+
+	export function setAction(action:string){
+		formElement.action=action;
+	}
 
 	$: status = $formData.status
 		? ProjectStatusOptions.find(option => option.value === $formData.status)
 		: undefined;
 	$: $formData.code = $formData.code.toUpperCase();
+
 </script>
 
 <SuperDebug data={$formData}></SuperDebug>
-
-<form method="POST" use:enhance>
+<form method="POST" bind:this={formElement} use:enhance>
 	<input type="hidden" name="id" bind:value={$formData.id} />
 	<Form.Field {form} name="name">
 		<Form.Control let:attrs>
