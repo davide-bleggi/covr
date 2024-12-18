@@ -8,7 +8,7 @@
 	<div class=" flex flex-col gap-3">
 		<h1 class="font-bold text-xl">{$page.status}</h1>
 		<p>{$page.error?.message || 'An unexpected error occurred.'}</p>
-		<Button class="self-end" variant="secondary" href="/projects">
+		<Button class="self-end" variant="secondary" href="/project">
 			Torna ai progetti
 		</Button>
 	</div>

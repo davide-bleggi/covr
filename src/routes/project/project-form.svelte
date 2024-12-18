@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
-	import { formSchema, type FormSchema } from './schema';
 	import SuperDebug, {
 		type SuperValidated,
 		type Infer,
@@ -12,12 +11,13 @@
 	import * as Select from '$lib/components/ui/select';
 	import { ProjectStatusOptions } from '$lib/db/types';
 	import { createEventDispatcher } from 'svelte';
+	import { projectFormSchema, type ProjectFormSchema } from './[code]/schema';
 
 	const dispatch = createEventDispatcher();
 
-	export let data: SuperValidated<Infer<FormSchema>>;
-	export const form = superForm<Infer<FormSchema>>(data, {
-		validators: zodClient(formSchema),
+	export let data: SuperValidated<Infer<ProjectFormSchema>>;
+	export const form = superForm<Infer<ProjectFormSchema>>(data, {
+		validators: zodClient(projectFormSchema),
 		onResult: ({ result }) => {
 			if (result.type === 'failure' || result.type === 'error') {
 				dispatch('error', result);

@@ -12,10 +12,10 @@
             COVR
         </Button>
         <div>
-            <Button variant="ghost" href="/projects">
+            <Button variant="ghost" href="/project">
                 Projects
             </Button>
-            <Button variant="ghost" href="/tests">
+            <Button variant="ghost" href="/test">
                 Tests
             </Button>
         </div>

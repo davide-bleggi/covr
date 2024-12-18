@@ -1,35 +1,33 @@
 <script lang="ts">
-	import {
-		Button
-	} from '$lib/components/ui/button/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { ProjectForm } from './index';
-	import type { FormSchema } from './schema';
-	import { type Infer, type SuperValidated } from 'sveltekit-superforms';
-	export let open = true;
-	export let form: SuperValidated<Infer<FormSchema>>;
+	import * as Dialog from '$lib/components/ui/dialog/index';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
+	import type { VersionFormSchema } from './schema';
+	import { VersionForm } from './index';
+	import { Button } from '$lib/components/ui/button';
 
-	let projectForm: ProjectForm;
+	export let open = true;
+	export let form: SuperValidated<Infer<VersionFormSchema>>;
+
+	let versionForm: VersionForm;
 
 	async function handleSubmit(action: string) {
-		projectForm.setAction('?/' + action);
-		projectForm.form.submit();
+		versionForm.setAction('?/' + action);
+		versionForm.form.submit();
 	}
 </script>
-
 <Dialog.Root bind:open={open}>
 	<Dialog.Content class="sm:max-w-[425px]">
 		<Dialog.Header>
-			<Dialog.Title>Crea Progetto</Dialog.Title>
+			<Dialog.Title>Aggiungi nuova versione</Dialog.Title>
 			<Dialog.Description>
 				Crea un nuovo progetto.
 			</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
-			<ProjectForm data={form} on:success={(event: CustomEvent)=>{
+			<VersionForm data={form} on:success={(event: CustomEvent)=>{
 				open=false;
 			}
-			} bind:this={projectForm}></ProjectForm>
+			} bind:this={versionForm}></VersionForm>
 		</div>
 		<Dialog.Footer>
 			<div class={`flex flex-row w-full ${form.data.id?'justify-between':'justify-end'}`}>
@@ -37,16 +35,16 @@
 					<Button
 						variant="destructive"
 						on:click={()=>{
-							handleSubmit('delete')
+							handleSubmit('deleteVersion')
 							}}>
 						Rimuovi
 					</Button>
 				{/if}
 				<Button on:click={()=>{
 					if(form.data.id){
-						handleSubmit('update')
+						handleSubmit('updateVersion')
 					}else{
-						handleSubmit('create')
+						handleSubmit('createVersion')
 					}
 				}}>Salva
 				</Button>
@@ -54,4 +52,3 @@
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
-

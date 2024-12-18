@@ -1,7 +1,13 @@
 import { z } from "zod";
 import { ProjectStatusOptions } from '$lib/db/types';
 
-export const formSchema = z.object({
+export const versionFormSchema = z.object({
+    id: z.number().optional(),
+    name: z.string().min(2).max(50),
+    projectId: z.number()
+});
+
+export const projectFormSchema = z.object({
     id: z.number().optional(),
     name: z.string().min(2).max(50),
     code: z.string().min(2).max(9).toUpperCase(),
@@ -9,4 +15,6 @@ export const formSchema = z.object({
     status: z.enum([...ProjectStatusOptions.map(item=>item.value)] as [string, ...string[]]),
 });
 
-export type FormSchema = typeof formSchema;
+export type ProjectFormSchema = typeof projectFormSchema;
+export type VersionFormSchema = typeof versionFormSchema;
+
