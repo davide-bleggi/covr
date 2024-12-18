@@ -73,6 +73,7 @@ export const actions: Actions = {
 				id: form.data.id
 			}
 		})
+		throw redirect(301, `/projects`);
 		return { success: true, message: 'Item deleted successfully' };
 	}
 };

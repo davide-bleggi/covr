@@ -11,24 +11,23 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Select from '$lib/components/ui/select';
 	import { ProjectStatusOptions } from '$lib/db/types';
-	import { invalidate } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { writable } from 'svelte/store';
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
 
 	export let data: SuperValidated<Infer<FormSchema>>;
-
-	const form = superForm<Infer<FormSchema>>(data, {
+	export const form = superForm<Infer<FormSchema>>(data, {
 		validators: zodClient(formSchema),
 		onResult: ({ result }) => {
 			if (result.type === 'failure' || result.type === 'error') {
+				dispatch('error', result);
 				return;
 			}
+			dispatch('success', {result});
 		}
 	});
+	const { form: formData, enhance} = form;
 
-
-	const { form: formData, enhance } = form;
-	export const { submit } = form;
 	let formElement: HTMLFormElement;
 
 	export function setAction(action:string){
