@@ -38,7 +38,7 @@
 			<div class="w-full max-w-[700px] p-4">
 				<h4 class="text-xl font-bold w-full">{version.name}</h4>
 				<Accordion.Root class="w-full">
-					<Accordion.Item value="installation">
+					<Accordion.Item value="installation" class="w-full">
 						<div class="flex flex-row w-full justify-between items-center">
 							<div class="flex flex-grow w-full">
 							<Accordion.Trigger class="w-full">Installazioni</Accordion.Trigger>

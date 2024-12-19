@@ -95,25 +95,6 @@ export const actions: Actions = {
 		throw redirect(301, `/project`);
 	},
 
-	createProject: async (event) => {
-		const form = await superValidate(event, zod(projectFormSchema));
-		if (!form.valid) {
-			return fail(400, {
-				form
-			});
-		}
-		if (!form.data.id) {
-			try {
-				await prisma.project.create({ data: form.data });
-			} catch {
-				return setError(form, 'code', 'codice già esitente');
-			}
-		}
-		return {
-			form
-		};
-	},
-
 	createVersion: async (event) => {
 		const form = await superValidate(event, zod(versionFormSchema));
 		console.log('form: ', form);

@@ -18,6 +18,9 @@
             <Button variant="ghost" href="/test">
                 Tests
             </Button>
+            <Button variant="ghost" href="/customers">
+                Customers
+            </Button>
         </div>
     </div>
     <div class="flex flex-1 h-full">
