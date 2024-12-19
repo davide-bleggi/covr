@@ -2,6 +2,8 @@
 	import { Button } from '$lib/components/ui/form/index';
 	import { CustomerDialog, CustomerItem } from './index';
 	import type { Customer } from '@prisma/client';
+	import * as Table from "$lib/components/ui/table/index.js";
+
 
 	let {data} = $props();
 	let open = $state(false);
@@ -21,7 +23,8 @@
 			Crea Cliente
 		</Button>
 	</div>
-	<ul class="grid grid-cols-5 gap-5 px-5">
+	<div class="flex w-full flex-row justify-center">
+	<ul class="flex flex-col gap-5 px-5 w-[700px]">
 		{#each data.customers as customer}
 			<li>
 				<CustomerItem edit={(event: {customer: Customer})=>{
@@ -34,4 +37,5 @@
 			</li>
 		{/each}
 	</ul>
+	</div>
 </div>

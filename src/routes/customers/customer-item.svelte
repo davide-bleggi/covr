@@ -6,10 +6,10 @@
 	let { edit, customer } = $props()
 
 </script>
-<div class="flex gap-2 items-center">
-	<div>
-	{customer.name}
-	</div>
+<div class="flex w-full flex-row gap-2 items-center justify-between shadow-md p-5 rounded-md">
+	<h4 class="text-lg font-semibold">
+		{customer.name}
+	</h4>
 	<Button size="icon" variant="outline" on:click={()=>edit({ customer })}>
 		<PencilIcon size={16} />
 	</Button>
