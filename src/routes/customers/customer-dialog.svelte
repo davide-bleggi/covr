@@ -52,9 +52,11 @@
 						action={action}>
 				<input type="hidden" name="id" bind:value={$formData.id} />
 				<Form.Field {form} name="name">
-					<Form.Control let:attrs>
+					<Form.Control>
+						{#snippet children({props})}
 						<Form.Label>Nome Cliente</Form.Label>
-						<Input bind:value={$formData.name} {...attrs} />
+						<Input {...props} bind:value={$formData.name} />
+							{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
@@ -64,14 +66,14 @@
 			<div class={`flex flex-row w-full ${$formData.id?'justify-between':'justify-end'}`}>
 				{#if $formData.id }
 					<Button
-						on:click={()=>{
+						onclick={()=>{
 							handleSubmit('deleteCustomer')}}
 						variant="destructive">
 						Rimuovi
 					</Button>
 				{/if}
 				<Button
-					on:click={()=>{
+					onclick={()=>{
 							handleSubmit($formData.id? 'updateCustomer': 'createCustomer')}}>
 					Salva
 				</Button>

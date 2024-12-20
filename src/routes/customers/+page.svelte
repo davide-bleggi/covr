@@ -4,7 +4,6 @@
 	import type { Customer } from '@prisma/client';
 	import * as Table from "$lib/components/ui/table/index.js";
 
-
 	let {data} = $props();
 	let open = $state(false);
 	let newFormData = data.customerForm.data;
@@ -16,7 +15,7 @@
 </CustomerDialog>
 <div class="flex flex-col w-full">
 	<div class="flex flex-row p-4 w-full justify-end">
-		<Button on:click={()=>{
+		<Button onclick={()=>{
 			selectedFormData = newFormData;
 			open=true
 		}}>

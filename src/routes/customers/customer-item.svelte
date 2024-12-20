@@ -10,7 +10,7 @@
 	<h4 class="text-lg font-semibold">
 		{customer.name}
 	</h4>
-	<Button size="icon" variant="outline" on:click={()=>edit({ customer })}>
+	<Button size="icon" variant="outline" onclick={()=>edit({ customer })}>
 		<PencilIcon size={16} />
 	</Button>
 </div>
