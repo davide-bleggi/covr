@@ -35,7 +35,6 @@
 
 </script>
 
-<SuperDebug data={$formData}></SuperDebug>
 <form method="POST" use:enhance action={action}>
 	<input type="hidden" name="id" bind:value={$formData.id} />
 	<Form.Field {form} name="name">

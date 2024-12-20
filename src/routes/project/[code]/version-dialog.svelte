@@ -20,9 +20,12 @@
 				open=false;
 			}
 		},
+		onUpdate: ({ form }) => {
+			$errors = form.errors;
+		},
 	});
 
-	const { form: formData, enhance, submit } = form;
+	const { form: formData, enhance, submit, errors } = form;
 
 	async function handleSubmit(actionValue: string) {
 		action = actionValue;
