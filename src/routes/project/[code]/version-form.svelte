@@ -16,11 +16,14 @@
 				return;
 			}
 			open=false;
-		}
+		},
+		onUpdate: ({ form }) => {
+			$errors = form.errors;
+		},
 	});
 
 
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, errors} = form;
 	submit = form.submit;
 
 </script>

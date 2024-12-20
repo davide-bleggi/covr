@@ -18,11 +18,14 @@
 			}
 			open = false;
 		},
+		onUpdate: ({ form }) => {
+			$errors = form.errors;
+		},
 	});
 
 	let action = $state('?/createCustomer');
 
-	const { form: formData, enhance, submit } = form;
+	const { form: formData, enhance, submit, errors} = form;
 
 	$effect(() => {
 		if (data) {
