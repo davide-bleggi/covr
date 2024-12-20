@@ -4,18 +4,22 @@
 	import { PencilIcon, Plus } from 'lucide-svelte';
 	import { ProjectDialog } from '../index';
 	import type { PageData } from './$types.js';
-	import { VersionDialog } from './index';
+	import { InstallationDialog, VersionDialog } from './index';
 	import * as Accordion from '$lib/components/ui/accordion/index';
 
 	let {data} = $props();
 	let openProjectDialog = $state(false);
 	let openVersionDialog = $state(false);
+	let openInstallationDialog = $state(false);
 
 </script>
 <ProjectDialog bind:open={openProjectDialog} form={data.projectForm}>
 </ProjectDialog>
 <VersionDialog bind:open={openVersionDialog} formToValidate={data.versionForm}>
 </VersionDialog>
+<InstallationDialog bind:open={openInstallationDialog} formToValidate={data.versionForm}>
+</InstallationDialog>
+
 
 <div class="flex w-full flex-col">
 	<div class="flex flex-row justify-between w-full p-4  h-fit items-center">
@@ -43,7 +47,7 @@
 							<div class="flex flex-grow w-full">
 							<Accordion.Trigger class="w-full">Installazioni</Accordion.Trigger>
 							</div>
-							<Button variant="outline" size="icon">
+							<Button variant="outline" size="icon" onclick={()=>openInstallationDialog=true}>
 								<Plus></Plus>
 							</Button>
 						</div>

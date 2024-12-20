@@ -15,6 +15,14 @@ export const projectFormSchema = z.object({
     status: z.enum([...ProjectStatusOptions.map(item=>item.value)] as [string, ...string[]]),
 });
 
+export const installationFormSchema = z.object({
+    id: z.number().optional(),
+    versionId: z.number(),
+    customerId: z.number(),
+    installationData: z.date(),
+});
+
+export type InstallationFormSchema = typeof installationFormSchema;
 export type ProjectFormSchema = typeof projectFormSchema;
 export type VersionFormSchema = typeof versionFormSchema;
 
