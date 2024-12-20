@@ -2,7 +2,6 @@
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 	import SuperDebug, {
-		type SuperValidated,
 		type Infer,
 		superForm
 	} from 'sveltekit-superforms';
@@ -28,10 +27,6 @@
 	});
 	const { form: formData, enhance, errors } = form;
 	submit = form.submit;
-
-	// let status = $derived($formData.status
-	// 	? ProjectStatusOptions.find(option => option.value === $formData.status)
-	// 	: undefined);
 
 	$effect(() => {
 		if ($formData.code !== $formData.code.toUpperCase())
