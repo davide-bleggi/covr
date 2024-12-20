@@ -15,52 +15,51 @@ model User {
 }
 
 model Project {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
-  code        String    @unique
+  code        String   @unique
   status      String
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
   description String?
 
-  versions    Version[] // A project can have many versions
+  versions Version[] // A project can have many versions
 }
 
 model Version {
-  id        Int        @id @default(autoincrement())
-  name      String     @unique
-  createdAt DateTime   @default(now())
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
 
-  project   Project    @relation(fields: [projectId], references: [id]) // Relation to Project
+  project   Project @relation(fields: [projectId], references: [id]) // Relation to Project
   projectId Int
 
   installations Installation[] // A version can have many installation
-  features  Feature[]  // A version can have many features
+  features      Feature[] // A version can have many features
 }
 
 model Customer {
-  id        Int        @id @default(autoincrement())
-  name      String     @unique
+  id   Int    @id @default(autoincrement())
+  name String @unique
 
   installations Installation[]
 }
 
-model Installation{
-  id        Int        @id @default(autoincrement())
-  customer   Customer    @relation(fields: [customerId], references: [id]) // Relation to Customer
+model Installation {
+  id         Int      @id @default(autoincrement())
+  customer   Customer @relation(fields: [customerId], references: [id]) // Relation to Customer
   customerId Int
 
-  version   Version    @relation(fields: [versionId], references: [id]) // Relation to Version
+  version   Version @relation(fields: [versionId], references: [id]) // Relation to Version
   versionId Int
 
   instalDate DateTime
-  createdAt DateTime   @default(now())
-
+  createdAt  DateTime @default(now())
 }
 
 model Feature {
-  id        Int        @id @default(autoincrement())
-  name      String
+  id   Int    @id @default(autoincrement())
+  name String
 
-  version   Version    @relation(fields: [versionId], references: [id]) // Relation to Version
+  version   Version @relation(fields: [versionId], references: [id]) // Relation to Version
   versionId Int
 }

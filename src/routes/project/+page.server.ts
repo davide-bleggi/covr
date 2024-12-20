@@ -23,8 +23,8 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
 	createProject: async (event) => {
 		const form = await superValidate(event, zod(projectFormSchema));
-		console.log('createProject');
 		if (!form.valid) {
+			console.log('Form not valid');
 			return fail(400, {
 				form
 			});
@@ -33,6 +33,7 @@ export const actions: Actions = {
 			try {
 				await prisma.project.create({ data: form.data });
 			} catch {
+				console.log('Duplicated project code')
 				return setError(form, 'code', 'codice già esitente');
 			}
 		}

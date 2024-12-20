@@ -10,81 +10,86 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Select from '$lib/components/ui/select';
 	import { ProjectStatusOptions } from '$lib/db/types';
-	import { createEventDispatcher } from 'svelte';
 	import { projectFormSchema, type ProjectFormSchema } from './[code]/schema';
 
-	const dispatch = createEventDispatcher();
+	let { data = $bindable(), open = $bindable(), action = $bindable(), submit = $bindable() } = $props();
 
-	export let data: SuperValidated<Infer<ProjectFormSchema>>;
-	export const form = superForm<Infer<ProjectFormSchema>>(data, {
+	const form = superForm<Infer<ProjectFormSchema>>(data, {
 		validators: zodClient(projectFormSchema),
 		onResult: ({ result }) => {
 			if (result.type === 'failure' || result.type === 'error') {
-				dispatch('error', result);
 				return;
 			}
-			dispatch('success', {result});
+			open = false;
 		}
 	});
-	const { form: formData, enhance} = form;
+	const { form: formData, enhance } = form;
+	submit = form.submit;
 
-	let formElement: HTMLFormElement;
+	// let status = $derived($formData.status
+	// 	? ProjectStatusOptions.find(option => option.value === $formData.status)
+	// 	: undefined);
 
-	export function setAction(action:string){
-		formElement.action=action;
-	}
-
-	$: status = $formData.status
-		? ProjectStatusOptions.find(option => option.value === $formData.status)
-		: undefined;
-	$: $formData.code = $formData.code.toUpperCase();
+	$effect(() => {
+		if ($formData.code !== $formData.code.toUpperCase())
+			$formData.code = $formData.code.toUpperCase();
+	});
 
 </script>
 
 <SuperDebug data={$formData}></SuperDebug>
-<form method="POST" bind:this={formElement} use:enhance>
+<form method="POST" use:enhance action={`project?/${action}`}>
 	<input type="hidden" name="id" bind:value={$formData.id} />
 	<Form.Field {form} name="name">
-		<Form.Control let:attrs>
-			<Form.Label>Nome Progetto</Form.Label>
-			<Input bind:value={$formData.name} {...attrs} />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Nome</Form.Label>
+				<Input {...props} bind:value={$formData.name} />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 	<Form.Field {form} name="code">
-		<Form.Control let:attrs>
-			<Form.Label>Codice Progetto</Form.Label>
-			<Input bind:value={$formData.code} {...attrs} placeholder="COD" />
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Codice Progetto</Form.Label>
+				<Input bind:value={$formData.code} {...props} placeholder="COD" />
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 	<Form.Field {form} name="description">
-		<Form.Control let:attrs>
-			<Form.Label>Descrizione</Form.Label>
-			<Textarea {...attrs} bind:value={$formData.description} placeholder="Descrizione progetto"></Textarea>
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Descrizione</Form.Label>
+				<Textarea {...props} bind:value={$formData.description} placeholder="Descrizione progetto"></Textarea>
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 		<Form.Description>Descrivi brevemente di cosa si occupa il progetto.</Form.Description>
-
 	</Form.Field>
 
 	<Form.Field {form} name="status">
-		<Form.Control let:attrs>
-			<Select.Root portal={null}
-									 selected={status}
-									 onSelectedChange={(v)=>{v && ($formData.status = v.value)}}>
-				<Select.Trigger class="w-full">
-					<Select.Value placeholder="Stato attuale" />
-				</Select.Trigger>
-				<Select.Content>
-					{#each ProjectStatusOptions as { value, label }}
-						<Select.Item value={value} label={label}>
-							{label}
-						</Select.Item>
-					{/each}
-				</Select.Content>
-				<Select.Input {...attrs} bind:value={$formData.status} name="status" />
-			</Select.Root>
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Stato</Form.Label>
+				<Select.Root type="single"
+										 bind:value={$formData.status}
+										 name={props.name}>
+					<Select.Trigger {...props} class="w-full">
+						{$formData.status
+							? ProjectStatusOptions.find((opt)=>opt.value ===$formData.status)?.label??''
+							: "Stato attuale"}
+					</Select.Trigger>
+					<Select.Content>
+						{#each ProjectStatusOptions as { value, label }}
+							<Select.Item value={value} label={label}>
+								{label}
+							</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
+			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
