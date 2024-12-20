@@ -27,7 +27,7 @@ model Project {
 
 model Version {
   id        Int      @id @default(autoincrement())
-  name      String   @unique
+  name      String
   createdAt DateTime @default(now())
 
   project   Project @relation(fields: [projectId], references: [id]) // Relation to Project
@@ -35,6 +35,8 @@ model Version {
 
   installations Installation[] // A version can have many installation
   features      Feature[] // A version can have many features
+
+  @@unique([projectId, name])
 }
 
 model Customer {
