@@ -6,16 +6,18 @@
 	import { ProjectForm } from './index';
 	import { type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import type { ProjectFormSchema } from './[code]/schema';
+	import { tick } from 'svelte';
 
 	let { open = $bindable(), form= $bindable()}= $props();
 
-	let projectForm: ProjectForm;
-	let submit: ()=>void = $state();
+	let submit: (()=>void)|undefined = $state();
 	let action = $state('createProject');
 
 	async function handleSubmit(actionValue: string) {
 		action =  actionValue;
-		submit();
+		await tick();
+		if(submit)
+			submit();
 	}
 </script>
 
@@ -40,16 +42,16 @@
 					<Button
 						variant="destructive"
 						onclick={()=>{
-							handleSubmit('deleteProject')
+							handleSubmit('/project/[code]?/deleteProject')
 							}}>
 						Rimuovi
 					</Button>
 				{/if}
 				<Button onclick={()=>{
 					if(form.data.id){
-						handleSubmit('updateProject')
+						handleSubmit('/project/[code]?/updateProject')
 					}else{
-						handleSubmit('createProject')
+						handleSubmit('project?/createProject')
 					}
 				}}>Salva
 				</Button>

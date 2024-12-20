@@ -7,20 +7,20 @@
 	import { VersionDialog } from './index';
 	import * as Accordion from '$lib/components/ui/accordion/index';
 
-	export let data: PageData;
-	let openProjectDialog = false;
-	let openVersionDialog = false;
+	let {data} = $props();
+	let openProjectDialog = $state(false);
+	let openVersionDialog = $state(false);
 
 </script>
 <ProjectDialog bind:open={openProjectDialog} form={data.projectForm}>
 </ProjectDialog>
-<VersionDialog bind:open={openVersionDialog} form={data.versionForm}>
+<VersionDialog bind:open={openVersionDialog} formToValidate={data.versionForm}>
 </VersionDialog>
 
 <div class="flex w-full flex-col">
 	<div class="flex flex-row justify-between w-full p-4  h-fit items-center">
 		<div class="flex flex-row items-center gap-4">
-			<Button variant="outline" class="p-2" on:click={()=>openProjectDialog=true}>
+			<Button variant="outline" class="p-2" onclick={()=>openProjectDialog=true}>
 				<PencilIcon size={16} />
 			</Button>
 			<h1 class="font-bold text-lg">
@@ -28,7 +28,7 @@
 			</h1>
 		</div>
 		<div>
-			<Button class="p-4" on:click={()=>openVersionDialog=true}>
+			<Button class="p-4" onclick={()=>openVersionDialog=true}>
 				Aggiungi Versione
 			</Button>
 		</div>

@@ -84,7 +84,7 @@ export const actions: Actions = {
 
 	},
 
-	deleteProjetc: async (event) => {
+	deleteProject: async (event) => {
 		const form = await superValidate(event, zod(projectFormSchema));
 
 		await prisma.project.delete({
@@ -102,7 +102,9 @@ export const actions: Actions = {
 			await prisma.version.create({ data: { ...form.data, id: undefined } });
 		} catch (err) {
 			console.log(err);
-			return setError(form, 'name', 'nome già esitente');
+			setError(form, 'name', 'nome già esistente');
+			// Make sure to return the form with the error
+			return fail(400, { form });
 		}
 
 		return {

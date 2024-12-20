@@ -1,50 +1,76 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog/index';
-	import type { Infer, SuperValidated } from 'sveltekit-superforms';
-	import type { VersionFormSchema } from './schema';
-	import { VersionForm } from './index';
 	import { Button } from '$lib/components/ui/button';
+	import { type Infer, superForm } from 'sveltekit-superforms';
+	import { versionFormSchema, type VersionFormSchema } from './schema';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { Input } from '$lib/components/ui/input';
+	import * as Form from '$lib/components/ui/form';
 
-	export let open = true;
-	export let form: SuperValidated<Infer<VersionFormSchema>>;
+	let {open = $bindable(false), formToValidate = $bindable()} = $props();
 
-	let versionForm: VersionForm;
+	let action = $state('?/createVersion');
 
-	async function handleSubmit(action: string) {
-		versionForm.setAction('?/' + action);
-		versionForm.form.submit();
+	export const form = superForm<Infer<VersionFormSchema>>(formToValidate, {
+		validators: zodClient(versionFormSchema),
+		onResult: ({ result }) => {
+			if (result.type === 'failure' || result.type === 'error') {
+				console.log('Form submission failed:', result);
+			}else{
+				open=false;
+			}
+		},
+	});
+
+	const { form: formData, enhance, submit } = form;
+
+	async function handleSubmit(actionValue: string) {
+		action = actionValue;
+		submit();
 	}
+
 </script>
 <Dialog.Root bind:open={open}>
 	<Dialog.Content class="sm:max-w-[425px]">
 		<Dialog.Header>
 			<Dialog.Title>Aggiungi nuova versione</Dialog.Title>
 			<Dialog.Description>
-				Crea un nuovo progetto.
+				Crea una nuova versione
 			</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
-			<VersionForm data={form} on:success={(event: CustomEvent)=>{
-				open=false;
-			}
-			} bind:this={versionForm}></VersionForm>
+			<form method="POST" action={action} use:enhance>
+				<input type="hidden" name="id" bind:value={$formData.id} />
+				<input type="hidden" name="projectId" bind:value={$formData.projectId} />
+
+				<Form.Field {form} name="name">
+					<Form.Control>
+						{#snippet children({props})}
+							<Form.Label>Nome Versione</Form.Label>
+							<Input {...props} bind:value={$formData.name} />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+			</form>
+
 		</div>
 		<Dialog.Footer>
-			<div class={`flex flex-row w-full ${form.data.id?'justify-between':'justify-end'}`}>
-				{#if form.data.id }
+			<div class={`flex flex-row w-full ${formToValidate.data.id?'justify-between':'justify-end'}`}>
+				{#if formToValidate.data.id }
 					<Button
 						variant="destructive"
-						on:click={()=>{
-							handleSubmit('deleteVersion')
+						onclick={()=>{
+							handleSubmit('?/deleteVersion')
 							}}>
 						Rimuovi
 					</Button>
 				{/if}
-				<Button on:click={()=>{
-					if(form.data.id){
-						handleSubmit('updateVersion')
+				<Button onclick={()=>{
+					if(formToValidate.data.id){
+						handleSubmit('?/updateVersion')
 					}else{
-						handleSubmit('createVersion')
+						handleSubmit('?/createVersion')
 					}
 				}}>Salva
 				</Button>
