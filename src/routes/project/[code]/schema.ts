@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ProjectStatusOptions } from '$lib/db/types';
+import { ProjectStatusOptions } from '$lib/types';
 
 export const versionFormSchema = z.object({
     id: z.number().optional(),
@@ -17,9 +17,9 @@ export const projectFormSchema = z.object({
 
 export const installationFormSchema = z.object({
     id: z.number().optional(),
-    versionId: z.number(),
-    customerId: z.number(),
-    installationData: z.date(),
+    versionId: z.number().gt(0),
+    customerId: z.number().gt(0, 'Selezionare un cliente'),
+    installationDate: z.coerce.date({message: 'Selezionare una data valida'}),
 });
 
 export type InstallationFormSchema = typeof installationFormSchema;

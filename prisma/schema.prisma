@@ -54,8 +54,8 @@ model Installation {
   version   Version @relation(fields: [versionId], references: [id]) // Relation to Version
   versionId Int
 
-  instalDate DateTime
-  createdAt  DateTime @default(now())
+  installationDate DateTime
+  createdAt        DateTime @default(now())
 }
 
 model Feature {

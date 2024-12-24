@@ -1,9 +1,9 @@
 import prisma from '$lib/prisma';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { Actions } from '../../../../.svelte-kit/types/src/routes/project/$types';
-import { projectFormSchema, versionFormSchema } from './schema';
+import { installationFormSchema, projectFormSchema, versionFormSchema } from './schema';
 
 export async function load({ params }) {
 	const { code } = params;
@@ -24,6 +24,8 @@ export async function load({ params }) {
 			}
 		}
 	});
+
+	const customers = await prisma.customer.findMany();
 
 	if (!project) {
 		// Throw an error with a custom status and message
@@ -46,7 +48,9 @@ export async function load({ params }) {
 		project,
 		versions: project.versions,
 		versionForm: await superValidate(versionFormData, zod(versionFormSchema), { errors: false }),
-		projectForm: await superValidate(projectFormData, zod(projectFormSchema))
+		projectForm: await superValidate(projectFormData, zod(projectFormSchema)),
+		installationForm: await superValidate(zod(installationFormSchema)),
+		customers
 	};
 }
 
@@ -110,5 +114,22 @@ export const actions: Actions = {
 		return {
 			form
 		};
-	}
+	},
+
+	createInstallation: async (event: RequestEvent) => {
+		// console.log('EVENT DATA BEING ANALYZED:', await event.request.formData());
+		const form = await superValidate(event, zod(installationFormSchema));
+		console.log('INSTALLATION FORM======= ', form);
+		try {
+			await prisma.installation.create({ data: { ...form.data, id: undefined } });
+		} catch (err) {
+			console.log(err);
+			// Make sure to return the form with the error
+			return fail(400, { form });
+		}
+
+		return {
+			form
+		};
+	},
 };

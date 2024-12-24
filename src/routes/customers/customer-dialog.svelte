@@ -20,12 +20,12 @@
 		},
 		onUpdate: ({ form }) => {
 			$errors = form.errors;
-		},
+		}
 	});
 
 	let action = $state('?/createCustomer');
 
-	const { form: formData, enhance, submit, errors} = form;
+	const { form: formData, enhance, submit, errors } = form;
 
 	$effect(() => {
 		if (data) {
@@ -41,7 +41,6 @@
 
 </script>
 
-
 <Dialog.Root bind:open={open}>
 	<Dialog.Content class="sm:max-w-[425px]">
 		<Dialog.Header>
@@ -51,15 +50,18 @@
 			</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
-			<form method="POST"  use:enhance
+			<form method="POST" use:enhance
+						onsubmit={()=>
+							handleSubmit($formData.id? 'updateCustomer': 'createCustomer')
+						}
 						action={action}>
 				<input type="hidden" name="id" bind:value={$formData.id} />
 				<Form.Field {form} name="name">
 					<Form.Control>
-						{#snippet children({props})}
-						<Form.Label>Nome Cliente</Form.Label>
-						<Input {...props} bind:value={$formData.name} />
-							{/snippet}
+						{#snippet children({ props })}
+							<Form.Label>Nome Cliente</Form.Label>
+							<Input {...props} bind:value={$formData.name} />
+						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>

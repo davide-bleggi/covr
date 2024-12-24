@@ -4,22 +4,18 @@
 	import { PencilIcon, Plus } from 'lucide-svelte';
 	import { ProjectDialog } from '../index';
 	import type { PageData } from './$types.js';
-	import { InstallationDialog, VersionDialog } from './index';
-	import * as Accordion from '$lib/components/ui/accordion/index';
+	import { VersionDialog, VersionItem } from './index';
+	import { tick } from 'svelte';
 
-	let {data} = $props();
+	let { data } = $props();
 	let openProjectDialog = $state(false);
 	let openVersionDialog = $state(false);
-	let openInstallationDialog = $state(false);
 
 </script>
 <ProjectDialog bind:open={openProjectDialog} form={data.projectForm}>
 </ProjectDialog>
 <VersionDialog bind:open={openVersionDialog} formToValidate={data.versionForm}>
 </VersionDialog>
-<InstallationDialog bind:open={openInstallationDialog} formToValidate={data.versionForm}>
-</InstallationDialog>
-
 
 <div class="flex w-full flex-col">
 	<div class="flex flex-row justify-between w-full p-4  h-fit items-center">
@@ -39,35 +35,7 @@
 	</div>
 	<div class="flex flex-col w-full justify-center items-center">
 		{#each data.versions as version}
-			<div class="w-full max-w-[700px] p-4">
-				<h4 class="text-xl font-bold w-full">{version.name}</h4>
-				<Accordion.Root class="w-full">
-					<Accordion.Item value="installation" class="w-full">
-						<div class="flex flex-row w-full justify-between items-center">
-							<div class="flex flex-grow w-full">
-							<Accordion.Trigger class="w-full">Installazioni</Accordion.Trigger>
-							</div>
-							<Button variant="outline" size="icon" onclick={()=>openInstallationDialog=true}>
-								<Plus></Plus>
-							</Button>
-						</div>
-						<Accordion.Content>
-							{#each version.installations as installation}
-								{installation.customer.name}
-							{/each}
-						</Accordion.Content>
-					</Accordion.Item>
-
-					<Accordion.Item value="feature">
-						<Accordion.Trigger>Features</Accordion.Trigger>
-						<Accordion.Content>
-							{#each version.features as feature}
-								{feature.name}
-							{/each}
-						</Accordion.Content>
-					</Accordion.Item>
-				</Accordion.Root>
-			</div>
+			<VersionItem {version} customers={data.customers} installationForm={data.installationForm}  ></VersionItem>
 		{/each}
 	</div>
 </div>

@@ -8,7 +8,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Select from '$lib/components/ui/select';
-	import { ProjectStatusOptions } from '$lib/db/types';
+	import { ProjectStatusOptions } from '$lib/types';
 	import { projectFormSchema, type ProjectFormSchema } from './[code]/schema';
 
 	let { data = $bindable(), open = $bindable(), action = $bindable(), submit = $bindable() } = $props();

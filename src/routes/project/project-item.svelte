@@ -2,7 +2,7 @@
 	import { PlayCircle } from 'lucide-svelte';
 	import { format } from 'date-fns';
 	import type { Project } from '@prisma/client';
-	import { ProjectStatusOptions } from '$lib/db/types';
+	import { ProjectStatusOptions } from '$lib/types';
 
 	export let project: Project;
 	const status = ProjectStatusOptions.find((status)=> project.status===status.value);
