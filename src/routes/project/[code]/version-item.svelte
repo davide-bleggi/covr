@@ -1,29 +1,29 @@
 <script lang="ts">
 	import { Calendar, Pencil, Plus } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index';
-	import { InstallationDialog } from './index';
+	import { InstallationDialog, InstallationItem } from './index';
 	import * as Accordion from '$lib/components/ui/accordion/index';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import SuperDebug, { type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import type { InstallationFormSchema } from './schema';
-	import type { Version } from '@prisma/client';
+	import { type Customer, type Feature, type Installation, Prisma, type Version } from '@prisma/client';
 	import { format } from 'date-fns';
 
-	let { version, customers, installationForm }: {
-		version: Version,
+
+	let { version, customers }: {
+		version: Version & { installations: (Installation & {customer: Customer})[] } & {features: Feature[]},
 		customers: Customer[],
-		installationForm: SuperValidated<Infer<InstallationFormSchema>>
 	} = $props();
 
 	let openInstallationDialog = $state(false);
-	let localInstallationForm = $state<typeof installationForm>(structuredClone(installationForm));
-	localInstallationForm.data.versionId = version.id;
+	let installationForm = {versionId: version.id};
 
 </script>
 
 <InstallationDialog
 	bind:open={openInstallationDialog}
-	bind:formToValidate={localInstallationForm}
+	formToValidate={installationForm}
 	customers={customers}
+	formId={`new-installation-form-${version.id}`}
 >
 </InstallationDialog>
 
@@ -36,6 +36,7 @@
 					<Accordion.Trigger class="flex border-b-0">Installazioni</Accordion.Trigger>
 				</div>
 				<Button variant="outline" size="icon" onclick={()=>{
+					console.log(installationForm)
 								openInstallationDialog=true}
 							}>
 					<Plus></Plus>
@@ -43,23 +44,11 @@
 			</div>
 
 			<Accordion.Content>
+				<ul class="gap-2 flex flex-col">
 				{#each version.installations as installation}
-					<div class="flex flex-row w-full gap-4 justify-between items-center">
-						<div class="flex items-center gap-2">
-							<Button size="icon" variant="outline" onclick={()=>{
-
-								openInstallationDialog=true
-							}}>
-								<Pencil></Pencil>
-							</Button>
-							{installation.customer.name}
-						</div>
-						<div class="flex flex-row items-center gap-2 opacity-50">
-							<Calendar></Calendar>
-							{format(installation.installationDate, 'yyyy-MM-dd')}
-						</div>
-					</div>
+					<li><InstallationItem {installationForm} {installation} {customers}></InstallationItem></li>
 				{/each}
+				</ul>
 			</Accordion.Content>
 		</Accordion.Item>
 

@@ -116,16 +116,37 @@ export const actions: Actions = {
 		};
 	},
 
-	createInstallation: async (event: RequestEvent) => {
+	deleteInstallation: async ({ request }) => {
+		const id = Number((await request.formData()).get('id'));
+		try {
+			await prisma.installation.delete({ where: { id: id ?? null } });
+		} catch {
+			return fail(400);
+		}
+	},
+
+	saveInstallation: async (event: RequestEvent) => {
 		// console.log('EVENT DATA BEING ANALYZED:', await event.request.formData());
 		const form = await superValidate(event, zod(installationFormSchema));
-		console.log('INSTALLATION FORM======= ', form);
-		try {
-			await prisma.installation.create({ data: { ...form.data, id: undefined } });
-		} catch (err) {
-			console.log(err);
-			// Make sure to return the form with the error
-			return fail(400, { form });
+		if(!form.data.id) {
+			try {
+				await prisma.installation.create({ data: { ...form.data, id: undefined } });
+			} catch (err) {
+				console.log(err);
+				// Make sure to return the form with the error
+				return fail(400, { form });
+			}
+		}else{
+			try {
+				await prisma.installation.update({
+					data: { ...form.data, id: undefined},
+					where: { id: form.data.id }
+				});
+			} catch (err) {
+				console.log(err);
+				// Make sure to return the form with the error
+				return fail(400, { form });
+			}
 		}
 
 		return {
