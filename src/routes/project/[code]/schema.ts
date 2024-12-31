@@ -22,7 +22,16 @@ export const installationFormSchema = z.object({
     installationDate: z.coerce.date({message: 'Selezionare una data valida'}),
 });
 
+export const featureFormSchema = z.object({
+    id: z.number().optional(),
+    versionId: z.number().gt(0),
+    name: z.string().min(2).max(100),
+    description: z.string().min(2).max(300).optional(),
+});
+
+
 export type InstallationFormSchema = typeof installationFormSchema;
+export type FeatureFormSchema = typeof featureFormSchema;
 export type ProjectFormSchema = typeof projectFormSchema;
 export type VersionFormSchema = typeof versionFormSchema;
 

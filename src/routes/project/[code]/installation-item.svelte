@@ -16,7 +16,6 @@
 
 	let openInstallationDialog = $state(false);
 
-
 </script>
 
 <InstallationDialog
@@ -29,15 +28,16 @@
 
 <div class="flex flex-row w-full gap-4 justify-between items-center">
 	<div class="flex items-center gap-2">
-		<Button size="icon" variant="outline" onclick={()=>{
-		installationForm = {
-			versionId: installation.versionId,
-			customerId: installation.customerId,
-			installationDate: installation.installationDate,
-			id: installation.id
-		};
-								openInstallationDialog=true
-							}}>
+		<Button size="icon" variant="outline"
+			onclick={()=>{
+					installationForm = {
+						versionId: installation.versionId,
+						customerId: installation.customerId,
+						installationDate: installation.installationDate,
+						id: installation.id
+					};
+					openInstallationDialog=true
+				}}>
 			<Pencil></Pencil>
 		</Button>
 		{installation.customer.name}

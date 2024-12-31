@@ -56,12 +56,17 @@ model Installation {
 
   installationDate DateTime
   createdAt        DateTime @default(now())
+
+  @@unique([customerId, versionId])
 }
 
 model Feature {
-  id   Int    @id @default(autoincrement())
-  name String
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
 
   version   Version @relation(fields: [versionId], references: [id]) // Relation to Version
   versionId Int
+
+  @@unique([name, versionId])
 }
