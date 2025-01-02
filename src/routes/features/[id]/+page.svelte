@@ -48,10 +48,10 @@
 					</Button>
 				</div>
 			</div>
-			<ul>
+			<ul class="flex flex-col gap-2 py-5">
 				{#each feature.requirements as requirement }
 					<li>
-						<RequirementItem {requirement} />
+						<RequirementItem {requirement} requirementForm={data.requirementForm} />
 					</li>
 				{/each}
 			</ul>

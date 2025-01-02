@@ -14,7 +14,10 @@
 	} = $props();
 </script>
 
-<AccordionPrimitive.Header {level} class="flex w-full">
+<AccordionPrimitive.Header {level} class="flex w-full gap-2">
+	<div class="h-full flex items-center">
+	 <ChevronDown class="size-4 shrink-0 transition-transform duration-200" />
+	</div>
 	<AccordionPrimitive.Trigger
 		bind:ref
 		class={cn(
@@ -24,6 +27,6 @@
 		{...restProps}
 	>
 		{@render children?.()}
-		<ChevronDown class="size-4 shrink-0 transition-transform duration-200" />
+
 	</AccordionPrimitive.Trigger>
 </AccordionPrimitive.Header>

@@ -35,7 +35,7 @@
 	</div>
 	<div class="flex flex-col w-full justify-center items-center">
 		{#each data.versions as version}
-			<VersionItem {version} customers={data.customers} installationForm={data.installationForm}  ></VersionItem>
+			<VersionItem {version} customers={data.customers} ></VersionItem>
 		{/each}
 	</div>
 </div>

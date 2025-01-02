@@ -53,7 +53,6 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
-		<SuperDebug data={$formData}></SuperDebug>
 		<div class="grid gap-4 py-4">
 			<form method="POST" action='?/saveRequirement' use:enhance id="saveRequirementForm">
 				<input hidden name="id" bind:value={$formData.id} />
@@ -80,7 +79,7 @@
 					<Form.Control>
 						{#snippet children({ props })}
 							<input hidden value={$formData.priority} name={props.name} />
-							<Form.Label>Cliente</Form.Label>
+							<Form.Label>Priorità</Form.Label>
 							<Select.Root type="single"
 													bind:value={$formData.priority}>
 								<Select.Trigger {...props}>
@@ -100,7 +99,7 @@
 					<Form.Control>
 						{#snippet children({ props })}
 							<input hidden value={$formData.status} name={props.name} />
-							<Form.Label>Cliente</Form.Label>
+							<Form.Label>Stato</Form.Label>
 							<Select.Root type="single"
 													 bind:value={$formData.status}>
 								<Select.Trigger {...props}>

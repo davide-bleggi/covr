@@ -17,15 +17,18 @@ export const priorityLabels = [{
 
 export const statusLabels = [{
 	value: 'WIP',
-	label: 'WIP'
+	label: 'WIP',
+	color: 'yellow-500'
 },
 	{
 		value: 'TODO',
-		label: 'Da fare'
+		label: 'Da fare',
+		color: 'gray-500'
 	},
 	{
 		value: 'DONE',
-		label: 'Fatto'
+		label: 'Fatto',
+		color: 'red-500'
 	}
 ] as const;
 
