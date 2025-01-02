@@ -12,6 +12,8 @@ model User {
   name      String
   email     String   @unique
   createdAt DateTime @default(now())
+
+  tests Test[]
 }
 
 model Project {
@@ -68,5 +70,57 @@ model Feature {
   version   Version @relation(fields: [versionId], references: [id]) // Relation to Version
   versionId Int
 
+  requirements Requirement[]
+
   @@unique([name, versionId])
+}
+
+model Requirement {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  status      String
+  priority    String
+
+  feature   Feature @relation(fields: [featureId], references: [id])
+  featureId Int
+
+  scenarios Scenario[]
+
+  @@unique([description, featureId])
+}
+
+model Scenario {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  status      String
+  priority    String
+
+  requirement   Requirement @relation(fields: [requirementId], references: [id]) // Relation to Version
+  requirementId Int
+
+  tests Test_Scenario[]
+
+  @@unique([name, requirementId])
+}
+
+model Test_Scenario {
+  scenario   Scenario @relation(fields: [scenarioId], references: [id]) // Relation to Version
+  scenarioId Int
+  test       Test     @relation(fields: [testId], references: [id]) // Relation to Version
+  testId     Int
+
+  @@id([scenarioId, testId])
+}
+
+model Test {
+  id             Int      @id @default(autoincrement())
+  type           String
+  status         String
+  execution_date DateTime
+  owner          User     @relation(fields: [ownerId], references: [id]) // Relation to Version
+  ownerId        Int
+
+  version Test_Scenario[]
 }

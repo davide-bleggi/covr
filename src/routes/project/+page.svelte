@@ -9,14 +9,14 @@
 </script>
 
 <div class="flex flex-col w-full">
-	<div class="flex flex-row p-4  w-full justify-end">
+	<div class="flex flex-row p-4 w-full justify-end">
 		<ProjectDialog bind:open form={data.form}>
 		</ProjectDialog>
 		<Button onclick={()=>{open=true}}>
 			Crea Progetto
 		</Button>
 	</div>
-	<ul class="grid grid-cols-1 lg:grid-cols-3 2xl:grid-cols-5 gap-5 px-5">
+	<ul class="grid grid-cols-1 lg:grid-cols-3 gap-5 p-5">
 		{#each data.projects as project}
 			<li>
 				<ProjectItem project={project}>

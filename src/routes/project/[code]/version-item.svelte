@@ -19,6 +19,10 @@
 	let installationForm = { versionId: version.id };
 	let featureForm = { versionId: version.id };
 
+	let openItems: string[] = $state([version.features.length > 0?'features':'', version.installations.length > 0?'installations':'']);
+
+
+
 </script>
 
 <InstallationDialog
@@ -37,8 +41,8 @@
 
 <div class="w-full max-w-[700px] p-4">
 	<h4 class="text-xl font-bold w-full">{version.name}</h4>
-	<Accordion.Root class="w-full">
-		<Accordion.Item value="installation" class="w-full">
+	<Accordion.Root class="w-full" bind:value={openItems}>
+		<Accordion.Item value="installations" class="w-full">
 			<div class="flex flex-row w-full justify-between items-center gap-2">
 				<div class="flex flex-grow w-full">
 					<Accordion.Trigger class="flex border-b-0">Installazioni</Accordion.Trigger>
@@ -62,7 +66,7 @@
 			</Accordion.Content>
 		</Accordion.Item>
 
-		<Accordion.Item value="feature">
+		<Accordion.Item value="features" >
 			<div class="flex flex-row w-full justify-between items-center gap-2">
 				<div class="flex flex-grow w-full">
 					<Accordion.Trigger class="flex border-b-0">Features</Accordion.Trigger>
@@ -73,7 +77,7 @@
 					<Plus></Plus>
 				</Button>
 			</div>
-			<Accordion.Content>
+			<Accordion.Content >
 				<ul class="gap-2 flex flex-col">
 					{#each version.features as feature}
 						<li>
