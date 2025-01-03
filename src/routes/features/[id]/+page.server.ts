@@ -1,10 +1,9 @@
 import prisma from '$lib/prisma';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { requirementFormSchema } from './schema';
+import { requirementFormSchema, scenarioFormSchema } from './schema';
 import { type Actions, error, fail, type RequestEvent } from '@sveltejs/kit';
 import { featureFormSchema } from '../../project/[code]/schema';
-
 
 export async function load({ params }) {
 	const { id } = params;
@@ -38,6 +37,7 @@ export async function load({ params }) {
 
 	return {
 		requirementForm: await superValidate(requirementFormData, zod(requirementFormSchema), {errors: false}),
+		scenarioForm: await superValidate(zod(scenarioFormSchema), {errors: false}),
 		feature: feature
 	}
 }
@@ -80,6 +80,56 @@ export const actions: Actions={
 		const id = Number((await request.formData()).get('id'));
 		try {
 			await prisma.requirement.delete({ where: { id: id ?? null } });
+		} catch {
+			return fail(400);
+		}
+	},
+	saveScenario: async (event: RequestEvent) => {
+		const form = await superValidate(event, zod(scenarioFormSchema));
+		if(!form.data.id) {
+			try {
+				await prisma.scenario.create({ data: {
+					requirementId: form.data.requirementId,
+						name: form.data.name,
+						scenario: JSON.stringify(form.data.scenario),
+						id: undefined }
+				});
+			} catch (err: any) {
+				console.log(err);
+				// Make sure to return the form with the error
+				if (err.code === 'P2002') {
+					return setError(form, 'name', 'nome già in uso');
+				}
+				return fail(400, { form });
+			}
+		}else{
+			try {
+				await prisma.scenario.update({
+					data: {
+						requirementId: form.data.requirementId,
+						name: form.data.name,
+						scenario: JSON.stringify(form.data.scenario),
+						id: undefined } ,
+					where: { id: form.data.id }
+				});
+			} catch (err: any) {
+				console.log(err);
+				// Make sure to return the form with the error
+				if (err.code === 'P2002') {
+					return setError(form, 'name', 'nome già in uso');
+				}
+				return fail(400, { form });
+			}
+		}
+
+		return {
+			form
+		};
+	},
+	deleteScenario: async ({ request }) => {
+		const id = Number((await request.formData()).get('id'));
+		try {
+			await prisma.scenario.delete({ where: { id: id ?? null } });
 		} catch {
 			return fail(400);
 		}

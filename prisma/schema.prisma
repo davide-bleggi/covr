@@ -91,27 +91,16 @@ model Requirement {
 }
 
 model Scenario {
-  id          Int    @id @default(autoincrement())
-  name        String
-  description String
-  status      String
-  priority    String
+  id       Int    @id @default(autoincrement())
+  name     String
+  scenario String
 
   requirement   Requirement @relation(fields: [requirementId], references: [id]) // Relation to Version
   requirementId Int
 
-  tests Test_Scenario[]
+  tests Test[]
 
   @@unique([name, requirementId])
-}
-
-model Test_Scenario {
-  scenario   Scenario @relation(fields: [scenarioId], references: [id]) // Relation to Version
-  scenarioId Int
-  test       Test     @relation(fields: [testId], references: [id]) // Relation to Version
-  testId     Int
-
-  @@id([scenarioId, testId])
 }
 
 model Test {
@@ -122,5 +111,5 @@ model Test {
   owner          User     @relation(fields: [ownerId], references: [id]) // Relation to Version
   ownerId        Int
 
-  version Test_Scenario[]
+  scenarios Scenario[]
 }

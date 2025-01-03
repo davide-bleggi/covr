@@ -5,7 +5,6 @@
 	import { ProjectDialog } from '../index';
 	import type { PageData } from './$types.js';
 	import { VersionDialog, VersionItem } from './index';
-	import { tick } from 'svelte';
 
 	let { data } = $props();
 	let openProjectDialog = $state(false);

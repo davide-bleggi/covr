@@ -5,26 +5,40 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Accordion from '$lib/components/ui/accordion/index';
 	import { priorityLabels, statusLabels } from './schema.js';
-	import { AccordionTrigger } from '$lib/components/ui/accordion/index.js';
 	import { RequirementDialog } from './index';
+	import { ScenarioDialog } from './index.js';
+	import * as Table from '$lib/components/ui/table/index.js';
+	import { getContext } from 'svelte';
 
-	let { requirement = $bindable(), requirementForm  }: {
+	const sidePanelStore = getContext('sidePanelStore');
+
+	let { requirement = $bindable(), requirementForm, scenarioForm }: {
 		requirementForm: any,
+		scenarioForm: any,
 		requirement: (Requirement & { scenarios: Scenario[] })
 	} = $props();
 
-	let openScenarios = $state(requirement.scenarios.length > 0 ? ['scenarios'] : undefined);
+	let openScenarios = $derived(requirement.scenarios.length > 0 ? ['scenarios'] : undefined);
 
-	let currentRequirementStatus = $derived(statusLabels.find((item)=>requirement.status === item.value))
-	let currentRequirementPriority = $derived(priorityLabels.find((item)=>requirement.priority === item.value))
+	let currentRequirementStatus = $derived(statusLabels.find((item) => requirement.status === item.value));
+	let currentRequirementPriority = $derived(priorityLabels.find((item) => requirement.priority === item.value));
 
-	let openRequirementDialog = $state(false)
+	let openRequirementDialog = $state(false);
+	let openScenarioDialog = $state(false);
+
+	let newScenarioForm = $state({ ...scenarioForm, requirementId: requirement.id });
+
 </script>
 
 <RequirementDialog
 	bind:open={openRequirementDialog}
 	bind:propFormData={requirementForm}
 	formId={`edit-requirement-form-${requirement.id}`}
+/>
+<ScenarioDialog
+	bind:open={openScenarioDialog}
+	bind:propFormData={newScenarioForm}
+	formId={`new-scenario-form-${requirement.id}`}
 />
 
 <div class="border rounded-lg p-4 shadow-sm">
@@ -62,25 +76,43 @@
 		</div>
 	</div>
 
-	<Accordion.Root class="w-full" bind:value={openScenarios}>
+	<Accordion.Root class="w-full" value={openScenarios}>
 		<Accordion.Item value="scenarios" class="w-full">
 			<div class="flex flex-row w-full justify-between items-center gap-2">
 				<div class="flex flex-grow w-full">
 					<Accordion.Trigger class="flex border-b-0">Scenari</Accordion.Trigger>
 				</div>
-				<Button variant="outline" size="icon" onclick={()=>{}}>
+				<Button variant="outline" size="icon" onclick={()=>{
+					openScenarioDialog=true
+				}}>
 					<Plus></Plus>
 				</Button>
 			</div>
 
 			<Accordion.Content>
-				<ul class="gap-2 flex flex-col">
-					{#each requirement.scenarios as scenario}
-						<li>
-							{scenario.name}
-						</li>
-					{/each}
-				</ul>
+				<div class="border rounded-lg">
+				<Table.Root>
+					<!--					<Table.Caption>A list of your recent invoices.</Table.Caption>-->
+					<Table.Header>
+						<Table.Row>
+							<Table.Head class="w-[110px]">ID Scenario</Table.Head>
+							<Table.Head class="">Nome scenario</Table.Head>
+							<Table.Head class="w-[110px]">Covered</Table.Head>
+						</Table.Row>
+					</Table.Header>
+					<Table.Body>
+						{#each requirement.scenarios as scenario}
+							<Table.Row on:click={()=>{
+								console.log(scenario)
+								$sidePanelStore=scenario}} class="cursor-pointer">
+								<Table.Cell>SCN-{scenario.id}</Table.Cell>
+								<Table.Cell>{scenario.name}</Table.Cell>
+								<Table.Cell>---</Table.Cell>
+							</Table.Row>
+						{/each}
+					</Table.Body>
+				</Table.Root>
+				</div>
 			</Accordion.Content>
 		</Accordion.Item>
 	</Accordion.Root>

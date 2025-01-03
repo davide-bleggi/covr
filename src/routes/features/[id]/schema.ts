@@ -41,5 +41,17 @@ export const requirementFormSchema = z.object({
 	status: z.enum([statusLabels[0].value, statusLabels[1].value, statusLabels[2].value])
 });
 
+export const scenarioFormSchema = z.object({
+	requirementId: z.number(),
+	id: z.number().optional(),
+	name: z.string().min(2).max(100),
+	scenario:z.object({
+		given:z.string().min(2).max(1000).optional(),
+		when:z.string().min(2).max(1000).optional(),
+		then:z.string().min(2).max(1000).optional(),
+	}),
+});
+
 
 export type RequirementFormSchema = typeof requirementFormSchema;
+export type ScenarioFormSchema = typeof scenarioFormSchema;

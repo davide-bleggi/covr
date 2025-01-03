@@ -5,7 +5,9 @@
 	import { Button } from '$lib/components/ui/button';
 	import { RequirementDialog, RequirementItem } from './index.js';
 	import type { RequirementFormSchema } from './schema';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import SuperDebug, { type SuperValidated } from 'sveltekit-superforms';
+	import { writable } from 'svelte/store';
+	import { setContext } from 'svelte';
 
 	type FeatureWithDetails = Feature & {
 		requirements: (Requirement & { scenarios: Scenario[] })[],
@@ -15,12 +17,15 @@
 	let { data } = $props<{
 		data: {
 			feature: FeatureWithDetails,
-			requirementForm: any
+			requirementForm: any,
+			scenarioForm: any
 		}
 	}>();
 
 	let openRequirementDialog = $state(false);
 
+	const selectedScenario = writable(undefined);
+	setContext('sidePanelStore', selectedScenario);
 
 	let feature: FeatureWithDetails = $derived<typeof data.feature>(data.feature);
 </script>
@@ -51,7 +56,8 @@
 			<ul class="flex flex-col gap-2 py-5">
 				{#each feature.requirements as requirement }
 					<li>
-						<RequirementItem {requirement} requirementForm={data.requirementForm} />
+						<RequirementItem {requirement} requirementForm={data.requirementForm}
+														 scenarioForm={data.scenarioForm.data} />
 					</li>
 				{/each}
 			</ul>
@@ -61,7 +67,11 @@
 	<Resizable.Pane defaultSize={30}>
 		<div class="p-2 h-full">
 			<div class="flex h-full items-center justify-center p-6 rounded-md border">
-				<span class="text-sm opacity-80">Seleziona uno scenario</span>
+				{#if !$selectedScenario}
+					<span class="text-sm opacity-80">Seleziona uno scenario</span>
+				{:else }
+					<SuperDebug data={$selectedScenario} />
+				{/if}
 			</div>
 		</div>
 	</Resizable.Pane>
