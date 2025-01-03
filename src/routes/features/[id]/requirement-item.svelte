@@ -4,7 +4,7 @@
 	import { InstallationItem } from '../../project/[code]';
 	import { Button } from '$lib/components/ui/button';
 	import * as Accordion from '$lib/components/ui/accordion/index';
-	import { priorityLabels, statusLabels } from './schema.js';
+	import { priorityLabels, requirementStatusLabels } from './schema.js';
 	import { RequirementDialog } from './index';
 	import { ScenarioDialog } from './index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
@@ -20,7 +20,7 @@
 
 	let openScenarios = $derived(requirement.scenarios.length > 0 ? ['scenarios'] : ['']);
 
-	let currentRequirementStatus = $derived(statusLabels.find((item) => requirement.status === item.value));
+	let currentRequirementStatus = $derived(requirementStatusLabels.find((item) => requirement.status === item.value));
 	let currentRequirementPriority = $derived(priorityLabels.find((item) => requirement.priority === item.value));
 
 	let openRequirementDialog = $state(false);

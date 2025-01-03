@@ -1,9 +1,9 @@
 <script lang="ts">
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 
-	import type { Feature, ManualTest, Project, Requirement, Scenario, Test, Version } from '@prisma/client';
+	import type { Feature, ManualTest, Project, Requirement, Scenario, Version, User } from '@prisma/client';
 	import { Button } from '$lib/components/ui/button';
-	import { RequirementDialog, RequirementItem, ScenarioDialog } from './index.js';
+	import { ManualTestDialog, RequirementDialog, RequirementItem, ScenarioDialog } from './index';
 	import { setContext } from 'svelte';
 	import { Pencil } from 'lucide-svelte';
 	import type { ScenarioFormData } from './schema';
@@ -18,15 +18,17 @@
 		data: {
 			feature: FeatureWithDetails,
 			requirementForm: any,
-			scenarioForm: any
+			scenarioForm: any,
+			users: User[]
 		}
 	}>();
 
 	let openRequirementDialog = $state(false);
+	let openManualTestDialog = $state(false);
 	let openScenarioDialog = $state(false);
 
 	const sidePanelStore = $state<{
-		scenario: ScenarioFormData | undefined
+		scenario: ScenarioFormData & {manualTest?: ManualTest} | undefined
 	}>(
 		{
 			scenario: undefined
@@ -37,7 +39,7 @@
 	let feature: FeatureWithDetails = $derived<typeof data.feature>(data.feature);
 
 	// Now the effect will trigger when either scenarioId or allScenarios changes
-	const currentScenario: ScenarioFormData & {manualTest: ManualTest} = $derived.by(() => {
+	const currentScenario: ScenarioFormData & { manualTest: ManualTest } = $derived.by(() => {
 		const requirements = feature.requirements;
 		const scenarioId = sidePanelStore.scenario?.id;
 		const foundScenario = requirements.flatMap(req => req.scenarios).find(scenario => scenario.id === scenarioId);
@@ -57,6 +59,13 @@
 	bind:open={openScenarioDialog}
 	propFormData={sidePanelStore.scenario??{}}
 	formId={editScenarioFormId}
+/>
+
+<ManualTestDialog
+	bind:open={openManualTestDialog}
+	propFormData={sidePanelStore.scenario?.manualTest??{}}
+	users={data.users}
+	formId={`new-manualTest-form-${sidePanelStore?.scenario?.id}`}
 />
 
 <Resizable.PaneGroup
@@ -123,11 +132,20 @@
 					</div>
 					<h2 class="font-bold">Test manuale</h2>
 					{#if !currentScenario?.manualTest}
-						Nessun test manuale
+						<div class="flex flex-row justify-between items-center w-full">
+							<span>Nessun test manuale</span>
+							<Button size="icon" variant="outline" class=""
+											onclick={(e)=>{
+													openManualTestDialog=true
+											}}>
+								<Pencil></Pencil>
+							</Button>
+
+						</div>
 					{:else}
 						Test manuale presente
 					{/if}
-					<SuperDebug data={currentScenario}/>
+<!--					<SuperDebug data={currentScenario} />-->
 				{/if}
 			</div>
 		</div>

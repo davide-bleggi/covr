@@ -12,9 +12,6 @@
 		type ScenarioFormData, scenarioFormSchema,
 		type ScenarioFormSchema,
 	} from './schema';
-	import { getContext } from 'svelte';
-
-	const sidePanelStore: any = getContext('sidePanelStore');
 
 	let {
 		open = $bindable(false),
@@ -62,7 +59,7 @@
 			<Dialog.Description>
 			</Dialog.Description>
 		</Dialog.Header>
-		<SuperDebug data={$formData}></SuperDebug>
+<!--		<SuperDebug data={$formData}></SuperDebug>-->
 		<div class="grid gap-4 py-4">
 			<form method="POST" action='?/saveScenario' use:enhance id="saveScenarioForm">
 				<input hidden name="id" bind:value={$formData.id} />

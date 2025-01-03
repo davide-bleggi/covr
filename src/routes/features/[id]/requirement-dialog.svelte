@@ -8,7 +8,7 @@
 	import * as Select from '$lib/components/ui/select/index';
 	import { FormField } from '$lib/components/ui/form/index.js';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { priorityLabels, type RequirementFormSchema, requirementFormSchema, statusLabels } from './schema';
+	import { priorityLabels, type RequirementFormSchema, requirementFormSchema, requirementStatusLabels } from './schema';
 	import type { Customer } from '@prisma/client';
 
 	let {
@@ -102,10 +102,10 @@
 							<Select.Root type="single"
 													 bind:value={$formData.status}>
 								<Select.Trigger {...props}>
-									{statusLabels.find((item)=>$formData.status===item.value)?.label?? 'Seleziona un opzione'}
+									{requirementStatusLabels.find((item)=>$formData.status===item.value)?.label?? 'Seleziona un opzione'}
 								</Select.Trigger>
 								<Select.Content>
-									{#each statusLabels as option}
+									{#each requirementStatusLabels as option}
 										<Select.Item value={option.value}>{option.label}</Select.Item>
 									{/each}
 								</Select.Content>

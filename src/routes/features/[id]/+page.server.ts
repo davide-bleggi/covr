@@ -30,6 +30,8 @@ export async function load({ params }) {
 		}
 	});
 
+	const users = await prisma.user.findMany()
+
 	if (!feature) {
 		// Throw an error with a custom status and message
 		throw error(404, `La feature: '${id}' non esiste`);
@@ -43,7 +45,8 @@ export async function load({ params }) {
 	return {
 		requirementForm: await superValidate(requirementFormData, zod(requirementFormSchema), {errors: false}),
 		scenarioForm: await superValidate(zod(scenarioFormSchema), {errors: false}),
-		feature: feature
+		feature: feature,
+		users
 	}
 }
 
