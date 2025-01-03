@@ -78,9 +78,11 @@ export const actions: Actions={
 	},
 	deleteRequirement: async ({ request }) => {
 		const id = Number((await request.formData()).get('id'));
+		console.log('key to delete: ', id)
 		try {
 			await prisma.requirement.delete({ where: { id: id ?? null } });
-		} catch {
+		} catch(error) {
+			console.log(error)
 			return fail(400);
 		}
 	},
@@ -123,16 +125,20 @@ export const actions: Actions={
 		}
 
 		return {
-			form
+			form,
+			actionType: 'create'
 		};
 	},
-	deleteScenario: async ({ request }) => {
-		const id = Number((await request.formData()).get('id'));
+	deleteScenario: async (event: RequestEvent) => {
+		const form = await superValidate(event, zod(scenarioFormSchema));
 		try {
-			await prisma.scenario.delete({ where: { id: id ?? null } });
-		} catch {
-			return fail(400);
+			await prisma.scenario.delete({ where: { id: form.data.id ?? null } });
+		} catch(error) {
+			console.log(error)
+			return fail(400, {form});
 		}
+
+		return {form, actionType: 'delete'}
 	},
 }
 

@@ -55,3 +55,4 @@ export const scenarioFormSchema = z.object({
 
 export type RequirementFormSchema = typeof requirementFormSchema;
 export type ScenarioFormSchema = typeof scenarioFormSchema;
+export type ScenarioFormData = z.infer<typeof scenarioFormSchema>;

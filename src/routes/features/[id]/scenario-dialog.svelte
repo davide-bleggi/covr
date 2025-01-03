@@ -9,13 +9,12 @@
 	import { FormField } from '$lib/components/ui/form/index.js';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import {
-		priorityLabels,
-		type RequirementFormSchema,
-		requirementFormSchema, scenarioFormSchema,
+		type ScenarioFormData, scenarioFormSchema,
 		type ScenarioFormSchema,
-		statusLabels
 	} from './schema';
-	import type { Customer } from '@prisma/client';
+	import { getContext } from 'svelte';
+
+	const sidePanelStore: any = getContext('sidePanelStore');
 
 	let {
 		open = $bindable(false),
@@ -23,7 +22,7 @@
 		formId
 	}: {
 		open: boolean,
-		propFormData: any;
+		propFormData: ScenarioFormData;
 		formId: string
 	} = $props();
 
@@ -35,6 +34,9 @@
 			if (result.type === 'failure' || result.type === 'error') {
 				console.log('Form submission failed:', result);
 			} else {
+				if(result.data.actionType === 'create'){
+					reset()
+				}
 				open = false;
 			}
 		},
@@ -43,9 +45,10 @@
 		}
 	}));
 
-	const { form: formData, enhance, errors } = form;
+	const { form: formData, enhance, errors, reset } = form;
 
 	$effect(() => {
+		form.id = formId
 		$formData = propFormData;
 	});
 
@@ -55,11 +58,12 @@
 	<Dialog.Content class="sm:max-w-[425px]  ">
 
 		<Dialog.Header>
-			<Dialog.Title>Aggiungi Requisito</Dialog.Title>
+			<Dialog.Title>Gestione Scenario</Dialog.Title>
 			<Dialog.Description>
 			</Dialog.Description>
 		</Dialog.Header>
 
+		{JSON.stringify(form.id)}
 	<SuperDebug data={$formData}></SuperDebug>
 		<div class="grid gap-4 py-4">
 			<form method="POST" action='?/saveScenario' use:enhance id="saveScenarioForm">
@@ -74,6 +78,7 @@
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
+				{#if $formData.scenario}
 				<FormField {form} name="scenario.given">
 					<Form.Control>
 						{#snippet children({ props })}
@@ -101,6 +106,7 @@
 					</Form.Control>
 					<Form.FieldErrors />
 				</FormField>
+					{/if}
 			</form>
 
 		</div>
@@ -113,6 +119,7 @@
 							type="submit"
 						>
 							<input type="hidden" name="id" value={$formData.id } />
+							{$formData.id}
 							Rimuovi
 						</Button>
 					</form>

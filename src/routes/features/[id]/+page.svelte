@@ -3,11 +3,10 @@
 
 	import type { Feature, Project, Requirement, Scenario, Version } from '@prisma/client';
 	import { Button } from '$lib/components/ui/button';
-	import { RequirementDialog, RequirementItem } from './index.js';
-	import type { RequirementFormSchema } from './schema';
-	import SuperDebug, { type SuperValidated } from 'sveltekit-superforms';
-	import { writable } from 'svelte/store';
+	import { RequirementDialog, RequirementItem, ScenarioDialog } from './index.js';
 	import { setContext } from 'svelte';
+	import { Pencil } from 'lucide-svelte';
+	import type { ScenarioFormData } from './schema';
 
 	type FeatureWithDetails = Feature & {
 		requirements: (Requirement & { scenarios: Scenario[] })[],
@@ -23,16 +22,35 @@
 	}>();
 
 	let openRequirementDialog = $state(false);
+	let openScenarioDialog = $state(false);
 
-	const selectedScenario = writable(undefined);
-	setContext('sidePanelStore', selectedScenario);
+	const sidePanelStore = $state<{
+		scenario: ScenarioFormData | undefined
+	}>(
+		{
+			scenario: undefined,
+		}
+	);
+	setContext('sidePanelStore', sidePanelStore);
 
 	let feature: FeatureWithDetails = $derived<typeof data.feature>(data.feature);
+
+	// Now the effect will trigger when either scenarioId or allScenarios changes
+	const  currentScenario = $derived(feature.requirements.flatMap(req => req.scenarios).find((scenario)=> scenario.id===sidePanelStore.scenario?.id));
+
+	const editScenarioFormId = $derived(`edit-scenario-form-${sidePanelStore.scenario?.id ?? ''}`);
+
 </script>
 <RequirementDialog
 	bind:open={openRequirementDialog}
 	propFormData={data.requirementForm.data}
 	formId={`new-requirement-form-${feature.id}`}
+/>
+
+<ScenarioDialog
+	bind:open={openScenarioDialog}
+	propFormData={sidePanelStore.scenario??{}}
+	formId={editScenarioFormId}
 />
 
 <Resizable.PaneGroup
@@ -65,12 +83,25 @@
 	</Resizable.Pane>
 	<Resizable.Handle />
 	<Resizable.Pane defaultSize={30}>
-		<div class="p-2 h-full">
-			<div class="flex h-full items-center justify-center p-6 rounded-md border">
-				{#if !$selectedScenario}
-					<span class="text-sm opacity-80">Seleziona uno scenario</span>
+		<div class="h-full p-4">
+			<div class="h-full p-4 rounded-md border">
+				{#if !currentScenario}
+					<div class="flex h-full items-center justify-center ">
+						<span class="text-sm opacity-80">Seleziona uno scenario</span>
+					</div>
 				{:else }
-					<SuperDebug data={$selectedScenario} />
+					<div class="flex flex-row w-full items-stretch">
+						<h2 class="font-bold flex-1">
+							{currentScenario.name}
+						</h2>
+						<Button size="icon" variant="outline" class=""
+										onclick={(e)=>{
+						openScenarioDialog=true
+					}}>
+							<Pencil></Pencil>
+						</Button>
+					</div>
+
 				{/if}
 			</div>
 		</div>

@@ -10,7 +10,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { getContext } from 'svelte';
 
-	const sidePanelStore = getContext('sidePanelStore');
+	const sidePanelStore: any = getContext('sidePanelStore');
 
 	let { requirement = $bindable(), requirementForm, scenarioForm }: {
 		requirementForm: any,
@@ -18,7 +18,7 @@
 		requirement: (Requirement & { scenarios: Scenario[] })
 	} = $props();
 
-	let openScenarios = $derived(requirement.scenarios.length > 0 ? ['scenarios'] : undefined);
+	let openScenarios = $derived(requirement.scenarios.length > 0 ? ['scenarios'] : ['']);
 
 	let currentRequirementStatus = $derived(statusLabels.find((item) => requirement.status === item.value));
 	let currentRequirementPriority = $derived(priorityLabels.find((item) => requirement.priority === item.value));
@@ -91,30 +91,31 @@
 
 			<Accordion.Content>
 				<div class="border rounded-lg">
-				<Table.Root>
-					<!--					<Table.Caption>A list of your recent invoices.</Table.Caption>-->
-					<Table.Header>
-						<Table.Row>
-							<Table.Head class="w-[110px]">ID Scenario</Table.Head>
-							<Table.Head class="">Nome scenario</Table.Head>
-							<Table.Head class="w-[110px]">Covered</Table.Head>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{#each requirement.scenarios as scenario}
-							<Table.Row on:click={()=>{
-								console.log(scenario)
-								$sidePanelStore=scenario}} class="cursor-pointer">
-								<Table.Cell>SCN-{scenario.id}</Table.Cell>
-								<Table.Cell>{scenario.name}</Table.Cell>
-								<Table.Cell>---</Table.Cell>
+					<Table.Root>
+						<!--					<Table.Caption>A list of your recent invoices.</Table.Caption>-->
+						<Table.Header>
+							<Table.Row>
+								<Table.Head class="w-[110px]">ID Scenario</Table.Head>
+								<Table.Head class="">Nome scenario</Table.Head>
+								<Table.Head class="w-[110px]">Covered</Table.Head>
 							</Table.Row>
-						{/each}
-					</Table.Body>
-				</Table.Root>
+						</Table.Header>
+						<Table.Body>
+							{#each requirement.scenarios as scenario}
+								<Table.Row on:click={()=>{
+									console.log(scenario)
+									sidePanelStore.scenario = {...scenario, scenario: JSON.parse(scenario.scenario)}
+								}}
+													 class="cursor-pointer">
+									<Table.Cell>SCN-{scenario.id}</Table.Cell>
+									<Table.Cell>{scenario.name}</Table.Cell>
+									<Table.Cell>---</Table.Cell>
+								</Table.Row>
+							{/each}
+						</Table.Body>
+					</Table.Root>
 				</div>
 			</Accordion.Content>
 		</Accordion.Item>
 	</Accordion.Root>
 </div>
-
