@@ -62,9 +62,7 @@
 			<Dialog.Description>
 			</Dialog.Description>
 		</Dialog.Header>
-
-		{JSON.stringify(form.id)}
-	<SuperDebug data={$formData}></SuperDebug>
+		<SuperDebug data={$formData}></SuperDebug>
 		<div class="grid gap-4 py-4">
 			<form method="POST" action='?/saveScenario' use:enhance id="saveScenarioForm">
 				<input hidden name="id" bind:value={$formData.id} />

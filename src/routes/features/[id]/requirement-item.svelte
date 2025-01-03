@@ -75,7 +75,10 @@
 			</Button>
 		</div>
 	</div>
-
+	<div class="flex flex-col py-2">
+		<span class="opacity-70 text-sm">Descrizione</span>
+		<span>{requirement.description}</span>
+	</div>
 	<Accordion.Root class="w-full" value={openScenarios}>
 		<Accordion.Item value="scenarios" class="w-full">
 			<div class="flex flex-row w-full justify-between items-center gap-2">
@@ -105,6 +108,7 @@
 								<Table.Row on:click={()=>{
 									console.log(scenario)
 									sidePanelStore.scenario = {...scenario, scenario: JSON.parse(scenario.scenario)}
+									console.log(	sidePanelStore.scenario)
 								}}
 													 class="cursor-pointer">
 									<Table.Cell>SCN-{scenario.id}</Table.Cell>

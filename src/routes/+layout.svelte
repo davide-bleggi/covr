@@ -6,9 +6,9 @@
 	let { children } = $props();
 
 </script>
-<div class="h-screen flex flex-col">
+<div class="h-screen flex flex-col overflow-hidden">
 	<div class="w-full flex flex-row justify-center p-4 border-b">
-		<div class="flex w-full flex-row justify-between max-w-[1200px] px-5">
+		<div class="flex w-full flex-row justify-between max-w-[1600px] px-5">
 			<Button href="/">
 				COVR
 			</Button>
@@ -25,8 +25,8 @@
 			</div>
 		</div>
 	</div>
-	<div class="flex h-full justify-center">
-		<div class="flex flex-1 h-full w-full justify-center max-w-[1200px]">
+	<div class="flex flex-col flex-1 overflow-auto justify-center items-center">
+		<div class="flex flex-1 w-full justify-center overflow-y-auto max-w-[1600px]">
 			{@render children()}
 		</div>
 	</div>

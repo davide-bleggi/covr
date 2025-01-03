@@ -13,7 +13,7 @@ model User {
   email     String   @unique
   createdAt DateTime @default(now())
 
-  tests Test[]
+  tests ManualTest[]
 }
 
 model Project {
@@ -98,18 +98,30 @@ model Scenario {
   requirement   Requirement @relation(fields: [requirementId], references: [id]) // Relation to Version
   requirementId Int
 
-  tests Test[]
+  automaticTests AutomaticTest[]
+
+  manualTest ManualTest?
 
   @@unique([name, requirementId])
 }
 
-model Test {
+model ManualTest {
   id             Int      @id @default(autoincrement())
-  type           String
+  name           String
   status         String
   execution_date DateTime
   owner          User     @relation(fields: [ownerId], references: [id]) // Relation to Version
   ownerId        Int
+
+  scenario   Scenario @relation(fields: [scenarioId], references: [id])
+  scenarioId Int      @unique
+}
+
+model AutomaticTest {
+  id             Int      @id @default(autoincrement())
+  name           String
+  status         String
+  execution_date DateTime
 
   scenarios Scenario[]
 }

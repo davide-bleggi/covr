@@ -1,15 +1,16 @@
 <script lang="ts">
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 
-	import type { Feature, Project, Requirement, Scenario, Version } from '@prisma/client';
+	import type { Feature, ManualTest, Project, Requirement, Scenario, Test, Version } from '@prisma/client';
 	import { Button } from '$lib/components/ui/button';
 	import { RequirementDialog, RequirementItem, ScenarioDialog } from './index.js';
 	import { setContext } from 'svelte';
 	import { Pencil } from 'lucide-svelte';
 	import type { ScenarioFormData } from './schema';
+	import SuperDebug from 'sveltekit-superforms';
 
 	type FeatureWithDetails = Feature & {
-		requirements: (Requirement & { scenarios: Scenario[] })[],
+		requirements: (Requirement & { scenarios: (Scenario & Test[])[] })[],
 		version: Version & { project: Project }
 	};
 
@@ -28,7 +29,7 @@
 		scenario: ScenarioFormData | undefined
 	}>(
 		{
-			scenario: undefined,
+			scenario: undefined
 		}
 	);
 	setContext('sidePanelStore', sidePanelStore);
@@ -36,7 +37,12 @@
 	let feature: FeatureWithDetails = $derived<typeof data.feature>(data.feature);
 
 	// Now the effect will trigger when either scenarioId or allScenarios changes
-	const  currentScenario = $derived(feature.requirements.flatMap(req => req.scenarios).find((scenario)=> scenario.id===sidePanelStore.scenario?.id));
+	const currentScenario: ScenarioFormData & {manualTest: ManualTest} = $derived.by(() => {
+		const requirements = feature.requirements;
+		const scenarioId = sidePanelStore.scenario?.id;
+		const foundScenario = requirements.flatMap(req => req.scenarios).find(scenario => scenario.id === scenarioId);
+		return foundScenario ? { ...foundScenario, scenario: JSON.parse(foundScenario.scenario) } : undefined;
+	});
 
 	const editScenarioFormId = $derived(`edit-scenario-form-${sidePanelStore.scenario?.id ?? ''}`);
 
@@ -55,10 +61,10 @@
 
 <Resizable.PaneGroup
 	direction="horizontal"
-	class="min-h-[200px] w-full rounded-lg"
+	class="min-h-[200px] w-full rounded-lg flex-1 flex flex-col"
 >
 	<Resizable.Pane defaultSize={70}>
-		<div class="p-5">
+		<div class="p-5 flex flex-col h-full overflow-hidden">
 			<div class="flex flex-row">
 				<div class="flex flex-col w-full ">
 					<h4>{feature.version.project.name.toUpperCase()} - {feature.version.name}</h4>
@@ -71,7 +77,7 @@
 					</Button>
 				</div>
 			</div>
-			<ul class="flex flex-col gap-2 py-5">
+			<ul class="flex h-full flex-col gap-2 py-5 overflow-y-auto">
 				{#each feature.requirements as requirement }
 					<li>
 						<RequirementItem {requirement} requirementForm={data.requirementForm}
@@ -101,7 +107,27 @@
 							<Pencil></Pencil>
 						</Button>
 					</div>
-
+					<div class="flex flex-col gap-2 py-4">
+						<div class="w-full p-2 rounded bg-gray-100">
+							<h2 class="font-bold text-sm opacity-50">GIVEN</h2>
+							{currentScenario.scenario?.given}
+						</div>
+						<div class="w-full p-2 rounded bg-gray-100">
+							<h2 class="font-bold text-sm opacity-50">WHEN</h2>
+							{currentScenario.scenario?.when}
+						</div>
+						<div class="w-full p-2 rounded bg-gray-100">
+							<h2 class="font-bold text-sm opacity-50">THEN</h2>
+							{currentScenario.scenario?.then}
+						</div>
+					</div>
+					<h2 class="font-bold">Test manuale</h2>
+					{#if !currentScenario?.manualTest}
+						Nessun test manuale
+					{:else}
+						Test manuale presente
+					{/if}
+					<SuperDebug data={currentScenario}/>
 				{/if}
 			</div>
 		</div>

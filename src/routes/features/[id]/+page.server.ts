@@ -19,7 +19,12 @@ export async function load({ params }) {
 			},
 			requirements: {
 				include: {
-					scenarios: true
+					scenarios: {
+							include: {
+								automaticTests: true,
+								manualTest: true
+						},
+					}
 				}
 			}
 		}
