@@ -11,8 +11,9 @@
 	import type { Customer, User } from '@prisma/client';
 	import {
 		manualTestFormSchema,
-		type ManualTestFormSchema,
+		type ManualTestFormSchema, priorityLabels, testStatusLabels
 	} from './schema';
+	import { DatePicker } from '$lib/components/wrapper';
 
 	let {
 		open = $bindable(false),
@@ -43,10 +44,10 @@
 
 	const { form: formData, enhance, errors } = form;
 
-	$effect(()=>{
+	$effect(() => {
 		form.id = formId;
-		$formData = propFormData
-	})
+		$formData = propFormData;
+	});
 
 </script>
 
@@ -59,10 +60,11 @@
 				inserire i dati di esecuzione del test
 			</Dialog.Description>
 		</Dialog.Header>
+		<SuperDebug data={$formData} />
 		<div class="grid gap-4 py-4">
 			<form method="POST" action='?/saveManualTest' use:enhance id="saveManualTestForm">
 				<input hidden name="id" bind:value={$formData.id} />
-				<input hidden name="featureId" bind:value={$formData.scnearioId} />
+				<input hidden name="scenarioId" bind:value={$formData.scenarioId} />
 				<Form.Field {form} name="ownerId">
 					<Form.Control>
 						{#snippet children({ props })}
@@ -83,48 +85,47 @@
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-<!--				<Form.Field {form} name="name">-->
-<!--					<Form.Control>-->
-<!--						{#snippet children({ props })}-->
-<!--							<Form.Label>Titolo requisito</Form.Label>-->
-<!--							<Input {...props} type="text" bind:value={$formData.name}/>-->
-<!--						{/snippet}-->
-<!--					</Form.Control>-->
-<!--					<Form.FieldErrors />-->
-<!--				</Form.Field>-->
-<!--				<FormField {form} name="description">-->
-<!--					<Form.Control>-->
-<!--						{#snippet children({ props })}-->
-<!--							<Form.Label>Descrizione</Form.Label>-->
-<!--							<Textarea {...props} bind:value={$formData.description}/>-->
-<!--						{/snippet}-->
-<!--					</Form.Control>-->
-<!--					<Form.FieldErrors />-->
-<!--				</FormField>-->
-<!--				<Form.Field {form} name="priority">-->
-
-<!--					<Form.FieldErrors />-->
-<!--				</Form.Field>-->
-<!--				<Form.Field {form} name="status">-->
-<!--					<Form.Control>-->
-<!--						{#snippet children({ props })}-->
-<!--							<input hidden value={$formData.status} name={props.name} />-->
-<!--							<Form.Label>Stato</Form.Label>-->
-<!--							<Select.Root type="single"-->
-<!--													 bind:value={$formData.status}>-->
-<!--								<Select.Trigger {...props}>-->
-<!--									{requirementStatusLabels.find((item)=>$formData.status===item.value)?.label?? 'Seleziona un opzione'}-->
-<!--								</Select.Trigger>-->
-<!--								<Select.Content>-->
-<!--									{#each requirementStatusLabels as option}-->
-<!--										<Select.Item value={option.value}>{option.label}</Select.Item>-->
-<!--									{/each}-->
-<!--								</Select.Content>-->
-<!--							</Select.Root>-->
-<!--						{/snippet}-->
-<!--					</Form.Control>-->
-<!--					<Form.FieldErrors />-->
-<!--				</Form.Field>-->
+				<FormField {form} name="executionDate">
+					<Form.Control>
+						{#snippet children({ props })}
+							<input hidden value={$formData.executionDate} name={props.name} />
+							<Form.Label>Data di esecuzione</Form.Label>
+							<DatePicker bind:date={$formData.executionDate}></DatePicker>
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</FormField>
+				<Form.Field {form} name="status">
+					<Form.Control>
+						{#snippet children({ props })}
+							<input hidden value={$formData.status} name={props.name} />
+							<Form.Label>Priorità</Form.Label>
+							<Select.Root type="single"
+													 bind:value={$formData.status}>
+								<Select.Trigger {...props}>
+									{testStatusLabels.find((item)=>$formData.status===item.value)?.label?? 'Seleziona un opzione'}
+								</Select.Trigger>
+								<Select.Content>
+									{#each testStatusLabels as option}
+										<Select.Item value={option.value}>{option.label}</Select.Item>
+									{/each}
+								</Select.Content>
+							</Select.Root>
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<FormField {form} name="notes">
+					<Form.Control>
+						{#snippet children({ props })}
+							<input hidden value={$formData.notes} name={props.name} />
+							<Form.Label>Note</Form.Label>
+							<Textarea bind:value={$formData.notes}></Textarea>
+							<Form.Description>Aggiungi descrizione dei problemi riscontrati</Form.Description>
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</FormField>
 			</form>
 
 		</div>
@@ -141,7 +142,7 @@
 						</Button>
 					</form>
 				{/if}
-				<Button form="saveRequirementForm" type="submit">Salva
+				<Button form="saveManualTestForm" type="submit">Salva
 				</Button>
 			</div>
 		</Dialog.Footer>

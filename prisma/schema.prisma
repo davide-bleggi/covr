@@ -106,22 +106,22 @@ model Scenario {
 }
 
 model ManualTest {
-  id             Int      @id @default(autoincrement())
-  name           String
-  status         String
-  execution_date DateTime
-  owner          User     @relation(fields: [ownerId], references: [id]) // Relation to Version
-  ownerId        Int
+  id            Int      @id @default(autoincrement())
+  status        String
+  executionDate DateTime
+  owner         User     @relation(fields: [ownerId], references: [id]) // Relation to Version
+  ownerId       Int
+  notes         String
 
   scenario   Scenario @relation(fields: [scenarioId], references: [id])
   scenarioId Int      @unique
 }
 
 model AutomaticTest {
-  id             Int      @id @default(autoincrement())
-  name           String
-  status         String
-  execution_date DateTime
+  id            Int      @id @default(autoincrement())
+  name          String
+  status        String
+  executionDate DateTime
 
   scenarios Scenario[]
 }

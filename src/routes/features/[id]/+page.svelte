@@ -1,17 +1,42 @@
 <script lang="ts">
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 
-	import type { Feature, ManualTest, Project, Requirement, Scenario, Version, User } from '@prisma/client';
+	import type {
+		Feature,
+		ManualTest,
+		Project,
+		Requirement,
+		Scenario,
+		Version,
+		User,
+		AutomaticTest
+	} from '@prisma/client';
 	import { Button } from '$lib/components/ui/button';
 	import { ManualTestDialog, RequirementDialog, RequirementItem, ScenarioDialog } from './index';
 	import { setContext } from 'svelte';
 	import { Pencil } from 'lucide-svelte';
-	import type { ScenarioFormData } from './schema';
+	import { type ScenarioFormData, testStatusLabels } from './schema';
 	import SuperDebug from 'sveltekit-superforms';
+	import { format } from 'date-fns';
 
 	type FeatureWithDetails = Feature & {
-		requirements: (Requirement & { scenarios: (Scenario & Test[])[] })[],
+		requirements: (Requirement & { scenarios: (Scenario & (ManualTest & { owner: User } & {automaticTests: AutomaticTest[]}))[] })[],
 		version: Version & { project: Project }
+	};
+
+	const colorClasses = {
+		NOT_PASS: {
+			text: 'text-red-500',
+			bg: 'bg-red-100'
+		},
+		PASS: {
+			text: 'text-green-500',
+			bg: 'bg-green-100'
+		},
+		TO_TEST:{
+			text: '',
+			bg: ''
+		}
 	};
 
 	let { data } = $props<{
@@ -24,11 +49,12 @@
 	}>();
 
 	let openRequirementDialog = $state(false);
-	let openManualTestDialog = $state(false);
+	let openNewManualTestDialog = $state(false);
+	let openEditManualTestDialog = $state(false);
 	let openScenarioDialog = $state(false);
 
 	const sidePanelStore = $state<{
-		scenario: ScenarioFormData & {manualTest?: ManualTest} | undefined
+		scenario: ScenarioFormData & { manualTest?: ManualTest } & {automaticTests: AutomaticTest[]}| undefined
 	}>(
 		{
 			scenario: undefined
@@ -39,7 +65,10 @@
 	let feature: FeatureWithDetails = $derived<typeof data.feature>(data.feature);
 
 	// Now the effect will trigger when either scenarioId or allScenarios changes
-	const currentScenario: ScenarioFormData & { manualTest: ManualTest } = $derived.by(() => {
+	const currentScenario: ScenarioFormData & {
+		manualTest: (ManualTest & { owner: User }),
+		automaticTests: AutomaticTest[],
+	} | undefined = $derived.by(() => {
 		const requirements = feature.requirements;
 		const scenarioId = sidePanelStore.scenario?.id;
 		const foundScenario = requirements.flatMap(req => req.scenarios).find(scenario => scenario.id === scenarioId);
@@ -57,16 +86,29 @@
 
 <ScenarioDialog
 	bind:open={openScenarioDialog}
-	propFormData={sidePanelStore.scenario??{}}
+	propFormData={currentScenario??{}}
 	formId={editScenarioFormId}
 />
 
 <ManualTestDialog
-	bind:open={openManualTestDialog}
-	propFormData={sidePanelStore.scenario?.manualTest??{}}
+	bind:open={openNewManualTestDialog}
+	propFormData={{
+		executionDate:  new Date()
+	}}
 	users={data.users}
-	formId={`new-manualTest-form-${sidePanelStore?.scenario?.id}`}
+	formId={`new-manualTest-form-${currentScenario?.id}`}
 />
+
+<ManualTestDialog
+	bind:open={openEditManualTestDialog}
+	propFormData={currentScenario?.manualTest??{
+		scenarioId: currentScenario?.id ?? null,
+		executionDate:  new Date()
+	}}
+	users={data.users}
+	formId={`edit-manualTest-form-${currentScenario?.id}`}
+/>
+
 
 <Resizable.PaneGroup
 	direction="horizontal"
@@ -98,8 +140,9 @@
 	</Resizable.Pane>
 	<Resizable.Handle />
 	<Resizable.Pane defaultSize={30}>
-		<div class="h-full p-4">
-			<div class="h-full p-4 rounded-md border">
+		<div class="h-full p-4 ">
+			<div class="h-full p-4 rounded-md border overflow-y-auto">
+
 				{#if !currentScenario}
 					<div class="flex h-full items-center justify-center ">
 						<span class="text-sm opacity-80">Seleziona uno scenario</span>
@@ -117,35 +160,73 @@
 						</Button>
 					</div>
 					<div class="flex flex-col gap-2 py-4">
-						<div class="w-full p-2 rounded bg-gray-100">
+						<div class="w-full p-4 rounded bg-gray-100">
 							<h2 class="font-bold text-sm opacity-50">GIVEN</h2>
 							{currentScenario.scenario?.given}
 						</div>
-						<div class="w-full p-2 rounded bg-gray-100">
+						<div class="w-full p-4 rounded bg-gray-100">
 							<h2 class="font-bold text-sm opacity-50">WHEN</h2>
 							{currentScenario.scenario?.when}
 						</div>
-						<div class="w-full p-2 rounded bg-gray-100">
+						<div class="w-full p-4 rounded bg-gray-100">
 							<h2 class="font-bold text-sm opacity-50">THEN</h2>
 							{currentScenario.scenario?.then}
 						</div>
 					</div>
-					<h2 class="font-bold">Test manuale</h2>
-					{#if !currentScenario?.manualTest}
+					<h2 class="font-bold pb-2">Test manuale</h2>
+
+					{#if !(currentScenario && currentScenario.manualTest)}
 						<div class="flex flex-row justify-between items-center w-full">
 							<span>Nessun test manuale</span>
 							<Button size="icon" variant="outline" class=""
 											onclick={(e)=>{
-													openManualTestDialog=true
+													openNewManualTestDialog=true
 											}}>
 								<Pencil></Pencil>
 							</Button>
 
 						</div>
-					{:else}
-						Test manuale presente
+
+					{:else if (currentScenario)}
+
+						<div class={`rounded ${colorClasses[currentScenario.manualTest.status].bg} p-4`}>
+						<div class="flex flex-row items-stretch">
+							<div class="flex flex-col flex-1">
+								<span class="text-sm opacity-60">Assegnatario</span>
+								{currentScenario.manualTest.owner.name}
+							</div>
+							<div class="flex flex-col flex-1">
+								<span class="text-sm opacity-60">Data</span>
+								{format(currentScenario.manualTest.executionDate, 'dd/MM/yyyy')}
+							</div>
+							<div class={`flex flex-col text-lg font-bold flex-1 h-full items-center justify-center
+								${colorClasses[currentScenario.manualTest.status].text}`
+							}>
+								<span class="">
+								{testStatusLabels.find((item)=>item.value===currentScenario?.manualTest.status).label}
+									</span>
+							</div>
+							<Button size="icon" variant="outline" class=""
+											onclick={(e)=>{
+													openEditManualTestDialog=true
+											}}>
+								<Pencil></Pencil>
+							</Button>
+						</div>
+							<div class="flex flex-col flex-1">
+								<span class="text-sm opacity-60">Note</span>
+								{currentScenario.manualTest.notes}
+							</div>
+						</div>
+
 					{/if}
-<!--					<SuperDebug data={currentScenario} />-->
+					<h2 class="font-bold py-4">Test automatici</h2>
+					{#if currentScenario.automaticTests.length > 0}
+
+						{:else}
+							<span>Nessun test automatico abbinato</span>
+					{/if}
+					<SuperDebug data={currentScenario} />
 				{/if}
 			</div>
 		</div>

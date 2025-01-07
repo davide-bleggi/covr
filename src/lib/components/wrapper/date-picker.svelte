@@ -23,6 +23,7 @@
 	let value = $state<DateValue | undefined>();
 
 	$effect(() => {
+		console.log(date)
 		value = date ? parseDate(format(date, 'yyyy-MM-dd')) : undefined;
 	});
 
@@ -52,7 +53,7 @@
 			calendarLabel="Seleziona una data"
 			onValueChange={(v) => {
                 if (v) {
-                  date = v;
+                  date = new Date(Date.UTC(v.year, v.month - 1, v.day));
                 } else {
                   date = "";
                 }

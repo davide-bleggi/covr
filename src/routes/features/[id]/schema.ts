@@ -32,15 +32,18 @@ export const requirementStatusLabels = [{
 	}
 ] as const;
 
-export const testStatusLabels = [{
-	value: 'PASS',
-	label: 'PASS',
-	color: 'green-500'
-},
+export const testStatusLabels = [
 	{
-		value: 'NOT_ASS',
+		value: 'PASS',
+		label: 'PASS',
+	},
+	{
+		value: 'NOT_PASS',
 		label: 'NOT PASS',
-		color: 'red-500'
+	},
+	{
+		value: 'TO_TEST',
+		label: 'TO TEST'
 	}
 ] as const;
 
@@ -48,8 +51,8 @@ export const requirementFormSchema = z.object({
 	featureId: z.number(),
 	id: z.number().optional(),
 	name: z.string().min(2).max(100),
-	description: z.string().min(2).max(500).optional(),
-	priority: z.enum([priorityLabels[0].value, priorityLabels[1].value,priorityLabels[2].value]),
+	description: z.string().max(500).optional(),
+	priority: z.enum([priorityLabels[0].value, priorityLabels[1].value, priorityLabels[2].value]),
 	status: z.enum([requirementStatusLabels[0].value, requirementStatusLabels[1].value, requirementStatusLabels[2].value])
 });
 
@@ -57,19 +60,20 @@ export const scenarioFormSchema = z.object({
 	requirementId: z.number(),
 	id: z.number().optional(),
 	name: z.string().min(2).max(100),
-	scenario:z.object({
-		given:z.string().min(2).max(1000).optional(),
-		when:z.string().min(2).max(1000).optional(),
-		then:z.string().min(2).max(1000).optional(),
-	}),
+	scenario: z.object({
+		given: z.string().max(1000).optional(),
+		when: z.string().max(1000).optional(),
+		then: z.string().max(1000).optional()
+	})
 });
 
 export const manualTestFormSchema = z.object({
 	scenarioId: z.number(),
 	id: z.number().optional(),
 	ownerId: z.number(),
-	executionDate:z.date(),
-	status: z.enum([testStatusLabels[0].value, testStatusLabels[1].value])
+	executionDate: z.date(),
+	status: z.enum([testStatusLabels[0].value, testStatusLabels[1].value, testStatusLabels[2].value]),
+	notes: z.string().max(5000).optional()
 });
 
 export type ManualTestFormSchema = typeof manualTestFormSchema
