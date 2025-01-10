@@ -23,7 +23,6 @@
 	let value = $state<DateValue | undefined>();
 
 	$effect(() => {
-		console.log(date)
 		value = date ? parseDate(format(date, 'yyyy-MM-dd')) : undefined;
 	});
 
