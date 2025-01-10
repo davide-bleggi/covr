@@ -15,18 +15,17 @@
 
 	let {
 		open = $bindable(false),
-		propFormData = $bindable(),
-		formId
+		propFormData
 	}: {
 		open: boolean,
 		propFormData: ScenarioFormData;
 		formId: string
 	} = $props();
 
-	const form = $state(superForm<Infer<ScenarioFormSchema>>(propFormData, {
+	const form = superForm<Infer<ScenarioFormSchema>>(propFormData, {
 		validators: zodClient(scenarioFormSchema),
 		dataType: 'json',
-		id: formId,
+		id: propFormData.id?`edit-scenario-dialog-${propFormData.id}`:'new-scenario-dialog',
 		onResult: ({ result }) => {
 			if (result.type === 'failure' || result.type === 'error') {
 				console.log('Form submission failed:', result);
@@ -40,26 +39,24 @@
 		onUpdate: ({ form }) => {
 			$errors = form.errors;
 		}
-	}));
+	});
 
 	const { form: formData, enhance, errors, reset } = form;
 
 	$effect(() => {
-		form.id = formId
-		$formData = propFormData;
+		$formData = {...propFormData};
 	});
 
 </script>
 
 <Dialog.Root bind:open={open}>
 	<Dialog.Content class="sm:max-w-[425px]  ">
-
 		<Dialog.Header>
 			<Dialog.Title>Gestione Scenario</Dialog.Title>
 			<Dialog.Description>
 			</Dialog.Description>
 		</Dialog.Header>
-<!--		<SuperDebug data={$formData}></SuperDebug>-->
+		<SuperDebug data={$formData}></SuperDebug>
 		<div class="grid gap-4 py-4">
 			<form method="POST" action='?/saveScenario' use:enhance id="saveScenarioForm">
 				<input hidden name="id" bind:value={$formData.id} />
