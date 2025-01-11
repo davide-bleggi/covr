@@ -10,7 +10,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import {
 		type ScenarioFormData, scenarioFormSchema,
-		type ScenarioFormSchema,
+		type ScenarioFormSchema
 	} from './schema';
 
 	let {
@@ -22,15 +22,15 @@
 		formId: string
 	} = $props();
 
-	const form = superForm<Infer<ScenarioFormSchema>>(propFormData, {
+	const form = superForm<Infer<ScenarioFormSchema>>({...propFormData}, {
 		validators: zodClient(scenarioFormSchema),
 		dataType: 'json',
 		onResult: ({ result }) => {
 			if (result.type === 'failure' || result.type === 'error') {
 				console.log('Form submission failed:', result);
 			} else {
-				if(result.data.actionType === 'create'){
-					reset()
+				if (result.data.actionType === 'create') {
+					reset();
 				}
 				open = false;
 			}
@@ -40,13 +40,18 @@
 		}
 	});
 
-	const { form: formData, enhance, errors, reset, formId} = form;
+	const { form: formData, enhance, errors, reset, formId } = form;
+
 
 	$effect(() => {
-		console.log('formId prev: ', $formId)
-		$formId = propFormData.id?`edit-scenario-dialog-${propFormData.id}`:'new-scenario-dialog';
-		console.log('formId next: ', $formId);
-		$formData = {...propFormData};
+		if ($formId) {
+			if (propFormData.id) {
+				$formId = `edit-scenario-dialog-${propFormData.id}`;
+			} else {
+				$formId = 'new-scenario-dialog';
+			}
+		}
+		$formData = { ...propFormData };
 	});
 
 </script>
@@ -74,34 +79,34 @@
 					<Form.FieldErrors />
 				</Form.Field>
 				{#if $formData.scenario}
-				<FormField {form} name="scenario.given">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label>Given</Form.Label>
-							<Textarea {...props} bind:value={$formData.scenario.given} />
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors />
-				</FormField>
-				<FormField {form} name="scenario.when">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label>When</Form.Label>
-							<Textarea {...props} bind:value={$formData.scenario.when} />
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors />
-				</FormField>
-				<FormField {form} name="scenario.then">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label>Then</Form.Label>
-							<Textarea {...props} bind:value={$formData.scenario.then} />
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors />
-				</FormField>
-					{/if}
+					<FormField {form} name="scenario.given">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Given</Form.Label>
+								<Textarea {...props} bind:value={$formData.scenario.given} />
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</FormField>
+					<FormField {form} name="scenario.when">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>When</Form.Label>
+								<Textarea {...props} bind:value={$formData.scenario.when} />
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</FormField>
+					<FormField {form} name="scenario.then">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Then</Form.Label>
+								<Textarea {...props} bind:value={$formData.scenario.then} />
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</FormField>
+				{/if}
 			</form>
 
 		</div>
