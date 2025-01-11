@@ -25,7 +25,6 @@
 	const form = superForm<Infer<ScenarioFormSchema>>(propFormData, {
 		validators: zodClient(scenarioFormSchema),
 		dataType: 'json',
-		id: propFormData.id?`edit-scenario-dialog-${propFormData.id}`:'new-scenario-dialog',
 		onResult: ({ result }) => {
 			if (result.type === 'failure' || result.type === 'error') {
 				console.log('Form submission failed:', result);
@@ -41,9 +40,12 @@
 		}
 	});
 
-	const { form: formData, enhance, errors, reset } = form;
+	const { form: formData, enhance, errors, reset, formId} = form;
 
 	$effect(() => {
+		console.log('formId prev: ', $formId)
+		$formId = propFormData.id?`edit-scenario-dialog-${propFormData.id}`:'new-scenario-dialog';
+		console.log('formId next: ', $formId);
 		$formData = {...propFormData};
 	});
 
@@ -51,6 +53,7 @@
 
 <Dialog.Root bind:open={open}>
 	<Dialog.Content class="sm:max-w-[425px]  ">
+		{$formId}
 		<Dialog.Header>
 			<Dialog.Title>Gestione Scenario</Dialog.Title>
 			<Dialog.Description>
