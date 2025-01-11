@@ -21,7 +21,7 @@
 		propFormData: ScenarioFormData;
 	} = $props();
 
-	const form = superForm<Infer<ScenarioFormSchema>>({...propFormData }, {
+	const form = superForm<Infer<ScenarioFormSchema>>(propFormData, {
 		validators: zodClient(scenarioFormSchema),
 		dataType: 'json',
 		onResult: ({ result }) => {
