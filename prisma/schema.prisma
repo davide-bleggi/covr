@@ -122,6 +122,7 @@ model AutomaticTest {
   name          String
   status        String
   executionDate DateTime
+  notes         String
 
   scenarios Scenario[]
 }

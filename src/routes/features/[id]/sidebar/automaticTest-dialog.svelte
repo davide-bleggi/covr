@@ -36,8 +36,14 @@
 		}
 	}));
 
-	const { form: formData, enhance, errors } = form;
+	const { form: formData, enhance, errors, formId } = form;
 
+	$effect(() => {
+		if ($formId) {
+			$formId = propFormData.id ? `edit-automaticTest-form-${propFormData.id}` : 'new-automaticTest-form';
+		}
+		$formData = propFormData;
+	});
 
 </script>
 
@@ -52,7 +58,7 @@
 		</Dialog.Header>
 		<SuperDebug data={$formData} />
 		<div class="grid gap-4 py-4">
-			<form method="POST" action='?/saveAtutomaticTest' use:enhance id="saveManualTestForm">
+			<form method="POST" action='?/saveAutomaticTest' use:enhance id="saveAutomaticTestForm">
 				<input hidden name="id" bind:value={$formData.id} />
 				<Form.Field {form} name="name">
 					<Form.Control>
@@ -108,7 +114,7 @@
 
 				<Form.Field {form} name="scenarioIds">
 					<div class="flex flex-col w-full gap-3">
-					<Form.Control >
+					<Form.Control>
 
 					<Form.Label>Scenario</Form.Label>
 						<ScenarioPicker
@@ -123,6 +129,7 @@
 					</Form.Description>
 					</div>
 				</Form.Field>
+				<input hidden name="scenarioIds" bind:value={$formData.scenarioIds}/>
 			</form>
 
 		</div>

@@ -210,6 +210,7 @@ export const actions: Actions = {
 
 		if (!form.data.id) {
 			try {
+				console.log(form.data)
 				await prisma.automaticTest.create({
 					data: {
 						...form.data,
@@ -217,6 +218,7 @@ export const actions: Actions = {
 						scenarios: {
 							connect: form.data.scenarioIds.map((id) => ({ id })),
 						},
+						scenarioIds: undefined
 					}
 				});
 			} catch (err: any) {
@@ -232,6 +234,7 @@ export const actions: Actions = {
 						scenarios: {
 							connect: form.data.scenarioIds.map((id) => ({ id })),
 						},
+						scenarioIds: undefined
 					},
 					where: { id: form.data.id }
 				});

@@ -79,7 +79,7 @@
 
 <AutomaticTestDialog
 	bind:open={openAutomaticTestDialog}
-	propFormData={{...data.automaticTestForm.data}}
+	propFormData={{...data.automaticTestForm.data, scenarioIds: [currentScenario?.id]}}
 />
 
 

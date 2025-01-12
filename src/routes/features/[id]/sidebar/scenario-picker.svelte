@@ -1,13 +1,13 @@
 <script lang="ts">
-	import Check from "lucide-svelte/icons/check";
-	import ChevronsUpDown from "lucide-svelte/icons/chevrons-up-down";
-	import X from "lucide-svelte/icons/x";
-	import Loader2 from "lucide-svelte/icons/loader-2";
-	import { tick } from "svelte";
-	import * as Command from "$lib/components/ui/command";
-	import * as Popover from "$lib/components/ui/popover";
-	import { Button } from "$lib/components/ui/button";
-	import { cn } from "$lib/utils";
+	import Check from 'lucide-svelte/icons/check';
+	import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
+	import X from 'lucide-svelte/icons/x';
+	import Loader2 from 'lucide-svelte/icons/loader-2';
+	import { tick } from 'svelte';
+	import * as Command from '$lib/components/ui/command';
+	import * as Popover from '$lib/components/ui/popover';
+	import { Button } from '$lib/components/ui/button';
+	import { cn } from '$lib/utils';
 
 	type ScenarioItem = {
 		value: number;
@@ -17,8 +17,8 @@
 	let {
 		noResultsText = 'Nessun risultato trovato',
 		path = '/api/frameworks',
-		placeholder = "Cerca...",
-		loadingText = "Caricamento...",
+		placeholder = 'Cerca...',
+		loadingText = 'Caricamento...',
 		values = $bindable([] as number[])
 	} = $props();
 
@@ -53,10 +53,12 @@
 
 		debounceTimer = window.setTimeout(async () => {
 			try {
-				console.log(searchTerm)
+				console.log(searchTerm);
 				loading = true;
 				options = await fetchOptions(value);
+				console.log('options: ', options);
 			} catch (error) {
+				console.log('error');
 				console.error('Error fetching options:', error);
 				options = [];
 			} finally {
@@ -82,23 +84,22 @@
 	}
 
 	// // SvelteKit 5's onMount equivalent using $effect
-	// $effect.root(() => {
-	// 	if (selectedValues.length > 0) {
-	// 		loadInitialSelections();
-	// 	}
-	// });
+	$effect.root(() => {
+		if (selectedValues.length > 0) {
+			loadInitialSelections();
+		}
+	});
 
-	// async function loadInitialSelections() {
-	// 	try {
-	// 		loading = true;
-	// 		const initialOptions = await fetchOptions('');
-	// 		options = initialOptions;
-	// 	} catch (error) {
-	// 		console.error('Error fetching initial options:', error);
-	// 	} finally {
-	// 		loading = false;
-	// 	}
-	// }
+	async function loadInitialSelections() {
+		try {
+			loading = true;
+			options =  await fetchOptions('');
+		} catch (error) {
+			console.error('Error fetching initial options:', error);
+		} finally {
+			loading = false;
+		}
+	}
 </script>
 
 <Popover.Root bind:open>
@@ -117,7 +118,7 @@
 							<Button
 								type="button"
 								class="hover:bg-secondary/80 rounded-sm"
-								onclick ={(e) =>{e.stopPropagation();
+								onclick={(e) =>{e.stopPropagation();
 									const optionToRemove = options.find(f => f.label === label)?.value;
 								if(optionToRemove){removeValue(optionToRemove)}}}
 							>
@@ -140,35 +141,48 @@
 				value={searchTerm}
 			/>
 			<Command.List>
-				{#if loading}
-					<div class="flex items-center justify-center py-6 text-sm text-muted-foreground gap-2">
-						<Loader2 class="size-4 animate-spin" />
-						{loadingText}
+				{JSON.stringify(options)}
+				<!--{#if loading}-->
+				<!--	isLoading-->
+				<!--	<div class="flex items-center justify-center py-6 text-sm text-muted-foreground gap-2">-->
+				<!--		<Loader2 class="size-4 animate-spin" />-->
+				<!--		{loadingText}-->
+				<!--	</div>-->
+				<!--{:else if options.length === 0}-->
+				<!--	empty list-->
+				<!--	<Command.Empty>{noResultsText}</Command.Empty>-->
+				<!--{:else}-->
+				rendering list
+
+				{#each options as option}
+					<div class="w-full">
+						<Button variant="ghost" class="w-full flex justify-start"
+														value={option.label}
+														onclick={() => {
+						                  toggleSelection(option);
+						                }}>
+							{option.label}
+						</Button>
 					</div>
-				{:else if options.length === 0}
-					<Command.Empty>{noResultsText}</Command.Empty>
-				{:else}
-					<Command.Group>
-						{#each options as option}
-							<Command.Item
-								value={option.label}
-								onSelect={() => {
-                  toggleSelection(option);
-                }}
-							>
-								<div class="flex items-center gap-2">
-									<div class={cn(
-                    "rounded-sm border border-primary size-4 flex items-center justify-center",
-                    selectedValues.includes(option.value) ? "bg-primary text-primary-foreground" : "opacity-50"
-                  )}>
-										<Check class={cn("size-3", !selectedValues.includes(option.value) && "invisible")} />
-									</div>
-									{option.label}
-								</div>
-							</Command.Item>
-						{/each}
-					</Command.Group>
-				{/if}
+					<!--							<Command.Item-->
+					<!--								value={option.label}-->
+					<!--								onSelect={() => {-->
+					<!--                  toggleSelection(option);-->
+					<!--                }}-->
+					<!--							>-->
+					<!--								<div class="flex items-center gap-2">-->
+					<!--									<div class={cn(-->
+					<!--                    "rounded-sm border border-primary size-4 flex items-center justify-center",-->
+					<!--                    selectedValues.includes(option.value) ? "bg-primary text-primary-foreground" : "opacity-50"-->
+					<!--                  )}>-->
+					<!--										<Check class={cn("size-3", !selectedValues.includes(option.value) && "invisible")} />-->
+					<!--									</div>-->
+					<!--									{option.label}-->
+					<!--								</div>-->
+					<!--							</Command.Item>-->
+				{/each}
+
+
 			</Command.List>
 		</Command.Root>
 	</Popover.Content>
