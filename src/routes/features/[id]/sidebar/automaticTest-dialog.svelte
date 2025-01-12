@@ -1,31 +1,29 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog/index';
-	import { Button } from '$lib/components/ui/button';
+	import type { AutomaticTest, User } from '@prisma/client';
 	import SuperDebug, { type Infer, superForm } from 'sveltekit-superforms';
+	import { automaticTestFormSchema, type AutomaticTestFormSchema, testStatusLabels } from '../schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { Input } from '$lib/components/ui/input';
 	import * as Form from '$lib/components/ui/form';
 	import * as Select from '$lib/components/ui/select/index';
-	import { FormField } from '$lib/components/ui/form/index.js';
-	import { Textarea } from '$lib/components/ui/textarea';
-	import type { Customer, User } from '@prisma/client';
-	import {
-		manualTestFormSchema,
-		type ManualTestFormSchema, priorityLabels, testStatusLabels
-	} from './schema';
+	import * as Command from "$lib/components/ui/command/index.js";
+	import * as Popover from "$lib/components/ui/popover/index.js";
 	import { DatePicker } from '$lib/components/wrapper';
-	import { getContext } from 'svelte';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import { Input } from '$lib/components/ui/input';
+	import { Button } from '$lib/components/ui/form';
+	import { ScenarioPicker } from './index';
 
 	let {
 		open = $bindable(false),
-		propFormData = $bindable(),
+		propFormData = $bindable()
 	}: {
 		open: boolean,
-		propFormData: any,
+		propFormData: Infer<AutomaticTestFormSchema>
 	} = $props();
 
-	const form = $state(superForm<Infer<ManualTestFormSchema>>(propFormData, {
-		validators: zodClient(manualTestFormSchema),
+	const form = $state(superForm<Infer<AutomaticTestFormSchema>>(propFormData, {
+		validators: zodClient(automaticTestFormSchema),
 		onResult: ({ result }) => {
 			if (result.type === 'failure' || result.type === 'error') {
 				console.log('Form submission failed:', result);
@@ -38,17 +36,8 @@
 		}
 	}));
 
-	const { form: formData, enhance, errors, formId } = form;
+	const { form: formData, enhance, errors } = form;
 
-	const sidePanelStore : {users: User[]} = getContext('sidePanelStore');
-
-
-	$effect(() => {
-		if ($formId) {
-			$formId = propFormData.id ? `edit-manualTest-form-${propFormData.id}` : 'new-manualTest-form';
-		}
-		$formData = propFormData;
-	});
 
 </script>
 
@@ -56,37 +45,26 @@
 	<Dialog.Content class="sm:max-w-[425px]  ">
 
 		<Dialog.Header>
-			<Dialog.Title>Aggiungi Test Manuale</Dialog.Title>
+			<Dialog.Title>Aggiungi Test Automatico</Dialog.Title>
 			<Dialog.Description>
 				inserire i dati di esecuzione del test
 			</Dialog.Description>
 		</Dialog.Header>
 		<SuperDebug data={$formData} />
 		<div class="grid gap-4 py-4">
-			<form method="POST" action='?/saveManualTest' use:enhance id="saveManualTestForm">
+			<form method="POST" action='?/saveAtutomaticTest' use:enhance id="saveManualTestForm">
 				<input hidden name="id" bind:value={$formData.id} />
-				<input hidden name="scenarioId" bind:value={$formData.scenarioId} />
-				<Form.Field {form} name="ownerId">
+				<Form.Field {form} name="name">
 					<Form.Control>
 						{#snippet children({ props })}
-							<input hidden value={$formData.ownerId} name={props.name} />
-							<Form.Label>Responsabile</Form.Label>
-							<Select.Root type="single"
-													 onValueChange={(value) => $formData.ownerId = parseInt(value)}>
-								<Select.Trigger {...props}>
-									{$formData.ownerId ? sidePanelStore.users.find((user: User) => user.id === $formData.ownerId)?.name : 'Seleziona un opzione'}
-								</Select.Trigger>
-								<Select.Content>
-									{#each sidePanelStore.users as user}
-										<Select.Item value={user.id}>{user.name}</Select.Item>
-									{/each}
-								</Select.Content>
-							</Select.Root>
+							<input hidden value={$formData.name} name={props.name} />
+							<Form.Label>Nome</Form.Label>
+							<Input bind:value={$formData.name}></Input>
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				<FormField {form} name="executionDate">
+				<Form.Field {form} name="executionDate">
 					<Form.Control>
 						{#snippet children({ props })}
 							<input hidden value={$formData.executionDate} name={props.name} />
@@ -95,7 +73,7 @@
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />
-				</FormField>
+				</Form.Field>
 				<Form.Field {form} name="status">
 					<Form.Control>
 						{#snippet children({ props })}
@@ -116,7 +94,7 @@
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				<FormField {form} name="notes">
+				<Form.Field {form} name="notes">
 					<Form.Control>
 						{#snippet children({ props })}
 							<input hidden value={$formData.notes} name={props.name} />
@@ -126,14 +104,32 @@
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />
-				</FormField>
+				</Form.Field>
+
+				<Form.Field {form} name="scenarioIds">
+					<div class="flex flex-col w-full gap-3">
+					<Form.Control >
+
+					<Form.Label>Scenario</Form.Label>
+						<ScenarioPicker
+							path="/api/scenarios"
+							bind:values={$formData.scenarioIds}
+							placeholder="Seleziona scenari collegati..."
+						/>
+					</Form.Control>
+
+					<Form.Description>
+						Seleziona scenari collegati
+					</Form.Description>
+					</div>
+				</Form.Field>
 			</form>
 
 		</div>
 		<Dialog.Footer>
 			<div class={`flex flex-row w-full ${$formData.id?'justify-between':'justify-end'}`}>
 				{#if $formData.id }
-					<form action="?/deleteManualTest" method="POST" use:enhance>
+					<form action="?/deleteAutomaticTest" method="POST" use:enhance>
 						<Button
 							variant="destructive"
 							type="submit"
@@ -143,7 +139,7 @@
 						</Button>
 					</form>
 				{/if}
-				<Button form="saveManualTestForm" type="submit">Salva
+				<Button form="saveAutomaticTestForm" type="submit">Salva
 				</Button>
 			</div>
 		</Dialog.Footer>

@@ -1,7 +1,7 @@
 import prisma from '$lib/prisma';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { manualTestFormSchema, requirementFormSchema, scenarioFormSchema } from './schema';
+import { automaticTestFormSchema, manualTestFormSchema, requirementFormSchema, scenarioFormSchema } from './schema';
 import { type Actions, error, fail, type RequestEvent } from '@sveltejs/kit';
 import { featureFormSchema } from '../../project/[code]/schema';
 
@@ -50,7 +50,7 @@ export async function load({ params }) {
 		requirementForm: await superValidate(requirementFormData, zod(requirementFormSchema), { errors: false }),
 		scenarioForm: await superValidate(zod(scenarioFormSchema), { errors: false }),
 		manualTestForm: await superValidate(zod(manualTestFormSchema), { errors: false }),
-		// automaticTestForm: await superValidate(zod(automa), {errors: false}),
+		automaticTestForm: await superValidate(zod(automaticTestFormSchema), {errors: false}),
 		feature: feature,
 		users
 	};
@@ -197,6 +197,59 @@ export const actions: Actions = {
 		const form = await superValidate(event, zod(manualTestFormSchema));
 		try {
 			await prisma.manualTest.delete({ where: { id: form.data.id ?? null } });
+		} catch (error) {
+			console.log(error);
+			return fail(400, { form });
+		}
+
+		return { form, actionType: 'delete' };
+	},
+
+	saveAutomaticTest: async (event: RequestEvent) => {
+		const form = await superValidate(event, zod(automaticTestFormSchema));
+
+		if (!form.data.id) {
+			try {
+				await prisma.automaticTest.create({
+					data: {
+						...form.data,
+						id: undefined,
+						scenarios: {
+							connect: form.data.scenarioIds.map((id) => ({ id })),
+						},
+					}
+				});
+			} catch (err: any) {
+				console.log(err);
+				return fail(400, { form });
+			}
+		} else {
+			try {
+				await prisma.automaticTest.update({
+					data: {
+						...form.data,
+						id: undefined,
+						scenarios: {
+							connect: form.data.scenarioIds.map((id) => ({ id })),
+						},
+					},
+					where: { id: form.data.id }
+				});
+			} catch (err: any) {
+				console.log(err);
+				return fail(400, { form });
+			}
+		}
+
+		return {
+			form,
+			actionType: 'create'
+		};
+	},
+	deleteAutomaticTest: async (event: RequestEvent) => {
+		const form = await superValidate(event, zod(automaticTestFormSchema));
+		try {
+			await prisma.automaticTest.delete({ where: { id: form.data.id ?? null } });
 		} catch (error) {
 			console.log(error);
 			return fail(400, { form });

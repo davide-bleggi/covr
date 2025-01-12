@@ -76,8 +76,17 @@ export const manualTestFormSchema = z.object({
 	notes: z.string().max(5000).optional()
 });
 
-export type ManualTestFormSchema = typeof manualTestFormSchema
+export const automaticTestFormSchema = z.object({
+	scenarioIds: z.array(z.number()).min(1).default([]),
+	id: z.number().optional(),
+	name: z.string().min(2),
+	executionDate: z.date(),
+	status: z.enum([testStatusLabels[0].value, testStatusLabels[1].value, testStatusLabels[2].value]),
+	notes: z.string().max(5000).optional()
+});
 
+export type ManualTestFormSchema = typeof manualTestFormSchema
+export type AutomaticTestFormSchema = typeof automaticTestFormSchema
 export type RequirementFormSchema = typeof requirementFormSchema;
 export type ScenarioFormSchema = typeof scenarioFormSchema;
 export type ScenarioFormData = z.infer<typeof scenarioFormSchema>;
