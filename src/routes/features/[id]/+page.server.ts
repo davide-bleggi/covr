@@ -21,7 +21,11 @@ export async function load({ params }) {
 				include: {
 					scenarios: {
 						include: {
-							automaticTests: true,
+							automaticTests: {
+								include: {
+									scenarios: true
+								}
+							},
 							manualTest: {
 								include: {
 									owner: true

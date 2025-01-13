@@ -18,7 +18,7 @@
 	import { type ScenarioFormData, testStatusLabels } from './schema';
 	import SuperDebug from 'sveltekit-superforms';
 	import { format } from 'date-fns';
-	import { AutomaticTestDialog, ManualTestSection, ScenarioDetails } from './sidebar';
+	import { AutomaticTestDialog, AutomaticTestItem, ManualTestSection, ScenarioDetails } from './sidebar';
 
 	type FeatureWithDetails = Feature & {
 		requirements: (Requirement & {
@@ -57,7 +57,7 @@
 	// Now the effect will trigger when either scenarioId or allScenarios changes
 	const currentScenario: ScenarioFormData & {
 		manualTest: (ManualTest & { owner: User }),
-		automaticTests: AutomaticTest[],
+		automaticTests: (AutomaticTest & {scenarios: Scenario[]})[],
 	} | undefined = $derived.by(() => {
 		const requirements = feature.requirements;
 		const scenarioId = sidePanelStore.scenario?.id;
@@ -151,7 +151,8 @@
 						<span>Nessun test automatico presente per lo scenario corrente</span>
 					{:else}
 						{#each currentScenario.automaticTests as test}
-							{JSON.stringify(test)}
+							<AutomaticTestItem automaticTest={test}/>
+<!--						<SuperDebug data={test}></SuperDebug>-->
 						{/each}
 						{/if}
 				{/if}
