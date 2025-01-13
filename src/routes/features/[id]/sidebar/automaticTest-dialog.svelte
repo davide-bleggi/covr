@@ -112,7 +112,6 @@
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				{JSON.stringify($formData.scenarioIds)}
 
 				<Form.Field {form} name="scenarioIds">
 					<div class="flex flex-col w-full gap-3">

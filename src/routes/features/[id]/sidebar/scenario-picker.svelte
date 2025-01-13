@@ -93,7 +93,7 @@
 	async function loadInitialSelections() {
 		try {
 			loading = true;
-			options =  await fetchOptions('');
+			options = await fetchOptions('');
 		} catch (error) {
 			console.error('Error fetching initial options:', error);
 		} finally {
@@ -114,7 +114,7 @@
 				{#if selectedLabels.length > 0}
 					{#each selectedLabels as label, i (label)}
 						<div class="bg-secondary text-secondary-foreground flex items-center gap-1 rounded px-1 py-0.5">
-							<span class="text-sm">{label}</span>
+							<span class="text-sm px-3">{label}</span>
 							<Button
 								type="button"
 								class="hover:bg-secondary/80 rounded-sm"
@@ -154,13 +154,15 @@
 
 				{#each options as option}
 					<div class="w-full">
-						<Button variant="ghost" class="w-full flex justify-start"
-														value={option.label}
-														onclick={() => {
+						<Command.Item class="w-full flex justify-start cursor-pointer p-4"
+													value={option.label}
+													onclick={() => {
 						                  toggleSelection(option);
 						                }}>
+							<Check class={cn("size-3", !selectedValues.includes(option.value) && "invisible")} />
+
 							{option.label}
-						</Button>
+						</Command.Item>
 					</div>
 					<!--							<Command.Item-->
 					<!--								value={option.label}-->
