@@ -12,11 +12,10 @@
 <ScenarioDialog
 	bind:open={openScenarioDialog}
 	propFormData={currentScenario??{}}
-	formId={`edit-scenario-form-${currentScenario?.scenario?.id ?? ''}`}
 />
 
 
-<div class="flex flex-row w-full items-stretch">
+<div class="flex flex-row w-full items-center justify-center">
 	<h2 class="font-bold flex-1">
 		{currentScenario.name}
 	</h2>

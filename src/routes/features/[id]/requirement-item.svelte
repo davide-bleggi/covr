@@ -37,9 +37,7 @@
 />
 <ScenarioDialog
 	bind:open={openScenarioDialog}
-	bind:propFormData={newScenarioForm}
-	formId={`new-scenario-form-${requirement.id}`}
-/>
+	propFormData={newScenarioForm} />
 
 <div class="border rounded-lg p-4 shadow-sm">
 	<div class="flex flex-row items-stretch w-full gap-3">

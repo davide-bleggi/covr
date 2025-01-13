@@ -231,12 +231,13 @@ export const actions: Actions = {
 			}
 		} else {
 			try {
+				console.log("Trying to update automaticTest: ", form.data )
 				await prisma.automaticTest.update({
 					data: {
 						...form.data,
 						id: undefined,
 						scenarios: {
-							connect: form.data.scenarioIds.map((id) => ({ id })),
+							set: form.data.scenarioIds.map((id) => ({ id })),
 						},
 						scenarioIds: undefined
 					},

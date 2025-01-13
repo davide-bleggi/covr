@@ -141,7 +141,6 @@
 				value={searchTerm}
 			/>
 			<Command.List>
-				{JSON.stringify(options)}
 				<!--{#if loading}-->
 				<!--	isLoading-->
 				<!--	<div class="flex items-center justify-center py-6 text-sm text-muted-foreground gap-2">-->
@@ -152,7 +151,6 @@
 				<!--	empty list-->
 				<!--	<Command.Empty>{noResultsText}</Command.Empty>-->
 				<!--{:else}-->
-				rendering list
 
 				{#each options as option}
 					<div class="w-full">

@@ -14,7 +14,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { ManualTestDialog, RequirementDialog, RequirementItem, ScenarioDialog } from './index';
 	import { setContext } from 'svelte';
-	import { Pencil } from 'lucide-svelte';
+	import { Pencil, Plus } from 'lucide-svelte';
 	import { type ScenarioFormData, testStatusLabels } from './schema';
 	import SuperDebug from 'sveltekit-superforms';
 	import { format } from 'date-fns';
@@ -39,7 +39,7 @@
 
 	let openRequirementDialog = $state(false);
 	let openManualTestDialog = $state(false);
-	let openAutomaticTestDialog = $state(false)
+	let openAutomaticTestDialog = $state(false);
 
 	const sidePanelStore = $state<{
 		scenario: ScenarioFormData & { manualTest?: ManualTest } & { automaticTests: AutomaticTest[] } | undefined
@@ -57,7 +57,7 @@
 	// Now the effect will trigger when either scenarioId or allScenarios changes
 	const currentScenario: ScenarioFormData & {
 		manualTest: (ManualTest & { owner: User }),
-		automaticTests: (AutomaticTest & {scenarios: Scenario[]})[],
+		automaticTests: (AutomaticTest & { scenarios: Scenario[] })[],
 	} | undefined = $derived.by(() => {
 		const requirements = feature.requirements;
 		const scenarioId = sidePanelStore.scenario?.id;
@@ -81,7 +81,6 @@
 	bind:open={openAutomaticTestDialog}
 	propFormData={{...data.automaticTestForm.data, scenarioIds: [currentScenario?.id]}}
 />
-
 
 
 <Resizable.PaneGroup
@@ -116,45 +115,52 @@
 	<Resizable.Pane defaultSize={30}>
 		<div class="h-full p-4 ">
 			<div class="h-full p-4 rounded-md border overflow-y-auto">
-
 				{#if !currentScenario}
 					<div class="flex h-full items-center justify-center ">
 						<span class="text-sm opacity-80">Seleziona uno scenario</span>
 					</div>
 				{:else }
 					<ScenarioDetails {currentScenario} />
-					<h2 class="font-bold pb-2">Test Manuale</h2>
-					{#if !currentScenario.manualTest}
-						<div class="flex flex-row justify-between items-center w-full">
-							<span>Nessun test manuale</span>
-							<Button size="icon" variant="outline" class=""
-											onclick={(e)=>{
+					<div class="px-4">
+						<h2 class="font-bold py-4">Test Manuale</h2>
+						{#if !currentScenario.manualTest}
+							<div class="flex flex-row justify-between items-center w-full">
+								<span>Nessun test manuale</span>
+								<Button size="icon" variant="outline" class=""
+												onclick={(e)=>{
 																			openManualTestDialog=true
 																	}}>
-								<Pencil></Pencil>
-							</Button>
+									<Pencil></Pencil>
+								</Button>
 
-						</div>
-					{:else}
-						<ManualTestSection manualTest={currentScenario.manualTest}/>
-					{/if}
-					<div class="flex flex-row">
-					<h2 class="font-bold pb-2">Test Automatici</h2>
-						<Button size="icon" variant="outline" class=""
-										onclick={(e)=>{
-																			openAutomaticTestDialog=true
-																	}}>
-							<Pencil></Pencil>
-						</Button>
-					</div>
-					{#if !(currentScenario.automaticTests.length>0)}
-						<span>Nessun test automatico presente per lo scenario corrente</span>
-					{:else}
-						{#each currentScenario.automaticTests as test}
-							<AutomaticTestItem automaticTest={test}/>
-<!--						<SuperDebug data={test}></SuperDebug>-->
-						{/each}
+							</div>
+						{:else}
+							<ManualTestSection manualTest={currentScenario.manualTest} />
 						{/if}
+					</div>
+					<div class="px-4">
+						<div class="flex flex-row justify-center items-center py-4">
+							<h2 class="font-bold flex-1">Test Automatici</h2>
+							<Button size="icon" variant="outline" class=""
+											onclick={(e)=>{
+																				openAutomaticTestDialog=true
+																		}}>
+								<Plus></Plus>
+							</Button>
+						</div>
+						{#if !(currentScenario.automaticTests.length > 0)}
+							<span>Nessun test automatico presente per lo scenario corrente</span>
+						{:else}
+							<ul class="flex flex-col gap-3">
+								{#each currentScenario.automaticTests as test}
+									<li>
+										<AutomaticTestItem automaticTest={test} />
+										<!--						<SuperDebug data={test}></SuperDebug>-->
+									</li>
+								{/each}
+							</ul>
+						{/if}
+					</div>
 				{/if}
 			</div>
 		</div>

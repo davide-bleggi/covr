@@ -47,6 +47,8 @@ export const testStatusLabels = [
 	}
 ] as const;
 
+export type TestStatusType = 'PASS' | 'NOT_PASS' | 'TO_TEST';
+
 export const requirementFormSchema = z.object({
 	featureId: z.number(),
 	id: z.number().optional(),

@@ -6,8 +6,8 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Form from '$lib/components/ui/form';
 	import * as Select from '$lib/components/ui/select/index';
-	import * as Command from "$lib/components/ui/command/index.js";
-	import * as Popover from "$lib/components/ui/popover/index.js";
+	import * as Command from '$lib/components/ui/command/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { DatePicker } from '$lib/components/wrapper';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Input } from '$lib/components/ui/input';
@@ -24,6 +24,7 @@
 
 	const form = $state(superForm<Infer<AutomaticTestFormSchema>>(propFormData, {
 		validators: zodClient(automaticTestFormSchema),
+		dataType: 'json',
 		onResult: ({ result }) => {
 			if (result.type === 'failure' || result.type === 'error') {
 				console.log('Form submission failed:', result);
@@ -56,7 +57,7 @@
 				inserire i dati di esecuzione del test
 			</Dialog.Description>
 		</Dialog.Header>
-		<SuperDebug data={$formData} />
+		<!--		<SuperDebug data={$formData} />-->
 		<div class="grid gap-4 py-4">
 			<form method="POST" action='?/saveAutomaticTest' use:enhance id="saveAutomaticTestForm">
 				<input hidden name="id" bind:value={$formData.id} />
@@ -111,25 +112,26 @@
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
+				{JSON.stringify($formData.scenarioIds)}
 
 				<Form.Field {form} name="scenarioIds">
 					<div class="flex flex-col w-full gap-3">
-					<Form.Control>
+						<Form.Control>
+							{#snippet children({ props })}
+								<input hidden name="scenarioIds" value={$formData.scenarioIds} />
+								<ScenarioPicker
+									path="/api/scenarios"
+									bind:values={$formData.scenarioIds}
+									placeholder="Seleziona scenari collegati..."
+								/>
+							{/snippet}
+						</Form.Control>
 
-					<Form.Label>Scenario</Form.Label>
-						<ScenarioPicker
-							path="/api/scenarios"
-							bind:values={$formData.scenarioIds}
-							placeholder="Seleziona scenari collegati..."
-						/>
-					</Form.Control>
-
-					<Form.Description>
-						Seleziona scenari collegati
-					</Form.Description>
+						<Form.Description>
+							Seleziona scenari collegati
+						</Form.Description>
 					</div>
 				</Form.Field>
-				<input hidden name="scenarioIds" bind:value={$formData.scenarioIds}/>
 			</form>
 
 		</div>
@@ -146,7 +148,8 @@
 						</Button>
 					</form>
 				{/if}
-				<Button form="saveAutomaticTestForm" type="submit">Salva
+				<Button form="saveAutomaticTestForm" type="submit">
+					Salva
 				</Button>
 			</div>
 		</Dialog.Footer>
