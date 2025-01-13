@@ -5,8 +5,13 @@ import { automaticTestFormSchema, manualTestFormSchema, requirementFormSchema, s
 import { type Actions, error, fail, type RequestEvent } from '@sveltejs/kit';
 import { featureFormSchema } from '../../project/[code]/schema';
 
-export async function load({ params }) {
+export async function load({ params, url }) {
+
 	const { id } = params;
+	const page = Number(url.searchParams.get('page') || '1');
+	const limit = 5;
+	const skip = (page - 1) * limit;
+
 	const feature = await prisma.feature.findUnique({
 		where: {
 			id: Number(id)
@@ -18,6 +23,8 @@ export async function load({ params }) {
 				}
 			},
 			requirements: {
+				skip,
+				take: limit,
 				include: {
 					scenarios: {
 						include: {
@@ -38,13 +45,18 @@ export async function load({ params }) {
 		}
 	});
 
+	const totalRequirements = await prisma.requirement.count({
+		where: {
+			featureId: Number(id)
+		}
+	});
+
 	const users = await prisma.user.findMany();
 
 	if (!feature) {
 		// Throw an error with a custom status and message
 		throw error(404, `La feature: '${id}' non esiste`);
 	}
-
 
 	const requirementFormData = {
 		featureId: feature.id
@@ -54,12 +66,15 @@ export async function load({ params }) {
 		requirementForm: await superValidate(requirementFormData, zod(requirementFormSchema), { errors: false }),
 		scenarioForm: await superValidate(zod(scenarioFormSchema), { errors: false }),
 		manualTestForm: await superValidate(zod(manualTestFormSchema), { errors: false }),
-		automaticTestForm: await superValidate(zod(automaticTestFormSchema), {errors: false}),
+		automaticTestForm: await superValidate(zod(automaticTestFormSchema), { errors: false }),
 		feature: feature,
-		users
+		users,
+		pagination: {
+			page,
+			total: totalRequirements
+		}
 	};
 }
-
 export const actions: Actions = {
 	saveRequirement: async (event: RequestEvent) => {
 		const form = await superValidate(event, zod(requirementFormSchema));

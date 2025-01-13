@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
+	import * as Pagination from '$lib/components/ui/pagination/index.js';
 
 	import type {
 		Feature,
@@ -33,7 +34,11 @@
 			requirementForm: any,
 			scenarioForm: any,
 			manualTestFOrm: any,
-			users: User[]
+			users: User[],
+			pagination: {
+				page: number,
+				total: number
+			}
 		}
 	}>();
 
@@ -109,6 +114,40 @@
 					</li>
 				{/each}
 			</ul>
+
+			<Pagination.Root count={data.pagination.total} perPage={5}>
+				{#snippet children({ pages, currentPage })}
+					<Pagination.Content>
+						<Pagination.Item>
+							<a href={`?page=${currentPage}`}>
+								<Pagination.PrevButton />
+							</a>
+						</Pagination.Item>
+						{#each pages as page (page.key)}
+							{#if page.type === "ellipsis"}
+								<Pagination.Item>
+									<Pagination.Ellipsis />
+								</Pagination.Item>
+							{:else}
+								<Pagination.Item isVisible={currentPage === page.value}>
+									<a href={`?page=${page.value}`}>
+										<Pagination.Link {page} isActive={currentPage === page.value}
+										>
+											{page.value}
+										</Pagination.Link>
+									</a>
+								</Pagination.Item>
+							{/if}
+						{/each}
+						<Pagination.Item>
+							<a href={`?page=${currentPage}`}>
+								<Pagination.NextButton />
+							</a>
+						</Pagination.Item>
+					</Pagination.Content>
+				{/snippet}
+			</Pagination.Root>
+
 		</div>
 	</Resizable.Pane>
 	<Resizable.Handle />
