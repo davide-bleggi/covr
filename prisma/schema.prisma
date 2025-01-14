@@ -8,99 +8,86 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   name      String
-  email     String   @unique
-  createdAt DateTime @default(now())
-
-  tests ManualTest[]
+  email     String       @unique
+  createdAt DateTime     @default(now())
+  tests     ManualTest[]
 }
 
 model Project {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
-  code        String   @unique
+  code        String    @unique
   status      String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   description String?
-
-  versions Version[] // A project can have many versions
+  versions    Version[]
 }
 
 model Version {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-
-  project   Project @relation(fields: [projectId], references: [id]) // Relation to Project
-  projectId Int
-
-  installations Installation[] // A version can have many installation
-  features      Feature[] // A version can have many features
+  id            Int            @id @default(autoincrement())
+  name          String
+  createdAt     DateTime       @default(now())
+  projectId     Int
+  features      Feature[]
+  installations Installation[]
+  project       Project        @relation(fields: [projectId], references: [id])
 
   @@unique([projectId, name])
 }
 
 model Customer {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
   installations Installation[]
 }
 
 model Installation {
-  id         Int      @id @default(autoincrement())
-  customer   Customer @relation(fields: [customerId], references: [id]) // Relation to Customer
-  customerId Int
-
-  version   Version @relation(fields: [versionId], references: [id]) // Relation to Version
-  versionId Int
-
+  id               Int      @id @default(autoincrement())
+  customerId       Int
+  versionId        Int
   installationDate DateTime
   createdAt        DateTime @default(now())
+  customer         Customer @relation(fields: [customerId], references: [id])
+  version          Version  @relation(fields: [versionId], references: [id])
 
   @@unique([customerId, versionId])
 }
 
 model Feature {
-  id          Int    @id @default(autoincrement())
-  name        String
-  description String
-
-  version   Version @relation(fields: [versionId], references: [id]) // Relation to Version
-  versionId Int
-
+  id           Int           @id @default(autoincrement())
+  name         String
+  description  String
+  versionId    Int
+  version      Version       @relation(fields: [versionId], references: [id])
   requirements Requirement[]
 
   @@unique([name, versionId])
 }
 
 model Requirement {
-  id          Int    @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   name        String
   description String
   status      String
   priority    String
-
-  feature   Feature @relation(fields: [featureId], references: [id])
-  featureId Int
-
-  scenarios Scenario[]
+  featureId   Int
+  feature     Feature    @relation(fields: [featureId], references: [id])
+  scenarios   Scenario[]
 
   @@unique([description, featureId])
 }
 
 model Scenario {
-  id       Int    @id @default(autoincrement())
-  name     String
-  scenario String
-
-  requirement   Requirement @relation(fields: [requirementId], references: [id]) // Relation to Version
-  requirementId Int
-
-  automaticTests AutomaticTest[]
-
-  manualTest ManualTest?
+  id             Int             @id @default(autoincrement())
+  name           String
+  scenario       String
+  requirementId  Int
+  testStatus     String?         @db.VarChar(10)
+  manualTest     ManualTest?
+  requirement    Requirement     @relation(fields: [requirementId], references: [id])
+  automaticTests AutomaticTest[] @relation("AutomaticTestToScenario")
 
   @@unique([name, requirementId])
 }
@@ -108,21 +95,19 @@ model Scenario {
 model ManualTest {
   id            Int      @id @default(autoincrement())
   status        String
-  executionDate DateTime
-  owner         User     @relation(fields: [ownerId], references: [id]) // Relation to Version
   ownerId       Int
+  scenarioId    Int      @unique
   notes         String
-
-  scenario   Scenario @relation(fields: [scenarioId], references: [id])
-  scenarioId Int      @unique
+  executionDate DateTime
+  owner         User     @relation(fields: [ownerId], references: [id])
+  scenario      Scenario @relation(fields: [scenarioId], references: [id])
 }
 
 model AutomaticTest {
-  id            Int      @id @default(autoincrement())
+  id            Int        @id @default(autoincrement())
   name          String
   status        String
   executionDate DateTime
   notes         String
-
-  scenarios Scenario[]
+  scenarios     Scenario[] @relation("AutomaticTestToScenario")
 }

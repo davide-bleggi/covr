@@ -93,6 +93,7 @@
 	class="min-h-[200px] w-full rounded-lg flex-1 flex flex-col"
 >
 	<Resizable.Pane defaultSize={70}>
+		{JSON.stringify(feature)}
 		<div class="p-5 flex flex-col h-full overflow-hidden">
 			<div class="flex flex-row">
 				<div class="flex flex-col w-full ">

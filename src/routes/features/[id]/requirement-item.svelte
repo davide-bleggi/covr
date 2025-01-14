@@ -9,6 +9,7 @@
 	import { ScenarioDialog } from './index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { getContext } from 'svelte';
+	import { cn } from '$lib/utils';
 
 	const sidePanelStore: any = getContext('sidePanelStore');
 
@@ -55,7 +56,7 @@
 		</div>
 		<div class="flex flex-col">
 			<span class="opacity-70 text-sm">Stato</span>
-			<span class={`bg-${currentRequirementStatus?.color??''} rounded-sm px-2 text-white`}>
+			<span class={`${currentRequirementStatus?.color??''} rounded-sm px-2 text-white`}>
 				{currentRequirementStatus?.label}
 			</span>
 		</div>
