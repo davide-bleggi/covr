@@ -112,7 +112,7 @@
 													 class="cursor-pointer">
 									<Table.Cell>SCN-{scenario.id}</Table.Cell>
 									<Table.Cell>{scenario.name}</Table.Cell>
-									<Table.Cell>---</Table.Cell>
+									<Table.Cell>{scenario.testStatus}</Table.Cell>
 								</Table.Row>
 							{/each}
 						</Table.Body>
