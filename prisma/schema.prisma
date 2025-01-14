@@ -75,6 +75,7 @@ model Requirement {
   featureId   Int
   feature     Feature    @relation(fields: [featureId], references: [id])
   scenarios   Scenario[]
+  coverage    Int        @default(0)
 
   @@unique([description, featureId])
 }

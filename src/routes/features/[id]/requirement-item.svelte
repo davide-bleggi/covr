@@ -52,7 +52,7 @@
 		</div>
 		<div class="flex flex-col">
 			<span class="opacity-70 text-sm">Copertura</span>
-			<span>---</span>
+			<span>{requirement.coverage}%</span>
 		</div>
 		<div class="flex flex-col">
 			<span class="opacity-70 text-sm">Stato</span>

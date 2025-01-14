@@ -61,7 +61,7 @@
 				inserire i dati di esecuzione del test
 			</Dialog.Description>
 		</Dialog.Header>
-		<SuperDebug data={$formData} />
+<!--		<SuperDebug data={$formData} />-->
 		<div class="grid gap-4 py-4">
 			<form method="POST" action='?/saveManualTest' use:enhance id="saveManualTestForm">
 				<input hidden name="id" bind:value={$formData.id} />
