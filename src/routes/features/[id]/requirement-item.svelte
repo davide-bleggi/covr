@@ -109,7 +109,7 @@
 									sidePanelStore.scenario = {...scenario, scenario: JSON.parse(scenario.scenario)}
 									console.log(	sidePanelStore.scenario)
 								}}
-													 class="cursor-pointer">
+													 class={`cursor-pointer ${sidePanelStore.scenario.id === scenario.id?'bg-gray-100':""}`}>
 									<Table.Cell>SCN-{scenario.id}</Table.Cell>
 									<Table.Cell>{scenario.name}</Table.Cell>
 									<Table.Cell>{scenario.testStatus}</Table.Cell>
