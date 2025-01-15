@@ -1,0 +1,207 @@
+CREATE TRIGGER TR_Scenario_UpdateCoverage
+ON Scenario
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    /*
+      1. Check if the TestStatus was actually updated (optional).
+         If you only care about coverage changes when the TestStatus changes, you can
+         guard the logic with IF UPDATE(TestStatus).
+    */
+    IF NOT UPDATE(TestStatus)
+        RETURN;
+
+    /*
+      2. Gather all the distinct RequirementIDs for scenarios that were updated.
+         'inserted' is the pseudo-table that contains the new values after UPDATE.
+    */
+    ;WITH DistinctReqIDs AS
+    (
+        SELECT DISTINCT i.RequirementID
+        FROM inserted i
+             -- If you also need old values, you can join to 'deleted'
+             -- But for coverage, we typically only need new RequirementIDs
+    )
+    SELECT RequirementID
+    INTO #TempRequirements
+    FROM DistinctReqIDs
+    WHERE RequirementID IS NOT NULL;  -- Just in case
+
+    /*
+      3. Call the coverage procedure for each requirement in #TempRequirements.
+         We'll use a cursor for simplicity (one call per RequirementID).
+         If you want to handle them all in a single call, you could pass them in a table-valued param, etc.
+    */
+    DECLARE @RequirementID INT;
+
+    DECLARE coverage_cursor CURSOR LOCAL FAST_FORWARD FOR
+        SELECT RequirementID
+        FROM #TempRequirements;
+
+    OPEN coverage_cursor;
+    FETCH NEXT FROM coverage_cursor INTO @RequirementID;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        EXEC [dbo].[sp_UpdateRequirementCoverage] @RequirementID;
+        FETCH NEXT FROM coverage_cursor INTO @RequirementID;
+    END
+
+    CLOSE coverage_cursor;
+    DEALLOCATE coverage_cursor;
+
+    DROP TABLE #TempRequirements;
+
+    SET NOCOUNT OFF;
+END;
+
+CREATE TRIGGER TRG_AutomaticTest_AUD
+ON AutomaticTest
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    /*
+      1. Gather all relevant ScenarioIDs connected to the updated AutomaticTest rows.
+         - 'Inserted' is the special table that holds the new/updated rows in a trigger.
+    */
+    ;WITH DistinctScenarios AS
+    (
+        SELECT DISTINCT s.B AS ScenarioID
+        FROM inserted i
+        INNER JOIN _AutomaticTestToScenario s
+            ON s.A = i.id  -- or i.ID, depending on your column name
+    )
+    SELECT ScenarioID
+    INTO #TempScenarioIDs
+    FROM DistinctScenarios;
+
+    /*
+      2. If you need to call your procedure for each ScenarioID individually,
+         you can use a cursor or a loop. (Below uses a cursor.)
+         If your procedure can accept a table parameter, you might do it differently.
+    */
+    DECLARE @ScenarioID INT;
+
+    DECLARE scenario_cursor CURSOR LOCAL FAST_FORWARD FOR
+        SELECT ScenarioID
+        FROM #TempScenarioIDs;
+
+    OPEN scenario_cursor;
+    FETCH NEXT FROM scenario_cursor INTO @ScenarioID;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        -- Call your procedure here. Make sure your procedure signature matches.
+        EXEC UpdateScenarioStatus @ScenarioID;
+
+        FETCH NEXT FROM scenario_cursor INTO @ScenarioID;
+    END
+
+    CLOSE scenario_cursor;
+    DEALLOCATE scenario_cursor;
+
+    DROP TABLE #TempScenarioIDs;
+
+    SET NOCOUNT OFF;
+END;
+
+CREATE TRIGGER TRG_AutomaticTestToScenario
+ON dbo._AutomaticTestToScenario
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    /*
+      1. Gather all relevant ScenarioIDs from both inserted and deleted.
+         - 'inserted' holds new rows (for INSERT or UPDATE).
+         - 'deleted' holds old rows (for UPDATE or DELETE).
+         Because A = AutomaticTestId, B = ScenarioId,
+         we want B from inserted/deleted as the scenario.
+    */
+    ;WITH DistinctScenarios AS
+    (
+        -- Scenario IDs from newly inserted or updated rows
+        SELECT DISTINCT B AS ScenarioID
+        FROM inserted
+        WHERE B IS NOT NULL
+
+        UNION
+
+        -- Scenario IDs from deleted rows
+        SELECT DISTINCT B AS ScenarioID
+        FROM deleted
+        WHERE B IS NOT NULL
+    )
+    SELECT ScenarioID
+    INTO #TempScenarioIDs
+    FROM DistinctScenarios;
+
+    /*
+      2. If no scenario IDs were found, we can exit early.
+    */
+    IF NOT EXISTS (SELECT 1 FROM #TempScenarioIDs)
+    BEGIN
+        DROP TABLE #TempScenarioIDs;
+        RETURN;
+    END;
+
+    /*
+      3. Call the procedure for each affected ScenarioID.
+    */
+    DECLARE @ScenarioID INT;
+
+    DECLARE scenario_cursor CURSOR LOCAL FAST_FORWARD FOR
+        SELECT ScenarioID
+        FROM #TempScenarioIDs;
+
+    OPEN scenario_cursor;
+    FETCH NEXT FROM scenario_cursor INTO @ScenarioID;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        -- Call your procedure, e.g.:
+        EXEC dbo.UpdateScenarioStatus @ScenarioID;
+
+        FETCH NEXT FROM scenario_cursor INTO @ScenarioID;
+    END;
+
+    CLOSE scenario_cursor;
+    DEALLOCATE scenario_cursor;
+
+    DROP TABLE #TempScenarioIDs;
+
+    SET NOCOUNT OFF;
+END;
+
+CREATE TRIGGER TRG_ManualTest_AUD
+ON ManualTest
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Collect affected scenario IDs
+    DECLARE @ScenarioIds TABLE (ScenarioId INT);
+    INSERT INTO @ScenarioIds
+    SELECT DISTINCT ScenarioId FROM Inserted
+    UNION
+    SELECT DISTINCT ScenarioId FROM Deleted;
+
+    -- Recalculate status for each affected scenario
+    DECLARE @Id INT;
+    DECLARE ScenarioCursor CURSOR FOR SELECT ScenarioId FROM @ScenarioIds;
+    OPEN ScenarioCursor;
+    FETCH NEXT FROM ScenarioCursor INTO @Id;
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        EXEC dbo.UpdateScenarioStatus @Id;
+        FETCH NEXT FROM ScenarioCursor INTO @Id;
+    END
+    CLOSE ScenarioCursor;
+    DEALLOCATE ScenarioCursor;
+END;

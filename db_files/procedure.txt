@@ -1,0 +1,137 @@
+CREATE TRIGGER TR_Scenario_UpdateCoverage
+ON Scenario
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    /*
+      1. Check if the TestStatus was actually updated (optional).
+         If you only care about coverage changes when the TestStatus changes, you can
+         guard the logic with IF UPDATE(TestStatus).
+    */
+    IF NOT UPDATE(TestStatus)
+        RETURN;
+
+    /*
+      2. Gather all the distinct RequirementIDs for scenarios that were updated.
+         'inserted' is the pseudo-table that contains the new values after UPDATE.
+    */
+    ;WITH DistinctReqIDs AS
+    (
+        SELECT DISTINCT i.RequirementID
+        FROM inserted i
+             -- If you also need old values, you can join to 'deleted'
+             -- But for coverage, we typically only need new RequirementIDs
+    )
+    SELECT RequirementID
+    INTO #TempRequirements
+    FROM DistinctReqIDs
+    WHERE RequirementID IS NOT NULL;  -- Just in case
+
+    /*
+      3. Call the coverage procedure for each requirement in #TempRequirements.
+         We'll use a cursor for simplicity (one call per RequirementID).
+         If you want to handle them all in a single call, you could pass them in a table-valued param, etc.
+    */
+    DECLARE @RequirementID INT;
+
+    DECLARE coverage_cursor CURSOR LOCAL FAST_FORWARD FOR
+        SELECT RequirementID
+        FROM #TempRequirements;
+
+    OPEN coverage_cursor;
+    FETCH NEXT FROM coverage_cursor INTO @RequirementID;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        EXEC [dbo].[sp_UpdateRequirementCoverage] @RequirementID;
+        FETCH NEXT FROM coverage_cursor INTO @RequirementID;
+    END
+
+    CLOSE coverage_cursor;
+    DEALLOCATE coverage_cursor;
+
+    DROP TABLE #TempRequirements;
+
+    SET NOCOUNT OFF;
+END;
+
+CREATE PROCEDURE dbo.UpdateScenarioStatus (@ScenarioId INT)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    PRINT 'Start Procedure for ScenarioId = ' + CAST(@ScenarioId AS VARCHAR(20));
+
+    -- Count ManualTest rows and how many are PASS
+    DECLARE @ManualCount INT, @ManualPassCount INT;
+    SELECT
+        @ManualCount = COUNT(*),
+        @ManualPassCount = SUM(CASE WHEN Status = 'PASS' THEN 1 ELSE 0 END)
+    FROM ManualTest
+    WHERE ScenarioId = @ScenarioId;
+
+    -- Count AutomaticTest rows and how many are PASS
+    DECLARE @AutoCount INT, @AutoPassCount INT;
+    SELECT
+        @AutoCount = COUNT(*),
+        @AutoPassCount = SUM(CASE WHEN at.Status = 'PASS' THEN 1 ELSE 0 END)
+    FROM _AutomaticTestToScenario ats
+    JOIN AutomaticTest at ON at.id = ats.A  -- 'A' = AutomaticTest.id
+    WHERE ats.B = @ScenarioId;             -- 'B' = Scenario.id
+
+    -- If there are no manual tests AND no automatic tests, mark as NOT_PASS
+    IF (@ManualCount = 0 AND @AutoCount = 0)
+    BEGIN
+        UPDATE Scenario
+        SET testStatus = 'NOT_PASS'
+        WHERE id = @ScenarioId;
+
+        PRINT 'No manual or automatic tests found -> NOT_PASS';
+        RETURN;
+    END;
+
+    /*
+      LOGIC:
+       - If Manual tests exist, all must be PASS. Otherwise NOT_PASS.
+       - If Automatic tests exist, all must be PASS. Otherwise NOT_PASS.
+       - If one side doesn't exist (count=0), that side is "ignored" (treated as satisfied).
+         So effectively:
+
+         IF
+           ( (ManualCount = 0) OR (ManualCount = ManualPassCount) )
+           AND
+           ( (AutoCount = 0)   OR (AutoCount   = AutoPassCount  ) )
+         THEN PASS
+         ELSE NOT_PASS
+    */
+
+    IF (
+         ( @ManualCount = 0 OR @ManualCount = @ManualPassCount )
+         AND
+         ( @AutoCount   = 0 OR @AutoCount   = @AutoPassCount   )
+       )
+    BEGIN
+        PRINT 'Scenario passes: manualCount=' + CAST(@ManualCount AS VARCHAR)
+            + ', manualPassCount=' + CAST(@ManualPassCount AS VARCHAR)
+            + ', autoCount=' + CAST(@AutoCount AS VARCHAR)
+            + ', autoPassCount=' + CAST(@AutoPassCount AS VARCHAR);
+
+        UPDATE Scenario
+        SET testStatus = 'PASS'
+        WHERE id = @ScenarioId;
+    END
+    ELSE
+    BEGIN
+        PRINT 'Scenario not all passed: manualCount=' + CAST(@ManualCount AS VARCHAR)
+            + ', manualPassCount=' + CAST(@ManualPassCount AS VARCHAR)
+            + ', autoCount=' + CAST(@AutoCount AS VARCHAR)
+            + ', autoPassCount=' + CAST(@AutoPassCount AS VARCHAR);
+
+        UPDATE Scenario
+        SET testStatus = 'NOT_PASS'
+        WHERE id = @ScenarioId;
+    END;
+END;
+
