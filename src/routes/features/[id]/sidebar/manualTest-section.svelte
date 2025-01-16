@@ -6,6 +6,7 @@
 	import {testStatusLabels} from '../schema';
 	import { ManualTestDialog } from '../index';
 	import type { ManualTest, User } from '@prisma/client';
+	import { marked } from 'marked';
 
 	let {manualTest}: {
 		manualTest: ManualTest & {owner: User};
@@ -62,7 +63,7 @@
 	<div>
 		<div class="flex flex-col flex-1">
 			<span class="text-sm opacity-60">Note</span>
-			{manualTest.notes}
+			<span class="markdown">{@html marked(manualTest.notes)}</span>
 		</div>
 	</div>
 </div>

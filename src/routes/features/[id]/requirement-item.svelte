@@ -10,6 +10,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { getContext } from 'svelte';
 	import { cn } from '$lib/utils';
+	import { marked } from 'marked';
 
 	const sidePanelStore: any = getContext('sidePanelStore');
 
@@ -76,7 +77,7 @@
 	</div>
 	<div class="flex flex-col py-2">
 		<span class="opacity-70 text-sm">Descrizione</span>
-		<span>{requirement.description}</span>
+		<span class="markdown">{@html marked(requirement.description??'')}</span>
 	</div>
 	<Accordion.Root class="w-full" value={openScenarios}>
 		<Accordion.Item value="scenarios" class="w-full">

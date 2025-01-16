@@ -77,7 +77,7 @@
 						<Form.Control>
 							{#snippet children({ props })}
 								<Form.Label>Given</Form.Label>
-								<Textarea {...props} bind:value={$formData.scenario.given} />
+								<Textarea {...props} bind:value={$formData.scenario.given} data-markdown />
 							{/snippet}
 						</Form.Control>
 						<Form.FieldErrors />
@@ -86,7 +86,7 @@
 						<Form.Control>
 							{#snippet children({ props })}
 								<Form.Label>When</Form.Label>
-								<Textarea {...props} bind:value={$formData.scenario.when} />
+								<Textarea {...props} bind:value={$formData.scenario.when} data-markdown />
 							{/snippet}
 						</Form.Control>
 						<Form.FieldErrors />
@@ -95,7 +95,7 @@
 						<Form.Control>
 							{#snippet children({ props })}
 								<Form.Label>Then</Form.Label>
-								<Textarea {...props} bind:value={$formData.scenario.then} />
+								<Textarea {...props} bind:value={$formData.scenario.then} data-markdown />
 							{/snippet}
 						</Form.Control>
 						<Form.FieldErrors />

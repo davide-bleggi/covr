@@ -119,9 +119,8 @@
 				<FormField {form} name="notes">
 					<Form.Control>
 						{#snippet children({ props })}
-							<input hidden value={$formData.notes} name={props.name} />
 							<Form.Label>Note</Form.Label>
-							<Textarea bind:value={$formData.notes}></Textarea>
+								<Textarea {...props}  bind:value={$formData.notes} data-markdown></Textarea>
 							<Form.Description>Aggiungi descrizione dei problemi riscontrati</Form.Description>
 						{/snippet}
 					</Form.Control>

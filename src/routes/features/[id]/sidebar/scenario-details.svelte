@@ -4,9 +4,10 @@
 	import SuperDebug from 'sveltekit-superforms';
 	import { Button } from '$lib/components/ui/button/index';
 	import { ScenarioDialog } from '../index';
-
+	import { marked } from 'marked';
 	let { currentScenario } = $props();
 	let openScenarioDialog = $state(false);
+
 </script>
 
 <ScenarioDialog
@@ -26,17 +27,17 @@
 		<Pencil></Pencil>
 	</Button>
 </div>
-<div class="flex flex-col gap-2 py-4">
+<div class="flex flex-col gap-2 py-4 markdown">
 	<div class="w-full p-4 rounded bg-gray-100">
 		<h2 class="font-bold text-sm opacity-50">GIVEN</h2>
-		{currentScenario.scenario?.given}
+		{@html marked(currentScenario.scenario?.given??'')}
 	</div>
 	<div class="w-full p-4 rounded bg-gray-100">
 		<h2 class="font-bold text-sm opacity-50">WHEN</h2>
-		{currentScenario.scenario?.when}
+		{@html marked(currentScenario.scenario?.when??'')}
 	</div>
 	<div class="w-full p-4 rounded bg-gray-100">
 		<h2 class="font-bold text-sm opacity-50">THEN</h2>
-		{currentScenario.scenario?.then}
+		{@html marked(currentScenario.scenario?.then??'')}
 	</div>
 </div>
