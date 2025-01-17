@@ -16,16 +16,13 @@
 	let {
 		open = $bindable(false),
 		propFormData = $bindable(),
-		formId
 	}: {
 		open: boolean,
 		propFormData: any;
-		formId: string
 	} = $props();
 
 	const form = $state(superForm<Infer<FeatureFormSchema>>(propFormData, {
 		validators: zodClient(featureFormSchema),
-		id: formId,
 		onResult: ({ result }) => {
 			if (result.type === 'failure' || result.type === 'error') {
 				console.log('Form submission failed:', result);
@@ -38,11 +35,15 @@
 		}
 	}));
 
-	const { form: formData, enhance, errors } = form;
+	const { form: formData, enhance, errors, formId} = form;
 
-	$effect(()=>{
-		$formData = propFormData
-	})
+	$effect(() => {
+		if ($formId) {
+			$formId = propFormData.id ? `edit-feature-dialog-${propFormData.id}` : 'new-feature-dialog';
+		}
+		$formData = { ...propFormData };
+	});
+
 
 </script>
 

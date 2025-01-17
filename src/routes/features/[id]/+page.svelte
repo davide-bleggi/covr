@@ -20,6 +20,7 @@
 	import SuperDebug from 'sveltekit-superforms';
 	import { format } from 'date-fns';
 	import { AutomaticTestDialog, AutomaticTestItem, ManualTestSection, ScenarioDetails } from './sidebar';
+	import { FeatureDialog } from '../../project/[code]';
 
 	type FeatureWithDetails = Feature & {
 		requirements: (Requirement & {
@@ -33,7 +34,8 @@
 			feature: FeatureWithDetails,
 			requirementForm: any,
 			scenarioForm: any,
-			manualTestFOrm: any,
+			manualTestForm: any,
+			featureForm: any,
 			users: User[],
 			pagination: {
 				page: number,
@@ -45,6 +47,7 @@
 	let openRequirementDialog = $state(false);
 	let openManualTestDialog = $state(false);
 	let openAutomaticTestDialog = $state(false);
+	let openFeatureDialog = $state(false);
 
 	const sidePanelStore = $state<{
 		scenario: ScenarioFormData & { manualTest?: ManualTest } & { automaticTests: AutomaticTest[] } | undefined
@@ -87,6 +90,17 @@
 	propFormData={{...data.automaticTestForm.data, scenarioIds: [currentScenario?.id]}}
 />
 
+<FeatureDialog
+	bind:open={openFeatureDialog}
+	propFormData={{
+		id: feature.id,
+		name: feature.name,
+		description: feature.description,
+		versionId: feature.versionId
+	}}
+	formId={`edit-feature-form-${feature.id}`}
+>
+</FeatureDialog>
 
 <Resizable.PaneGroup
 	direction="horizontal"
@@ -94,17 +108,23 @@
 >
 	<Resizable.Pane defaultSize={70}>
 		<div class="p-5 flex flex-col h-full overflow-hidden">
+			<div class="w-full">
 			<div class="flex flex-row">
 				<div class="flex flex-col w-full ">
-					<h4>{feature.version.project.name.toUpperCase()} - {feature.version.name}</h4>
+					<h4><a href="/project/AUTH"><Button variant="outline">{feature.version.project.name.toUpperCase()}</Button></a> - {feature.version.name}</h4>
 					<h1 class="text-2xl font-bold">{feature.name}</h1>
 					<span class="opacity-80">{feature.description}</span>
 				</div>
-				<div class=" flex flex-1 items-center">
-					<Button onclick={()=>openRequirementDialog = true}>
-						Crea Requisito
-					</Button>
-				</div>
+				<Button size="icon" variant="outline" class=""
+								onclick={(e)=>{openFeatureDialog=true}}>
+					<Pencil></Pencil>
+				</Button>
+			</div>
+			<div class=" flex flex-1 items-center w-full pt-3">
+				<Button variant="outline" onclick={()=>openRequirementDialog = true} class="w-full">
+					Crea Requisito
+				</Button>
+			</div>
 			</div>
 			<ul class="flex h-full flex-col gap-2 py-5 overflow-y-auto">
 				{#each feature.requirements as requirement }

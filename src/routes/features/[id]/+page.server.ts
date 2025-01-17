@@ -67,6 +67,7 @@ export async function load({ params, url }) {
 		scenarioForm: await superValidate(zod(scenarioFormSchema), { errors: false }),
 		manualTestForm: await superValidate(zod(manualTestFormSchema), { errors: false }),
 		automaticTestForm: await superValidate(zod(automaticTestFormSchema), { errors: false }),
+		featureForm:await superValidate(feature, zod(featureFormSchema), { errors: false }),
 		feature: feature,
 		users,
 		pagination: {
@@ -76,6 +77,49 @@ export async function load({ params, url }) {
 	};
 }
 export const actions: Actions = {
+	saveFeature: async (event: RequestEvent) => {
+		const form = await superValidate(event, zod(featureFormSchema));
+		if(!form.data.id) {
+			try {
+				await prisma.feature.create({ data: { ...form.data, id: undefined } });
+			} catch (err: any) {
+				console.log(err);
+				// Make sure to return the form with the error
+				if (err.code === 'P2002') {
+					return setError(form, 'name', 'nome già in uso');
+				}
+				return fail(400, { form });
+			}
+		}else{
+			try {
+				await prisma.feature.update({
+					data: { ...form.data, id: undefined},
+					where: { id: form.data.id }
+				});
+			} catch (err: any) {
+				console.log(err);
+				// Make sure to return the form with the error
+				if (err.code === 'P2002') {
+					return setError(form, 'name', 'nome già in uso');
+				}
+				return fail(400, { form });
+			}
+		}
+
+		return {
+			form
+		};
+	},
+
+	deleteFeature: async ({ request }) => {
+		const id = Number((await request.formData()).get('id'));
+		try {
+			await prisma.feature.delete({ where: { id: id ?? null } });
+		} catch {
+			return fail(400);
+		}
+	},
+
 	saveRequirement: async (event: RequestEvent) => {
 		const form = await superValidate(event, zod(requirementFormSchema));
 		if (!form.data.id) {

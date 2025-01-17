@@ -78,5 +78,8 @@
         ul {
             @apply list-disc leading-tight px-5 py-2;
         }
+        p{
+            @apply pb-3
+        }
     }
 }
