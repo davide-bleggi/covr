@@ -26,7 +26,7 @@ export const featureFormSchema = z.object({
     id: z.number().optional(),
     versionId: z.number().gt(0),
     name: z.string().min(2).max(100),
-    description: z.string().min(2).max(300).optional(),
+    description: z.string().min(2).max(1000).optional(),
 });
 
 

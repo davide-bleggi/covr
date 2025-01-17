@@ -48,7 +48,7 @@
 </script>
 
 <Dialog.Root bind:open={open}>
-	<Dialog.Content class="sm:max-w-[425px]  ">
+	<Dialog.Content class="sm:max-w-[600px]  ">
 
 		<Dialog.Header>
 			<Dialog.Title>Aggiungi Feature</Dialog.Title>
@@ -74,7 +74,7 @@
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>Descrizione</Form.Label>
-							<Textarea {...props} bind:value={$formData.description}/>
+							<Textarea class="min-h-[350px]" {...props} bind:value={$formData.description}/>
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />

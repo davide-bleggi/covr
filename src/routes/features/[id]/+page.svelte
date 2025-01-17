@@ -21,6 +21,8 @@
 	import { format } from 'date-fns';
 	import { AutomaticTestDialog, AutomaticTestItem, ManualTestSection, ScenarioDetails } from './sidebar';
 	import { FeatureDialog } from '../../project/[code]';
+	import { marked } from 'marked';
+
 
 	type FeatureWithDetails = Feature & {
 		requirements: (Requirement & {
@@ -111,9 +113,9 @@
 			<div class="w-full">
 			<div class="flex flex-row">
 				<div class="flex flex-col w-full ">
-					<h4><a href="/project/AUTH"><Button variant="outline">{feature.version.project.name.toUpperCase()}</Button></a> - {feature.version.name}</h4>
+					<h4><a href={`/project/${feature.version.project.code}`}><Button variant="outline">{feature.version.project.name.toUpperCase()}</Button></a> - {feature.version.name}</h4>
 					<h1 class="text-2xl font-bold">{feature.name}</h1>
-					<span class="opacity-80">{feature.description}</span>
+					<span class="opacity-80 markdown">{@html marked(feature.description)}</span>
 				</div>
 				<Button size="icon" variant="outline" class=""
 								onclick={(e)=>{openFeatureDialog=true}}>

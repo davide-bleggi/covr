@@ -28,7 +28,7 @@
 	</Button>
 </div>
 <div class="flex flex-col gap-2 py-4 markdown">
-	<div class="w-full p-4 rounded bg-gray-100">
+	<div class="w-full max-h-[500px] overflow-auto p-4 rounded bg-gray-100">
 		{@html marked(currentScenario.scenario??'')}
 	</div>
 </div>
