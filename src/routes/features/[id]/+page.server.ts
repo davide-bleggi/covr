@@ -127,7 +127,7 @@ export const actions: Actions = {
 					data: {
 						requirementId: form.data.requirementId,
 						name: form.data.name,
-						scenario: JSON.stringify(form.data.scenario),
+						scenario: form.data.scenario,
 						id: undefined
 					}
 				});
@@ -145,7 +145,7 @@ export const actions: Actions = {
 					data: {
 						requirementId: form.data.requirementId,
 						name: form.data.name,
-						scenario: JSON.stringify(form.data.scenario),
+						scenario: form.data.scenario,
 						id: undefined
 					},
 					where: { id: form.data.id }

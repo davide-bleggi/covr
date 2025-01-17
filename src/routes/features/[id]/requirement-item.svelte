@@ -107,7 +107,7 @@
 							{#each requirement.scenarios as scenario}
 								<Table.Row on:click={()=>{
 									console.log(scenario)
-									sidePanelStore.scenario = {...scenario, scenario: JSON.parse(scenario.scenario)}
+									sidePanelStore.scenario = {...scenario}
 									console.log(	sidePanelStore.scenario)
 								}}
 													 class={`cursor-pointer ${sidePanelStore.scenario?.id === scenario?.id?'bg-gray-100':""}`}>

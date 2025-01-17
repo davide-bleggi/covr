@@ -62,11 +62,7 @@ export const scenarioFormSchema = z.object({
 	requirementId: z.number(),
 	id: z.number().optional(),
 	name: z.string().min(2).max(100),
-	scenario: z.object({
-		given: z.string().max(1000).optional(),
-		when: z.string().max(1000).optional(),
-		then: z.string().max(1000).optional()
-	})
+	scenario: z.string(),
 });
 
 export const manualTestFormSchema = z.object({

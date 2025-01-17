@@ -48,17 +48,51 @@
 		$formData = { ...propFormData };
 	});
 
+	let cursorPosition = 0;
+	let descriptionTextArea: HTMLTextAreaElement | null = $state(null);
+
+	function handleInput(event: Event) {
+
+		const target = event.target as HTMLTextAreaElement;
+		cursorPosition = target.selectionStart;
+		// console.log(event);
+		// if (event instanceof InputEvent && event.inputType === 'insertLineBreak') {
+		// 	const text = target.value;
+		// 	const beforeCursor = text.slice(0, cursorPosition);
+		// 	const afterCursor = text.slice(cursorPosition);
+		// 	target.value = beforeCursor + '  \n' + afterCursor;
+		// 	target.selectionStart = target.selectionEnd = cursorPosition + 3;
+		// }
+	}
+
+	function insertAtCursor(insertText: string) {
+		console.log(descriptionTextArea);
+		let text = $formData.scenario ?? '';
+		// Insert text at the cursor position
+		$formData.scenario = `${text.slice(0, cursorPosition)}**${insertText}** ${text.slice(cursorPosition)}`;
+		// Set cursor position after the inserted text
+
+		if (descriptionTextArea) {
+			setTimeout(() => {
+				descriptionTextArea?.focus();
+				if (descriptionTextArea instanceof HTMLTextAreaElement) {
+					const newPosition = (cursorPosition ?? 0) + insertText.length + 5;
+					descriptionTextArea.setSelectionRange(newPosition, newPosition);
+				}
+			}, 0);
+		}
+	}
 </script>
 
 <Dialog.Root bind:open={open}>
-	<Dialog.Content class="sm:max-w-[425px]  ">
+	<Dialog.Content class="sm:max-w-[600px]  ">
 		{$formId}
 		<Dialog.Header>
 			<Dialog.Title>Gestione Scenario</Dialog.Title>
 			<Dialog.Description>
 			</Dialog.Description>
 		</Dialog.Header>
-<!--		<SuperDebug data={$formData}></SuperDebug>-->
+		<!--		<SuperDebug data={$formData}></SuperDebug>-->
 		<div class="grid gap-4 py-4">
 			<form method="POST" action='?/saveScenario' use:enhance id="saveScenarioForm">
 				<input hidden name="id" bind:value={$formData.id} />
@@ -72,35 +106,35 @@
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				{#if $formData.scenario}
-					<FormField {form} name="scenario.given">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>Given</Form.Label>
-								<Textarea {...props} bind:value={$formData.scenario.given} data-markdown />
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</FormField>
-					<FormField {form} name="scenario.when">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>When</Form.Label>
-								<Textarea {...props} bind:value={$formData.scenario.when} data-markdown />
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</FormField>
-					<FormField {form} name="scenario.then">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>Then</Form.Label>
-								<Textarea {...props} bind:value={$formData.scenario.then} data-markdown />
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</FormField>
-				{/if}
+
+				<FormField {form} name="scenario">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>Description</Form.Label>
+							<div>
+								<Button variant="outline" size="sm" onclick={(e)=>{e.preventDefault(); insertAtCursor('GIVEN')}}>
+									GIVEN
+								</Button>
+								<Button variant="outline" size="sm" onclick={(e)=>{e.preventDefault(); insertAtCursor('THEN')}}>
+									THEN
+								</Button>
+								<Button variant="outline" size="sm" onclick={(e)=>{e.preventDefault(); insertAtCursor('WHEN')}}>
+									WHEN
+								</Button>
+								<Button variant="outline" size="sm" onclick={(e)=>{e.preventDefault(); insertAtCursor('AND')}}>
+									AND
+								</Button>
+								<Button variant="outline" size="sm" onclick={(e)=>{e.preventDefault(); insertAtCursor('"BUT"')}}>
+									BUT
+								</Button>
+							</div>
+							<Textarea class="min-h-[350px]" bind:ref={descriptionTextArea} oninput={handleInput} onclick={handleInput} {...props}
+												bind:value={$formData.scenario} data-markdown />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</FormField>
+
 			</form>
 
 		</div>

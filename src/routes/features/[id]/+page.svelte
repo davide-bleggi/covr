@@ -67,7 +67,7 @@
 		const requirements = feature.requirements;
 		const scenarioId = sidePanelStore.scenario?.id;
 		const foundScenario = requirements.flatMap(req => req.scenarios).find(scenario => scenario.id === scenarioId);
-		return foundScenario ? { ...foundScenario, scenario: JSON.parse(foundScenario.scenario) } : undefined;
+		return foundScenario ? { ...foundScenario} : undefined;
 	});
 
 </script>
