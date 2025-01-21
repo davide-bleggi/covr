@@ -22,6 +22,7 @@
 	import { AutomaticTestDialog, AutomaticTestItem, ManualTestSection, ScenarioDetails } from './sidebar';
 	import { FeatureDialog } from '../../project/[code]';
 	import { marked } from 'marked';
+	import { ScrollArea } from '$lib/components/ui/scroll-area';
 
 
 	type FeatureWithDetails = Feature & {
@@ -72,7 +73,7 @@
 		const requirements = feature.requirements;
 		const scenarioId = sidePanelStore.scenario?.id;
 		const foundScenario = requirements.flatMap(req => req.scenarios).find(scenario => scenario.id === scenarioId);
-		return foundScenario ? { ...foundScenario} : undefined;
+		return foundScenario ? { ...foundScenario } : undefined;
 	});
 
 </script>
@@ -111,32 +112,35 @@
 	<Resizable.Pane defaultSize={70}>
 		<div class="p-5 flex flex-col h-full overflow-hidden">
 			<div class="w-full">
-			<div class="flex flex-row">
-				<div class="flex flex-col w-full ">
-					<h4><a href={`/project/${feature.version.project.code}`}><Button variant="outline">{feature.version.project.name.toUpperCase()}</Button></a> - {feature.version.name}</h4>
-					<h1 class="text-2xl font-bold">{feature.name}</h1>
-					<span class="opacity-80 markdown">{@html marked(feature.description)}</span>
+				<div class="flex flex-row">
+					<div class="flex flex-col w-full ">
+						<h4><a href={`/project/${feature.version.project.code}`}>
+							<Button variant="outline">{feature.version.project.name.toUpperCase()}</Button>
+						</a> - {feature.version.name}</h4>
+						<h1 class="text-2xl font-bold">{feature.name}</h1>
+						<span class="opacity-80 markdown">{@html marked(feature.description)}</span>
+					</div>
+					<Button size="icon" variant="outline" class=""
+									onclick={(e)=>{openFeatureDialog=true}}>
+						<Pencil></Pencil>
+					</Button>
 				</div>
-				<Button size="icon" variant="outline" class=""
-								onclick={(e)=>{openFeatureDialog=true}}>
-					<Pencil></Pencil>
-				</Button>
+				<div class=" flex flex-1 items-center w-full pt-3">
+					<Button variant="outline" onclick={()=>openRequirementDialog = true} class="w-full">
+						Crea Requisito
+					</Button>
+				</div>
 			</div>
-			<div class=" flex flex-1 items-center w-full pt-3">
-				<Button variant="outline" onclick={()=>openRequirementDialog = true} class="w-full">
-					Crea Requisito
-				</Button>
-			</div>
-			</div>
-			<ul class="flex h-full flex-col gap-2 py-5 overflow-y-auto">
-				{#each feature.requirements as requirement }
-					<li>
-						<RequirementItem {requirement} requirementForm={data.requirementForm}
-														 scenarioForm={data.scenarioForm.data} />
-					</li>
-				{/each}
-			</ul>
-
+			<ScrollArea class="h-full my-5">
+				<ul class="flex  flex-col gap-2">
+					{#each feature.requirements as requirement }
+						<li>
+							<RequirementItem {requirement} requirementForm={data.requirementForm}
+															 scenarioForm={data.scenarioForm.data} />
+						</li>
+					{/each}
+				</ul>
+			</ScrollArea>
 			<Pagination.Root count={data.pagination.total} perPage={5}>
 				{#snippet children({ pages, currentPage })}
 					<Pagination.Content>
@@ -175,7 +179,7 @@
 	<Resizable.Handle />
 	<Resizable.Pane defaultSize={30}>
 		<div class="h-full p-4 ">
-			<div class="h-full p-4 rounded-md border overflow-y-auto">
+			<ScrollArea class="h-full p-4 rounded-md border ">
 				{#if !currentScenario}
 					<div class="flex h-full items-center justify-center ">
 						<span class="text-sm opacity-80">Seleziona uno scenario</span>
@@ -223,7 +227,7 @@
 						{/if}
 					</div>
 				{/if}
-			</div>
+			</ScrollArea>
 		</div>
 		<!--					<div class="flex flex-row w-full items-stretch">-->
 		<!--						<h2 class="font-bold flex-1">-->
