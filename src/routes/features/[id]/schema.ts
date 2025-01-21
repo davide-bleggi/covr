@@ -38,8 +38,8 @@ export const testStatusLabels = [
 		label: 'PASS',
 	},
 	{
-		value: 'NOT_PASS',
-		label: 'NOT PASS',
+		value: 'FAIL',
+		label: 'FAIL',
 	},
 	{
 		value: 'TO_TEST',
@@ -47,7 +47,7 @@ export const testStatusLabels = [
 	}
 ] as const;
 
-export type TestStatusType = 'PASS' | 'NOT_PASS' | 'TO_TEST';
+export type TestStatusType = 'PASS' | 'FAIL' | 'TO_TEST';
 
 export const requirementFormSchema = z.object({
 	featureId: z.number(),

@@ -13,7 +13,7 @@
 	} = $props();
 
 	const colorClasses = {
-		NOT_PASS: {
+		FAIL: {
 			text: 'text-red-500',
 			bg: 'bg-red-100'
 		},

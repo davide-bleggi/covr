@@ -10,11 +10,11 @@
 	import { toast } from 'svelte-sonner';
 
 	let { automaticTest }: {
-		automaticTest: (AutomaticTest & {scenarios: Scenario[], status: TestStatusType});
+		automaticTest: (AutomaticTest & { scenarios: Scenario[], status: TestStatusType });
 	} = $props();
 
 	const colorClasses = {
-		NOT_PASS: {
+		FAIL: {
 			text: 'text-red-500',
 			bg: 'bg-red-100'
 		},
@@ -33,7 +33,7 @@
 	async function copyToClipboard(text: string) {
 		try {
 			await navigator.clipboard.writeText(text);
-			toast("Testo copiato")
+			toast('Testo copiato');
 		} catch (err) {
 			console.error('Failed to copy text: ', err);
 		}
@@ -70,15 +70,18 @@
 			<span class="text-sm opacity-60">Nome</span>
 			{`E2E-${automaticTest.id}-${automaticTest.name}`}
 		</div>
-		<Button variant="outline" size="icon" onclick={()=>{copyToClipboard(`E2E-${automaticTest.id}-${automaticTest.name}`)}}>
+		<Button variant="outline" size="icon"
+						onclick={()=>{copyToClipboard(`E2E-${automaticTest.id}-${automaticTest.name}`)}}>
 			<CopyCheck></CopyCheck>
 		</Button>
 	</div>
-
-	<div>
-		<div class="flex flex-col flex-1">
-			<span class="text-sm opacity-60">Note</span>
-			{automaticTest.notes}
+	
+	{#if automaticTest.notes?.length > 0}
+		<div>
+			<div class="flex flex-col flex-1">
+				<span class="text-sm opacity-60">Note</span>
+				{automaticTest.notes}
+			</div>
 		</div>
-	</div>
+	{/if}
 </div>

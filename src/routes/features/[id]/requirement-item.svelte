@@ -11,6 +11,7 @@
 	import { getContext } from 'svelte';
 	import { cn } from '$lib/utils';
 	import { marked } from 'marked';
+	import { Progress } from '$lib/components/ui/progress';
 
 	const sidePanelStore: any = getContext('sidePanelStore');
 
@@ -53,8 +54,11 @@
 		</div>
 		<div class="flex flex-col">
 			<span class="opacity-70 text-sm">Copertura</span>
+			<div class="flex flex-row w-[200px] items-center gap-2">
+				<Progress value={requirement.coverage} class="h-2"/>
 			<span>{requirement.coverage}%</span>
-		</div>
+			</div>
+			</div>
 		<div class="flex flex-col">
 			<span class="opacity-70 text-sm">Stato</span>
 			<span class={`${currentRequirementStatus?.color??''} rounded-sm px-2 text-white`}>
@@ -113,7 +117,8 @@
 													 class={`cursor-pointer ${sidePanelStore.scenario?.id === scenario?.id?'bg-gray-100':""}`}>
 									<Table.Cell>SCN-{scenario.id}</Table.Cell>
 									<Table.Cell>{scenario.name}</Table.Cell>
-									<Table.Cell>{scenario.testStatus}</Table.Cell>
+									<Table.Cell class="flex"><span class={`border rounded-md p-2 w-full flex justify-center font-semibold
+										${scenario.testStatus==='PASS'?"border-green-500 text-green-500":scenario.testStatus==='FAIL'?"border-red-500 text-red-500":'border-none'}`}>{scenario.testStatus}</span></Table.Cell>
 								</Table.Row>
 							{/each}
 						</Table.Body>
