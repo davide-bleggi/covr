@@ -98,7 +98,7 @@ model ManualTest {
   status        String
   ownerId       Int
   scenarioId    Int      @unique
-  notes         String
+  notes         String?
   executionDate DateTime
   owner         User     @relation(fields: [ownerId], references: [id])
   scenario      Scenario @relation(fields: [scenarioId], references: [id])
@@ -109,6 +109,6 @@ model AutomaticTest {
   name          String
   status        String
   executionDate DateTime
-  notes         String
+  notes         String?
   scenarios     Scenario[] @relation("AutomaticTestToScenario")
 }

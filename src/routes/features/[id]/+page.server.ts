@@ -225,6 +225,7 @@ export const actions: Actions = {
 		const form = await superValidate(event, zod(manualTestFormSchema));
 
 		if (!form.data.id) {
+			console.log('Making new manual test');
 			try {
 				await prisma.manualTest.create({
 					data: {

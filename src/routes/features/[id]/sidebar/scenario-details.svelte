@@ -17,9 +17,12 @@
 
 
 <div class="flex flex-row w-full items-center justify-center">
-	<h2 class="font-bold flex-1">
+<div class="flex flex-col flex-1">
+	<span class="text-sm">{`SCN-${currentScenario.id}`}</span>
+	<h2 class="font-bold ">
 		{currentScenario.name}
 	</h2>
+</div>
 	<Button size="icon" variant="outline" class=""
 					onclick={(e)=>{
 						openScenarioDialog=true

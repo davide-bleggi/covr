@@ -49,7 +49,7 @@
 </script>
 
 <Dialog.Root bind:open={open}>
-	<Dialog.Content class="sm:max-w-[425px]  ">
+	<Dialog.Content class="sm:max-w-[600px]  ">
 
 		<Dialog.Header>
 			<Dialog.Title>Aggiungi Test Automatico</Dialog.Title>
@@ -106,7 +106,7 @@
 						{#snippet children({ props })}
 							<input hidden value={$formData.notes} name={props.name} />
 							<Form.Label>Note</Form.Label>
-							<Textarea bind:value={$formData.notes}></Textarea>
+							<Textarea class="min-h-[250px]" bind:value={$formData.notes}></Textarea>
 							<Form.Description>Aggiungi descrizione dei problemi riscontrati</Form.Description>
 						{/snippet}
 					</Form.Control>

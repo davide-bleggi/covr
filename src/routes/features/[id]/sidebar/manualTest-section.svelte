@@ -3,14 +3,14 @@
 	import { format } from 'date-fns';
 	import { Pencil } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button';
-	import {testStatusLabels} from '../schema';
+	import { testStatusLabels } from '../schema';
 	import { ManualTestDialog } from '../index';
 	import type { ManualTest, User } from '@prisma/client';
 	import { marked } from 'marked';
 
-	let {manualTest}: {
-		manualTest: ManualTest & {owner: User};
-	}=$props();
+	let { manualTest }: {
+		manualTest: ManualTest & { owner: User };
+	} = $props();
 
 	const colorClasses = {
 		NOT_PASS: {
@@ -60,10 +60,12 @@
 			<Pencil></Pencil>
 		</Button>
 	</div>
-	<div>
-		<div class="flex flex-col flex-1">
-			<span class="text-sm opacity-60">Note</span>
-			<span class="markdown">{@html marked(manualTest.notes)}</span>
+	{#if manualTest.notes?.length > 0 }
+		<div>
+			<div class="flex flex-col flex-1">
+				<span class="text-sm opacity-60">Note</span>
+				<span class="markdown">{@html marked(manualTest.notes)}</span>
+			</div>
 		</div>
-	</div>
+	{/if}
 </div>

@@ -53,7 +53,7 @@
 </script>
 
 <Dialog.Root bind:open={open}>
-	<Dialog.Content class="sm:max-w-[425px]  ">
+	<Dialog.Content class="sm:max-w-[600px]  ">
 
 		<Dialog.Header>
 			<Dialog.Title>Aggiungi Test Manuale</Dialog.Title>
@@ -120,7 +120,7 @@
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>Note</Form.Label>
-								<Textarea {...props}  bind:value={$formData.notes} data-markdown></Textarea>
+								<Textarea class="min-h-[300px]" {...props}  bind:value={$formData.notes} data-markdown></Textarea>
 							<Form.Description>Aggiungi descrizione dei problemi riscontrati</Form.Description>
 						{/snippet}
 					</Form.Control>

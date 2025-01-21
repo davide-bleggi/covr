@@ -1,12 +1,13 @@
 <script lang="ts">
 
 	import { format } from 'date-fns';
-	import { Pencil } from 'lucide-svelte';
+	import { Copy, CopyCheck, CopyIcon, Pencil } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { testStatusLabels, type TestStatusType } from '../schema';
 	import { ManualTestDialog } from '../index';
 	import type { AutomaticTest, ManualTest, Scenario, User } from '@prisma/client';
 	import { AutomaticTestDialog } from './index';
+	import { toast } from 'svelte-sonner';
 
 	let { automaticTest }: {
 		automaticTest: (AutomaticTest & {scenarios: Scenario[], status: TestStatusType});
@@ -28,6 +29,15 @@
 	};
 
 	let openManualTestDialog = $state(false);
+
+	async function copyToClipboard(text: string) {
+		try {
+			await navigator.clipboard.writeText(text);
+			toast("Testo copiato")
+		} catch (err) {
+			console.error('Failed to copy text: ', err);
+		}
+	}
 </script>
 
 <AutomaticTestDialog
@@ -60,6 +70,9 @@
 			<span class="text-sm opacity-60">Nome</span>
 			{`E2E-${automaticTest.id}-${automaticTest.name}`}
 		</div>
+		<Button variant="outline" size="icon" onclick={()=>{copyToClipboard(`E2E-${automaticTest.id}-${automaticTest.name}`)}}>
+			<CopyCheck></CopyCheck>
+		</Button>
 	</div>
 
 	<div>

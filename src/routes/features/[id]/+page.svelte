@@ -182,7 +182,7 @@
 					</div>
 				{:else }
 					<ScenarioDetails {currentScenario} />
-					<div class="px-4">
+					<div class="px-0">
 						<h2 class="font-bold py-4">Test Manuale</h2>
 						{#if !currentScenario.manualTest}
 							<div class="flex flex-row justify-between items-center w-full">
@@ -199,8 +199,8 @@
 							<ManualTestSection manualTest={currentScenario.manualTest} />
 						{/if}
 					</div>
-					<div class="px-4">
-						<div class="flex flex-row justify-center items-center py-4">
+					<div class="px-0">
+						<div class="flex flex-row justify-center items-center py-4 pr-4">
 							<h2 class="font-bold flex-1">Test Automatici</h2>
 							<Button size="icon" variant="outline" class=""
 											onclick={(e)=>{
