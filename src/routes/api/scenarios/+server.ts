@@ -8,12 +8,28 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	try {
 		// Example: fetch from your database
-		console.log('searching for scenarios: ', search )
+		console.log('searching for scenarios: ', search);
+
 		const scenarios = await prisma.scenario.findMany({
 			where: {
-				name: {
-					contains: search,
-				}
+				OR: search && !isNaN(Number(search)) ? [
+					{
+						name: {
+							contains: search
+						}
+					},
+					{
+						id: {
+							equals: Number(search)
+						}
+					}
+				] : [
+					{
+						name: {
+							contains: search
+						}
+					}
+				]
 			},
 			select: {
 				name: true,
@@ -21,9 +37,9 @@ export const GET: RequestHandler = async ({ url }) => {
 			}
 		});
 
-		console.log(scenarios)
+		console.log(scenarios);
 
-		return json(scenarios.map(({name, id})=>({label: name, value: id })));
+		return json(scenarios.map(({ name, id }) => ({ label: name, value: id })));
 	} catch (error) {
 		return new Response('Failed to fetch frameworks', { status: 500 });
 	}

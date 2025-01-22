@@ -1,3 +1,3 @@
 import DatePicker from "./date-picker.svelte"
-
-export {DatePicker}
+import ComboSelector from "./combo-selector.svelte"
+export {DatePicker, ComboSelector}

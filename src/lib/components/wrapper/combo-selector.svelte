@@ -19,7 +19,8 @@
 		path = '/api/frameworks',
 		placeholder = 'Cerca...',
 		loadingText = 'Caricamento...',
-		values = $bindable([] as number[])
+		values = $bindable([] as number[]),
+		optionFormat
 	} = $props();
 
 	let open = $state(false);
@@ -134,7 +135,7 @@
 		</Button>
 	</Popover.Trigger>
 	<Popover.Content class="w-auto p-0">
-		<Command.Root>
+		<Command.Root shouldFilter={false}>
 			<Command.Input
 				{placeholder}
 				oninput={(e)=>{handleSearch(e.currentTarget.value.length>0?e.currentTarget.value:'')}}
@@ -151,17 +152,19 @@
 				<!--	empty list-->
 				<!--	<Command.Empty>{noResultsText}</Command.Empty>-->
 				<!--{:else}-->
-
+<!--				<div class="max-w-[400px] overflow-auto">-->
+<!--				{JSON.stringify(options)}-->
+<!--				</div>-->
 				{#each options as option}
 					<div class="w-full">
-						<Command.Item class="w-full flex justify-start cursor-pointer p-4"
+						<Command.Item class="w-full flex justify-start cursor-pointer p-4 font-normal"
 													value={option.label}
 													onclick={() => {
 						                  toggleSelection(option);
 						                }}>
 							<Check class={cn("size-3", !selectedValues.includes(option.value) && "invisible")} />
-
-							{option.label}
+							{@render optionFormat(option)}
+							<!--{`${prefix} ${option.label}`}-->
 						</Command.Item>
 					</div>
 					<!--							<Command.Item-->

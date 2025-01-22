@@ -8,11 +8,10 @@
 	import * as Select from '$lib/components/ui/select/index';
 	import * as Command from '$lib/components/ui/command/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
-	import { DatePicker } from '$lib/components/wrapper';
+	import { ComboSelector, DatePicker } from '$lib/components/wrapper';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/form';
-	import { ScenarioPicker } from './index';
 
 	let {
 		open = $bindable(false),
@@ -118,11 +117,16 @@
 						<Form.Control>
 							{#snippet children({ props })}
 								<input hidden name="scenarioIds" value={$formData.scenarioIds} />
-								<ScenarioPicker
+								<ComboSelector
 									path="/api/scenarios"
 									bind:values={$formData.scenarioIds}
 									placeholder="Seleziona scenari collegati..."
-								/>
+								>
+									{#snippet optionFormat(option)}
+										{`SCN - ${option.value} - ${option.label}`}
+									{/snippet}
+
+								</ComboSelector>
 							{/snippet}
 						</Form.Control>
 
