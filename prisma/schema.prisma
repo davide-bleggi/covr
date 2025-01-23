@@ -8,21 +8,29 @@ datasource db {
 }
 
 model User {
-  id        Int          @id @default(autoincrement())
-  name      String
-  email     String       @unique
-  createdAt DateTime     @default(now())
-  tests     ManualTest[]
+  id              Int          @id @default(autoincrement())
+  name            String
+  email           String       @unique
+  password        String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @default(now()) @updatedAt
+  tests           ManualTest[]
+  createdProjects Project[]    @relation("CreatedProjects")
+  updatedProjects Project[]    @relation("UpdatedProjects")
 }
 
 model Project {
-  id          Int       @id @default(autoincrement())
-  name        String
-  code        String    @unique
-  status      String
-  createdAt   DateTime  @default(now())
-  description String?
-  versions    Version[]
+  id            Int       @id @default(autoincrement())
+  name          String
+  code          String    @unique
+  status        String
+  createdAt     DateTime  @default(now())
+  description   String?
+  versions      Version[]
+  createdByUser User      @relation("CreatedProjects", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedByUser User      @relation("UpdatedProjects", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy     Int       @default(1)
+  updatedBy     Int       @default(1)
 }
 
 model Version {
