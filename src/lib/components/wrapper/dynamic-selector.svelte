@@ -8,6 +8,7 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import { Button } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils';
+	import SuperDebug from 'sveltekit-superforms';
 
 	type OptionsItem = {
 		value: number;
@@ -21,7 +22,7 @@
 		loadingText = 'Caricamento...',
 		value = $bindable<number | null>(null),
 		optionFormat,
-		params = { }
+		params = $bindable({})
 	} = $props();
 
 	let open = $state(false);
@@ -31,16 +32,12 @@
 	let selectedValue = $state<number | null>(value);
 	let debounceTimer: number;
 
-	$effect(() => {
-		value = selectedValues;
-	});
-
 	const selectedLabel = $derived<string | null>(
 		options.find(option => option.value === selectedValue)?.label ?? null
 	);
 
 	async function fetchOptions(search: string, limit?: number) {
-		const localParams = new URLSearchParams({ search, limit: limit?limit.toString():100,...params });
+		const localParams = new URLSearchParams({ search, limit: limit ? limit.toString() : 100, ...params });
 		const response = await fetch(`${path}?${localParams}`);
 		if (!response.ok) throw new Error('Failed to fetch options');
 		return response.json();
@@ -73,10 +70,12 @@
 		} else {
 			selectedValue = option.value;
 		}
+		open = false;
 	}
+
 	// // SvelteKit 5's onMount equivalent using $effect
 	$effect.root(() => {
-			loadInitialSelections();
+		loadInitialSelections();
 	});
 
 	async function loadInitialSelections() {
@@ -89,10 +88,19 @@
 			loading = false;
 		}
 	}
+
+	$effect(() => {
+		value = selectedValue;
+	});
+
+	$effect(async () => {
+		void params
+		options = await fetchOptions(searchTerm);
+	})
 </script>
 
 <Popover.Root bind:open>
-	<Popover.Trigger class="w-full">
+	<Popover.Trigger class="flex-1">
 		<Button
 			variant="outline"
 			class="w-full h-auto justify-between"

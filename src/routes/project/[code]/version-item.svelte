@@ -9,7 +9,7 @@
 
 
 	let { version, customers }: {
-		version: Version & { installations: (Installation & { customer: Customer })[] } & { features: Feature[] },
+		version: Version & { installations: (Installation & { customer: Customer })[] } & { features: Feature[] } & {project: Project},
 		customers: Customer[],
 	} = $props();
 
@@ -36,10 +36,11 @@
 <FeatureDialog
 	bind:open={openFeatureDialog}
 	propFormData={featureForm}
+	version = {version}
 	formId={`new-feature-form-${version.id}`}>
 </FeatureDialog>
 
-<div class="w-full max-w-[700px] p-4">
+<div class="w-full max-w-[700px] gap-2 items-center justify-between shadow-md p-5 rounded-md">
 	<h4 class="text-xl font-bold w-full">{version.name}</h4>
 	<Accordion.Root class="w-full" bind:value={openItems}>
 		<Accordion.Item value="installations" class="w-full">
@@ -81,7 +82,7 @@
 				<ul class="gap-2 flex flex-col">
 					{#each version.features as feature}
 						<li>
-							<FeatureItem {featureForm} {feature}></FeatureItem>
+							<FeatureItem {feature}></FeatureItem>
 						</li>
 					{/each}
 				</ul>

@@ -4,7 +4,7 @@
 	import SuperDebug, { type Infer, superForm } from 'sveltekit-superforms';
 	import {
 		type FeatureFormSchema,
-		featureFormSchema,
+		featureFormSchema
 	} from './schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Input } from '$lib/components/ui/input';
@@ -22,10 +22,12 @@
 	}: {
 		open: boolean,
 		propFormData: any;
-		version: Version & {project: Project};
+		version: Version & { project: Project } | undefined;
 	} = $props();
 
-	let projectId = $state(version.project.id)
+	let projectId = $state(version ? version.project.id : null);
+	let versionsParams = $state(version ? { projectId: projectId } : {});
+
 
 	const form = $state(superForm<Infer<FeatureFormSchema>>(propFormData, {
 		validators: zodClient(featureFormSchema),
@@ -41,13 +43,17 @@
 		}
 	}));
 
-	const { form: formData, enhance, errors, formId} = form;
+	const { form: formData, enhance, errors, formId } = form;
 
 	$effect(() => {
 		if ($formId) {
 			$formId = propFormData.id ? `edit-feature-dialog-${propFormData.id}` : 'new-feature-dialog';
 		}
 		$formData = { ...propFormData };
+	});
+
+	$effect(() => {
+		versionsParams = { projectId: projectId };
 	});
 
 </script>
@@ -62,46 +68,52 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
+		<div class="grid gap-4 py-4">
+			<form method="POST" class="flex flex-col gap-3" action='?/saveFeature' use:enhance id="saveFeatureForm">
+				<input hidden name="id" bind:value={$formData.id} />
+				<input hidden name="versionId" bind:value={$formData.versionId} />
 
-		<DynamicSelector
-			path="/api/projects"
-			bind:value={projectId}
-			placeholder="Seleziona progetto di appartenenza..."
-		>
-			{#snippet optionFormat(option)}
-				{`${option.label}`}
-			{/snippet}
-		</DynamicSelector>
-
-		<Form.Field {form} name="versionId">
-			<div class="flex flex-col w-full gap-3">
-				<input hidden value={version.id}/>
-				<Form.Control>
-					{#snippet children({ props })}
+				<div class="grid grid-cols-3 flex-row gap-2 w-full">
+					<div class="grid col-span-2 flex- w-full gap-3">
+						<label class="font-medium text-sm leading-none ">Progetto</label>
 						<DynamicSelector
-							path='/api/versions'
-							params={{versionId: version.project.id}}
-							bind:value={version.id}
-							placeholder="Seleziona versione di appartenenza..."
+							path="/api/projects"
+							bind:value={projectId}
+							placeholder="Seleziona progetto..."
 						>
 							{#snippet optionFormat(option)}
 								{`${option.label}`}
 							{/snippet}
 						</DynamicSelector>
-					{/snippet}
-				</Form.Control>
-			</div>
-		</Form.Field>
+					</div>
 
-		<div class="grid gap-4 py-4">
-			<form method="POST" action='?/saveFeature' use:enhance id="saveFeatureForm">
-				<input hidden name="id" bind:value={$formData.id} />
-				<input hidden name="versionId" bind:value={$formData.versionId} />
+					<Form.Field  {form} name="versionId">
+						<div class="grid col-span-1 w-full gap-3">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Form.Label>Versione</Form.Label>
+
+									<DynamicSelector
+										path='/api/versions'
+										bind:params={versionsParams}
+										bind:value={$formData.versionId}
+										placeholder="Seleziona versione..."
+									>
+										{#snippet optionFormat(option)}
+											{`${option.label} - ${option.value}`}
+										{/snippet}
+									</DynamicSelector>
+								{/snippet}
+							</Form.Control>
+						</div>
+					</Form.Field>
+				</div>
+
 				<Form.Field {form} name="name">
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>Nome Feature</Form.Label>
-							<Input {...props} type="text" bind:value={$formData.name}/>
+							<Input {...props} type="text" bind:value={$formData.name} />
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />
@@ -111,7 +123,7 @@
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>Descrizione</Form.Label>
-							<Textarea class="min-h-[350px]" {...props} bind:value={$formData.description}/>
+							<Textarea class="min-h-[350px]" {...props} bind:value={$formData.description} />
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />

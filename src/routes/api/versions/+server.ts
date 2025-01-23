@@ -5,13 +5,13 @@ import * as sea from 'node:sea';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const search = url.searchParams.get('search') || '';
-	const versionId = url.searchParams.get('versionId') || '';
+	const projectId = url.searchParams.get('projectId') || '';
 
 	const limit = url.searchParams.get('limit') || '100';
 
 	try {
 		// Example: fetch from your database
-		console.log('searching for versions: ', search);
+		console.log(`searching for versions '${search}' with project id: ${projectId}` );
 		const versions = await prisma.version.findMany({
 			where: {
 				AND: [
@@ -21,18 +21,21 @@ export const GET: RequestHandler = async ({ url }) => {
 						}
 					},
 					{
-						id: {
-							equals: Number(versionId)
+						projectId: {
+							equals: Number(projectId)
 						}
 					}
 				]
 			},
 			select: {
 				name: true,
-				id: true
+				id: true,
+				projectId: true
 			},
 			take: Number(limit)
 		});
+
+		console.log(versions)
 
 		return json(versions.map(({ name, id }) => ({ label: name, value: id })));
 	} catch (error) {

@@ -19,7 +19,8 @@ export async function load({ params }) {
 						include: {
 							customer: true
 						}
-					}
+					},
+					project: true
 				}
 			}
 		}
