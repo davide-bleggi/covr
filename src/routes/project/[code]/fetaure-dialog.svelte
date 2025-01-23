@@ -12,14 +12,20 @@
 	import * as Select from '$lib/components/ui/select/index';
 	import { FormField } from '$lib/components/ui/form/index.js';
 	import { Textarea } from '$lib/components/ui/textarea';
+	import type { Customer, Project, Version } from '@prisma/client';
+	import { ComboSelector, DynamicSelector } from '$lib/components/wrapper';
 
 	let {
 		open = $bindable(false),
 		propFormData = $bindable(),
+		version
 	}: {
 		open: boolean,
 		propFormData: any;
+		version: Version & {project: Project};
 	} = $props();
+
+	let projectId = $state(version.project.id)
 
 	const form = $state(superForm<Infer<FeatureFormSchema>>(propFormData, {
 		validators: zodClient(featureFormSchema),
@@ -44,7 +50,6 @@
 		$formData = { ...propFormData };
 	});
 
-
 </script>
 
 <Dialog.Root bind:open={open}>
@@ -56,6 +61,37 @@
 				Inserire i dati della feature
 			</Dialog.Description>
 		</Dialog.Header>
+
+
+		<DynamicSelector
+			path="/api/projects"
+			bind:value={projectId}
+			placeholder="Seleziona progetto di appartenenza..."
+		>
+			{#snippet optionFormat(option)}
+				{`${option.label}`}
+			{/snippet}
+		</DynamicSelector>
+
+		<Form.Field {form} name="versionId">
+			<div class="flex flex-col w-full gap-3">
+				<input hidden value={version.id}/>
+				<Form.Control>
+					{#snippet children({ props })}
+						<DynamicSelector
+							path='/api/versions'
+							params={{versionId: version.project.id}}
+							bind:value={version.id}
+							placeholder="Seleziona versione di appartenenza..."
+						>
+							{#snippet optionFormat(option)}
+								{`${option.label}`}
+							{/snippet}
+						</DynamicSelector>
+					{/snippet}
+				</Form.Control>
+			</div>
+		</Form.Field>
 
 		<div class="grid gap-4 py-4">
 			<form method="POST" action='?/saveFeature' use:enhance id="saveFeatureForm">
@@ -70,6 +106,7 @@
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
+
 				<FormField {form} name="description">
 					<Form.Control>
 						{#snippet children({ props })}

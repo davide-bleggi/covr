@@ -101,7 +101,7 @@
 		description: feature.description,
 		versionId: feature.versionId
 	}}
-	formId={`edit-feature-form-${feature.id}`}
+	version = {feature.version}
 >
 </FeatureDialog>
 

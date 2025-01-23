@@ -125,7 +125,6 @@
 									{#snippet optionFormat(option)}
 										{`SCN - ${option.value} - ${option.label}`}
 									{/snippet}
-
 								</ComboSelector>
 							{/snippet}
 						</Form.Control>

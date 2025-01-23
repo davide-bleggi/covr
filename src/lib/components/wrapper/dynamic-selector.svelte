@@ -9,7 +9,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils';
 
-	type ScenarioItem = {
+	type OptionsItem = {
 		value: number;
 		label: string;
 	};
@@ -19,30 +19,29 @@
 		path = '/api/frameworks',
 		placeholder = 'Cerca...',
 		loadingText = 'Caricamento...',
-		values = $bindable([] as number[]),
-		optionFormat
+		value = $bindable<number | null>(null),
+		optionFormat,
+		params = { }
 	} = $props();
 
 	let open = $state(false);
 	let loading = $state(false);
-	let options = $state<ScenarioItem[]>([]);
+	let options = $state<OptionsItem[]>([]);
 	let searchTerm = $state('');
-	let selectedValues = $state<number[]>(values);
+	let selectedValue = $state<number | null>(value);
 	let debounceTimer: number;
 
 	$effect(() => {
-		values = selectedValues;
+		value = selectedValues;
 	});
 
-	const selectedLabels = $derived(
-		options
-			.filter((f) => selectedValues.includes(f.value))
-			.map((f) => f.label)
+	const selectedLabel = $derived<string | null>(
+		options.find(option => option.value === selectedValue)?.label ?? null
 	);
 
 	async function fetchOptions(search: string, limit?: number) {
-		const params = new URLSearchParams(limit ? { search, limit: limit.toString() } : { search });
-		const response = await fetch(`${path}?${params}`);
+		const localParams = new URLSearchParams({ search, limit: limit?limit.toString():100,...params });
+		const response = await fetch(`${path}?${localParams}`);
 		if (!response.ok) throw new Error('Failed to fetch options');
 		return response.json();
 	}
@@ -68,27 +67,16 @@
 		}, 300);
 	}
 
-	function toggleSelection(option: ScenarioItem) {
-		if (selectedValues.includes(option.value)) {
-			selectedValues = selectedValues.filter(v => v !== option.value);
+	function toggleSelection(option: OptionItem) {
+		if (selectedValue === option.value) {
+			selectedValue = null;
 		} else {
-			selectedValues = [...selectedValues, option.value];
-
-			if (!options.some(o => o.value === option.value)) {
-				options = [...options, option];
-			}
+			selectedValue = option.value;
 		}
 	}
-
-	function removeValue(valueToRemove: number) {
-		selectedValues = selectedValues.filter(v => v !== valueToRemove);
-	}
-
 	// // SvelteKit 5's onMount equivalent using $effect
 	$effect.root(() => {
-		// if (selectedValues.length > 0) {
 			loadInitialSelections();
-		// }
 	});
 
 	async function loadInitialSelections() {
@@ -112,21 +100,8 @@
 			aria-expanded={open}
 		>
 			<div class="flex flex-wrap gap-1">
-				{#if selectedLabels.length > 0}
-					{#each selectedLabels as label, i (label)}
-						<div class="bg-secondary text-secondary-foreground flex items-center gap-1 rounded px-1 py-0.5">
-							<span class="text-sm px-3">{label}</span>
-							<Button
-								type="button"
-								class="hover:bg-secondary/80 rounded-sm"
-								onclick={(e) =>{e.stopPropagation();
-									const optionToRemove = options.find(f => f.label === label)?.value;
-								if(optionToRemove){removeValue(optionToRemove)}}}
-							>
-								<X class="size-3" />
-							</Button>
-						</div>
-					{/each}
+				{#if selectedLabel}
+					{selectedLabel}
 				{:else}
 					<span class="text-muted-foreground">{placeholder}</span>
 				{/if}
@@ -162,7 +137,7 @@
 													onclick={() => {
 						                  toggleSelection(option);
 						                }}>
-							<Check class={cn("size-3", !selectedValues.includes(option.value) && "invisible")} />
+							<Check class={cn("size-3", !(selectedValue === option.value) && "invisible")} />
 							{@render optionFormat(option)}
 						</Command.Item>
 					</div>
