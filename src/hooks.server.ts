@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import type { Handle } from '@sveltejs/kit';
+import { type Handle, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import prisma from '$lib/prisma';
 
@@ -23,13 +23,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 			};
 			console.log('user saved');
 		} catch (e) {
-			// Token invalid or expired; you can choose to clear the cookie, etc.
-			event.cookies.delete('jwt', {
-				path: '/'
-			});
+			event.locals.user = undefined
 		}
-	} else {
-		event.locals.user = undefined
 	}
 
 	return resolve(event);

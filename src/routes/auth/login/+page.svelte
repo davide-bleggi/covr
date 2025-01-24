@@ -28,9 +28,7 @@
 
 </script>
 
-<div class="flex flex-col">
-	<SuperDebug data={$formData} />
-
+<div class="flex flex-col w-80 full justify-center">
 	<form method="POST" use:enhance
 				action="?/login">
 		<Form.Field {form} name="email">
@@ -57,7 +55,7 @@
 					<span class="text-red-500 font-bold">{error}</span>
 				{/each}
 			{/if}
-			<Form.Button type="submit">Login</Form.Button>
+			<Form.Button type="submit" class="mt-5">Login</Form.Button>
 		</div>
 	</form>
 </div>

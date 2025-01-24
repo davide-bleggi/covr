@@ -36,7 +36,7 @@
 					<span class="sr-only">Toggle theme</span>
 				</Button>
 				<Button variant="secondary"
-								onclick={() => { fetch('/api/auth/logout', { method: 'POST' })}}>
+								onclick={async () => { await fetch('/api/auth/logout', { method: 'POST' }); window.location.href='/' }}>
 					Logout
 				</Button>
 			</div>
