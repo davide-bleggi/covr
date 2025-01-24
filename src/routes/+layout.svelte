@@ -11,12 +11,12 @@
 <ModeWatcher />
 
 <div class="h-screen flex flex-col overflow-hidden">
-	<div class="w-full flex flex-row justify-center p-4 border-b">
-		<div class="flex w-full flex-row justify-between max-w-[1600px] px-5 ">
+	<div class="w-full flex flex-row justify-center p-4 border-b ">
+		<div class="flex w-full flex-row justify-between max-w-[1600px] px-5">
 			<Button href="/">
 				COVR
 			</Button>
-			<div class="flex justify-center">
+			<div class="flex justify-center gap-2 ">
 				<Button variant="ghost" href="/project">
 					Projects
 				</Button>
@@ -34,6 +34,10 @@
 						class="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
 					/>
 					<span class="sr-only">Toggle theme</span>
+				</Button>
+				<Button variant="secondary"
+								onclick={() => { fetch('/api/auth/logout', { method: 'POST' })}}>
+					Logout
 				</Button>
 			</div>
 		</div>
