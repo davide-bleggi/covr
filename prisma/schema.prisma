@@ -8,15 +8,27 @@ datasource db {
 }
 
 model User {
-  id              Int          @id @default(autoincrement())
-  name            String
-  email           String       @unique
-  password        String
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @default(now()) @updatedAt
-  tests           ManualTest[]
-  createdProjects Project[]    @relation("CreatedProjects")
-  updatedProjects Project[]    @relation("UpdatedProjects")
+  id                   Int            @id @default(autoincrement())
+  name                 String
+  email                String         @unique
+  password             String
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @default(now()) @updatedAt
+  tests                ManualTest[]
+  createdProjects      Project[]      @relation("CreatedProjects")
+  updatedProjects      Project[]      @relation("UpdatedProjects")
+  createdVersions      Version[]      @relation("CreatedVersions")
+  updatedVersions      Version[]      @relation("UpdatedVersions")
+  createdInstallations Installation[] @relation("CreatedInstallations")
+  updatedInstallations Installation[] @relation("UpdatedInstallations")
+  createdRequirements  Requirement[]  @relation("CreatedRequirements")
+  updatedRequirements  Requirement[]  @relation("UpdatedRequirements")
+  createdFeatures      Feature[]      @relation("CreatedFeatures")
+  updatedFeatures      Feature[]      @relation("UpdatedFeatures")
+  createdManualTest    ManualTest[]   @relation("CreatedManualTests")
+  updatedManualTest    ManualTest[]   @relation("UpdatedManualTests")
+  createdScenario      Scenario[]     @relation("CreatedScenarios")
+  updatedScenario      Scenario[]     @relation("UpdatedScenarios")
 }
 
 model Project {
@@ -41,6 +53,10 @@ model Version {
   features      Feature[]
   installations Installation[]
   project       Project        @relation(fields: [projectId], references: [id])
+  createdByUser User           @relation("CreatedVersions", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedByUser User           @relation("UpdatedVersions", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy     Int            @default(1)
+  updatedBy     Int            @default(1)
 
   @@unique([projectId, name])
 }
@@ -59,31 +75,43 @@ model Installation {
   createdAt        DateTime @default(now())
   customer         Customer @relation(fields: [customerId], references: [id])
   version          Version  @relation(fields: [versionId], references: [id])
+  createdByUser    User     @relation("CreatedInstallations", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedByUser    User     @relation("UpdatedInstallations", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy        Int      @default(1)
+  updatedBy        Int      @default(1)
 
   @@unique([customerId, versionId])
 }
 
 model Feature {
-  id           Int           @id @default(autoincrement())
-  name         String
-  description  String
-  versionId    Int
-  version      Version       @relation(fields: [versionId], references: [id])
-  requirements Requirement[]
+  id            Int           @id @default(autoincrement())
+  name          String
+  description   String
+  versionId     Int
+  version       Version       @relation(fields: [versionId], references: [id])
+  requirements  Requirement[]
+  createdByUser User          @relation("CreatedFeatures", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedByUser User          @relation("UpdatedFeatures", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy     Int           @default(1)
+  updatedBy     Int           @default(1)
 
   @@unique([name, versionId])
 }
 
 model Requirement {
-  id          Int        @id @default(autoincrement())
-  name        String
-  description String
-  status      String
-  priority    String
-  featureId   Int
-  feature     Feature    @relation(fields: [featureId], references: [id])
-  scenarios   Scenario[]
-  coverage    Int        @default(0)
+  id            Int        @id @default(autoincrement())
+  name          String
+  description   String
+  status        String
+  priority      String
+  featureId     Int
+  feature       Feature    @relation(fields: [featureId], references: [id])
+  scenarios     Scenario[]
+  coverage      Int        @default(0)
+  createdByUser User       @relation("CreatedRequirements", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedByUser User       @relation("UpdatedRequirements", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy     Int        @default(1)
+  updatedBy     Int        @default(1)
 
   @@unique([description, featureId])
 }
@@ -97,6 +125,10 @@ model Scenario {
   manualTest     ManualTest?
   requirement    Requirement     @relation(fields: [requirementId], references: [id])
   automaticTests AutomaticTest[] @relation("AutomaticTestToScenario")
+  createdByUser  User            @relation("CreatedScenarios", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedByUser  User            @relation("UpdatedScenarios", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy      Int             @default(1)
+  updatedBy      Int             @default(1)
 
   @@unique([name, requirementId])
 }
@@ -110,6 +142,10 @@ model ManualTest {
   executionDate DateTime
   owner         User     @relation(fields: [ownerId], references: [id])
   scenario      Scenario @relation(fields: [scenarioId], references: [id])
+  createdByUser User     @relation("CreatedManualTests", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedByUser User     @relation("UpdatedManualTests", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy     Int      @default(1)
+  updatedBy     Int      @default(1)
 }
 
 model AutomaticTest {
