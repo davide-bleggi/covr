@@ -27,3 +27,4 @@ vite.config.ts.timestamp-*
 /prisma/migrations/20241212123736_add_new_models/migration.sql
 /prisma/migrations/20241212125254_edit_project_schema/migration.sql
 /prisma/migrations/migration_lock.toml
+/static/uploads/
