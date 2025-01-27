@@ -2,6 +2,9 @@ import { PrismaClient } from '@prisma/client';
 import { type Handle, redirect } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import prisma from '$lib/prisma';
+import { WebSocketServer } from 'ws';
+
+let wss: WebSocketServer;
 
 const SECRET = process.env.JWT_SECRET || 'mysecret';
 
@@ -25,6 +28,28 @@ export const handle: Handle = async ({ event, resolve }) => {
 		} catch (e) {
 			event.locals.user = undefined
 		}
+	}
+
+	if (!wss) {
+		wss = new WebSocketServer({ port: 8080 });
+
+		wss.on('connection', (ws) => {
+			console.log('Client connected');
+
+			// Send a message to the client when connected
+			ws.send(JSON.stringify({ message: 'Connected to WebSocket server!' }));
+
+			// Handle messages from the client
+			ws.on('message', (message) => {
+				console.log('Received:', message);
+			});
+
+			// Notify the client of a database update
+			setInterval(() => {
+				// ws.send(JSON.stringify({ update: true }));
+
+			}, 10000); // Replace with real DB notification
+		});
 	}
 
 	return resolve(event);

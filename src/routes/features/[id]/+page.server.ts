@@ -11,6 +11,7 @@ export async function load({ params, url }) {
 	const page = Number(url.searchParams.get('page') || '1');
 	const limit = 5;
 	const skip = (page - 1) * limit;
+	console.log("loading new data")
 
 	const feature = await prisma.feature.findUnique({
 		where: {

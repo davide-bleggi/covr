@@ -14,7 +14,7 @@
 	} from '@prisma/client';
 	import { Button } from '$lib/components/ui/button';
 	import { ManualTestDialog, RequirementDialog, RequirementItem, ScenarioDialog } from './index';
-	import { setContext } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import { Pencil, Plus } from 'lucide-svelte';
 	import { type ScenarioFormData, testStatusLabels } from './schema';
 	import SuperDebug from 'sveltekit-superforms';
@@ -23,6 +23,7 @@
 	import { FeatureDialog } from '../../project/[code]';
 	import { marked } from 'marked';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
+	import { invalidate, invalidateAll } from '$app/navigation';
 
 
 	type FeatureWithDetails = Feature & {
@@ -44,7 +45,7 @@
 				page: number,
 				total: number
 			}
-		}
+		},
 	}>();
 
 	let openRequirementDialog = $state(false);
@@ -74,6 +75,23 @@
 		const scenarioId = sidePanelStore.scenario?.id;
 		const foundScenario = requirements.flatMap(req => req.scenarios).find(scenario => scenario.id === scenarioId);
 		return foundScenario ? { ...foundScenario } : undefined;
+	});
+
+
+// aggiornamento in tempo reale
+	let socket: WebSocket;
+
+	onMount(() => {
+		socket = new WebSocket('ws://localhost:8080');
+
+		socket.onmessage = async (event) => {
+			console.log('socket message: ',JSON.parse(event.data));
+			await invalidateAll();
+		};
+
+		return () => {
+			socket.close();
+		};
 	});
 
 </script>
@@ -204,7 +222,7 @@
 						{/if}
 					</div>
 					<div class="px-0">
-						<div class="flex flex-row justify-center items-center py-4 pr-4">
+						<div class="flex flex-row justify-center items-center py-4">
 							<h2 class="font-bold flex-1">Test Automatici</h2>
 							<Button size="icon" variant="outline" class=""
 											onclick={(e)=>{

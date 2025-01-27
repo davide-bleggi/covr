@@ -109,5 +109,5 @@
 	</div>
 {/if}
 
-<div bind:this={element} class="resize-y overflow-auto h-32 border p-2 text-md rounded" />
+<div bind:this={element} class="resize-y overflow-auto h-[450px] border p-2 text-md rounded" />
 
