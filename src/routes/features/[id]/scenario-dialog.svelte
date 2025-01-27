@@ -12,6 +12,7 @@
 		type ScenarioFormData, scenarioFormSchema,
 		type ScenarioFormSchema
 	} from './schema';
+	import { Tiptap } from '$lib/components/wrapper';
 
 	let {
 		open = $bindable(false),
@@ -85,6 +86,7 @@
 </script>
 
 <Dialog.Root bind:open={open}>
+
 	<Dialog.Content class="sm:max-w-[600px]  ">
 		{$formId}
 		<Dialog.Header>
@@ -92,6 +94,7 @@
 			<Dialog.Description>
 			</Dialog.Description>
 		</Dialog.Header>
+		<SuperDebug data={$formData}></SuperDebug>
 		<!--		<SuperDebug data={$formData}></SuperDebug>-->
 		<div class="grid gap-4 py-4">
 			<form method="POST" action='?/saveScenario' use:enhance id="saveScenarioForm">
@@ -111,25 +114,7 @@
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>Description</Form.Label>
-							<div>
-								<Button variant="outline" size="sm" onclick={(e)=>{e.preventDefault(); insertAtCursor('GIVEN')}}>
-									GIVEN
-								</Button>
-								<Button variant="outline" size="sm" onclick={(e)=>{e.preventDefault(); insertAtCursor('THEN')}}>
-									THEN
-								</Button>
-								<Button variant="outline" size="sm" onclick={(e)=>{e.preventDefault(); insertAtCursor('WHEN')}}>
-									WHEN
-								</Button>
-								<Button variant="outline" size="sm" onclick={(e)=>{e.preventDefault(); insertAtCursor('AND')}}>
-									AND
-								</Button>
-								<Button variant="outline" size="sm" onclick={(e)=>{e.preventDefault(); insertAtCursor('"BUT"')}}>
-									BUT
-								</Button>
-							</div>
-							<Textarea class="min-h-[350px]" bind:ref={descriptionTextArea} oninput={handleInput} onclick={handleInput} {...props}
-												bind:value={$formData.scenario} data-markdown />
+							<Tiptap bind:content={$formData.scenario}/>
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />

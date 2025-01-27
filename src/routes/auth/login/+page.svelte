@@ -25,7 +25,6 @@
 
 	const { form: formData, enhance, errors } = form;
 
-
 </script>
 
 <div class="flex flex-col w-80 full justify-center">
@@ -34,8 +33,8 @@
 		<Form.Field {form} name="email">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>Username</Form.Label>
-					<Input {...props} bind:value={$formData.email} />
+					<Form.Label>Email</Form.Label>
+					<Input type="email" {...props} bind:value={$formData.email} />
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
@@ -44,7 +43,7 @@
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>Password</Form.Label>
-					<Input {...props} bind:value={$formData.password} />
+					<Input type="password" {...props} bind:value={$formData.password} />
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
