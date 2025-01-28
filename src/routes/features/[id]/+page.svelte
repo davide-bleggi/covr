@@ -85,7 +85,7 @@
 		socket = new WebSocket('ws://localhost:8080');
 
 		socket.onmessage = async (event) => {
-			console.log('socket message: ',JSON.parse(event.data));
+			console.log('socket message: ',event);
 			await invalidateAll();
 		};
 

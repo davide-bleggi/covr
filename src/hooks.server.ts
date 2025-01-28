@@ -31,6 +31,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	if (!wss) {
+		let lastChecked = new Date();
 		wss = new WebSocketServer({ port: 8080 });
 
 		wss.on('connection', (ws) => {
@@ -39,16 +40,23 @@ export const handle: Handle = async ({ event, resolve }) => {
 			// Send a message to the client when connected
 			ws.send(JSON.stringify({ message: 'Connected to WebSocket server!' }));
 
-			// Handle messages from the client
-			ws.on('message', (message) => {
-				console.log('Received:', message);
-			});
-
 			// Notify the client of a database update
-			setInterval(() => {
+			setInterval(async () => {
 				// ws.send(JSON.stringify({ update: true }));
+				const changes = await prisma.automaticTest.findMany({
+					where: {
+						executionDate: {
+							gt: lastChecked,
+						},
+					},
+				});
+				console.log('changes: ', changes)
 
-			}, 10000); // Replace with real DB notification
+				if (changes.length > 0) {
+					ws.send('change deteced')
+				}
+
+			}, 30000); // Replace with real DB notification
 		});
 	}
 

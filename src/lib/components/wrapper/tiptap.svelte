@@ -24,7 +24,7 @@
 			],
 			editorProps: {
 				attributes: {
-					class: 'focus:outline-none'
+					class: 'focus:outline-none tiptap ProseMirror'
 				}
 			},
 			content: content,
@@ -38,7 +38,6 @@
 
 	onDestroy(() => {
 		if (editor) {
-			editor.destroy();
 			editor.destroy();
 		}
 	});
@@ -111,3 +110,8 @@
 
 <div bind:this={element} class="resize-y overflow-auto h-[450px] border p-2 text-md rounded" />
 
+<style>
+    :global(.tiptap.ProseMirror p) {
+        margin-bottom: 20px !important;
+    }
+</style>
