@@ -1,0 +1,20 @@
+# Base image for building
+FROM node:18 AS builder
+
+WORKDIR /app
+
+# Install dependencies separately for better caching
+COPY package.json package-lock.json ./
+RUN npm install
+COPY prisma ./prisma/
+
+RUN npx prisma generate
+# Copy the app code and build
+COPY . .
+RUN npm run build
+
+# Expose the port (SvelteKit defaults to 3000)
+EXPOSE 4173
+
+# Start the app
+CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0"]

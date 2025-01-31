@@ -1,0 +1,32 @@
+# Ignore node_modules (except for the final image)
+node_modules
+npm-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# Ignore local environment files
+.env
+.env.local
+.env.*.local
+
+# Ignore SvelteKit build artifacts (only needed inside the container)
+.build/
+.svelte-kit/
+.vercel/
+.netlify/
+
+# Ignore dependencies and lockfiles from other package managers
+yarn.lock
+pnpm-lock.yaml
+
+# Ignore IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore Git and system files
+.git/
+.gitignore
+.DS_Store
+Thumbs.db
