@@ -7,6 +7,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { loginFormSchema } from './schema';
 import { customerFormSchema } from '../../customers/schema';
+import { DATABASE_URL } from '$env/static/private';
 
 
 const prisma = new PrismaClient();
@@ -14,8 +15,8 @@ const SECRET = process.env.JWT_SECRET || 'mysecret';
 
 export const load = async (req: Request, res: Response) => {
 	const loginForm = await superValidate(zod(loginFormSchema), { errors: false })
-
-	return {loginForm}
+	const databaseUrl = DATABASE_URL.toString();
+	return {loginForm, databaseUrl};
 }
 
 
