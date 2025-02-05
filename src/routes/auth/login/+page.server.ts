@@ -14,7 +14,7 @@ const prisma = new PrismaClient();
 const SECRET = process.env.JWT_SECRET || 'mysecret';
 
 export const load = async (req: Request, res: Response) => {
-	const loginForm = await superValidate(zod(loginFormSchema), { errors: false })
+	const loginForm = await superValidate(zod(loginFormSchema), { errors: false });
 	const databaseUrl = DATABASE_URL.toString();
 	return {loginForm, databaseUrl};
 }
@@ -50,7 +50,6 @@ export const actions = {
 		event.cookies.set('jwt', token, {
 			path: '/',
 			httpOnly: true,
-			sameSite: 'strict',
 			secure: false // set true in production
 		});
 
