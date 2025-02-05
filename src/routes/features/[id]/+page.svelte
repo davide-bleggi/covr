@@ -82,7 +82,11 @@
 	let socket: WebSocket;
 
 	onMount(() => {
-		socket = new WebSocket('ws://localhost:8080');
+		const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+		const hostname = window.location.hostname // Gets the correct domain
+		console.log(hostname)
+		const socket = new WebSocket(`${protocol}://${hostname}:8080`);
+
 
 		socket.onmessage = async (event) => {
 			console.log('socket message: ',event);

@@ -16,6 +16,7 @@ function initWss() {
 		let lastChecked = new Date();
 		try {
 			wss = new WebSocketServer({ port: 8080 });
+			console.log('Websocket created')
 
 			wss.on('connection', (ws) => {
 				console.log('Client connected');
@@ -35,7 +36,8 @@ function initWss() {
 					});
 
 					if (changes.length > 0) {
-						ws.send('change deteced');
+						console.log('change detected')
+						ws.send('change detected');
 					}
 
 				}, 30000); // Replace with real DB notification
