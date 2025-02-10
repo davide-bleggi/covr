@@ -113,7 +113,7 @@
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>Description</Form.Label>
-							<Tiptap bind:content={$formData.scenario}/>
+							<Tiptap bind:content={$formData.scenario} params={{imageButton: true, gerkinsButtons: true}}/>
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />

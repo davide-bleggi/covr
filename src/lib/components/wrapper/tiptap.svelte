@@ -7,7 +7,14 @@
 	import Image from '@tiptap/extension-image';
 	import { ImagePlus, Code } from 'lucide-svelte';
 
-	let { content = $bindable() } = $props();
+
+	let { content = $bindable(), params } :
+		{content: string|undefined,
+			params:  {
+				gerkinsButtons: boolean|undefined;
+				imageButton: boolean|undefined;
+			}
+		} = $props();
 
 	let element;
 	let editor = $state();
@@ -76,39 +83,43 @@
 
 {#if editor}
 	<div class="flex flex-row gap-2 ">
-		<Button variant="outline" size="sm"
-						onclick={() => editor.chain().focus().insertContent('<strong>GIVEN</strong> ').run()}>
-			<strong>GIVEN</strong>
-		</Button>
-		<Button variant="outline" size="sm"
-						onclick={() => editor.chain().focus().insertContent('<strong>WHEN</strong> ').run()}>
-			<strong>WHEN</strong>
-		</Button>
-		<Button variant="outline" size="sm"
-						onclick={() => editor.chain().focus().insertContent('<strong>AND</strong> ').run()}>
-			<strong>AND</strong>
-		</Button>
-		<Button variant="outline" size="sm"
-						onclick={() => editor.chain().focus().insertContent('<strong>THEN</strong> ').run()}>
-			<strong>THEN</strong>
-		</Button>
-		<Button variant="outline" size="sm"
-						onclick={() => editor.chain().focus().insertContent('<strong>BUT</strong> ').run()}>
-			<strong>BUT</strong>
-		</Button>
-		<input type="file" accept="image/*" onchange={handleFileInput} style="display: none" id="fileInput" />
-		<Button variant="outline" size="sm" onclick={() => document.getElementById('fileInput')?.click()}>
-			<div>
-				<ImagePlus />
-			</div>
-		</Button>
+		{#if params.gerkinsButtons}
+			<Button variant="outline" size="sm"
+							onclick={() => editor.chain().focus().insertContent('<strong>GIVEN</strong> ').run()}>
+				<strong>GIVEN</strong>
+			</Button>
+			<Button variant="outline" size="sm"
+							onclick={() => editor.chain().focus().insertContent('<strong>WHEN</strong> ').run()}>
+				<strong>WHEN</strong>
+			</Button>
+			<Button variant="outline" size="sm"
+							onclick={() => editor.chain().focus().insertContent('<strong>AND</strong> ').run()}>
+				<strong>AND</strong>
+			</Button>
+			<Button variant="outline" size="sm"
+							onclick={() => editor.chain().focus().insertContent('<strong>THEN</strong> ').run()}>
+				<strong>THEN</strong>
+			</Button>
+			<Button variant="outline" size="sm"
+							onclick={() => editor.chain().focus().insertContent('<strong>BUT</strong> ').run()}>
+				<strong>BUT</strong>
+			</Button>
+		{/if}
+		{#if params.imageButton}
+			<input type="file" accept="image/*" onchange={handleFileInput} style="display: none" id="fileInput" />
+			<Button variant="outline" size="sm" onclick={() => document.getElementById('fileInput')?.click()}>
+				<div>
+					<ImagePlus />
+				</div>
+			</Button>
+		{/if}
 		<Button variant="outline" size="sm" onclick={() => editor.chain().focus().toggleCodeBlock().run()}>
 			<div><Code /></div>
 		</Button>
 	</div>
 {/if}
 
-<div bind:this={element} class="resize-y overflow-auto h-[450px] border p-2 text-md rounded" />
+<div bind:this={element} class="resize-y overflow-auto h-[450px] border p-2 text-md rounded"> </div>
 
 <style>
     :global(.tiptap.ProseMirror p) {

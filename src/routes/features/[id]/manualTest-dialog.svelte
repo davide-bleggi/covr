@@ -13,7 +13,7 @@
 		manualTestFormSchema,
 		type ManualTestFormSchema, priorityLabels, testStatusLabels
 	} from './schema';
-	import { DatePicker } from '$lib/components/wrapper';
+	import { DatePicker, Tiptap } from '$lib/components/wrapper';
 	import { getContext } from 'svelte';
 
 	let {
@@ -120,7 +120,8 @@
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>Note</Form.Label>
-								<Textarea class="min-h-[300px]" {...props}  bind:value={$formData.notes} data-markdown></Textarea>
+							<input hidden value={$formData.notes} name={props.name}/>
+							<Tiptap {...props}  bind:content={$formData.notes} params={{imageButton: true, gerkinsButtons: true}}></Tiptap>
 							<Form.Description>Aggiungi descrizione dei problemi riscontrati</Form.Description>
 						{/snippet}
 					</Form.Control>
