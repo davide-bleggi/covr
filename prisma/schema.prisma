@@ -43,6 +43,7 @@ model Project {
   updatedByUser User      @relation("UpdatedProjects", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   createdBy     Int       @default(1)
   updatedBy     Int       @default(1)
+  coverage      Int       @default(0)
 }
 
 model Version {
@@ -97,6 +98,7 @@ model Feature {
   updatedByUser User          @relation("UpdatedFeatures", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   createdBy     Int           @default(1)
   updatedBy     Int           @default(1)
+  coverage      Int           @default(0)
 
   @@unique([name, versionId])
 }

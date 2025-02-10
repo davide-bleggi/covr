@@ -24,6 +24,7 @@
 	import { marked } from 'marked';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import { invalidate, invalidateAll } from '$app/navigation';
+	import { Progress } from '$lib/components/ui/progress';
 
 
 	type FeatureWithDetails = Feature & {
@@ -78,18 +79,18 @@
 	});
 
 
-// aggiornamento in tempo reale
+	// aggiornamento in tempo reale
 	let socket: WebSocket;
 
 	onMount(() => {
 		const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-		const hostname = window.location.hostname // Gets the correct domain
-		console.log(hostname)
+		const hostname = window.location.hostname; // Gets the correct domain
+		console.log(hostname);
 		const socket = new WebSocket(`${protocol}://${hostname}:8080`);
 
 
 		socket.onmessage = async (event) => {
-			console.log('socket message: ',event);
+			console.log('socket message: ', event);
 			await invalidateAll();
 		};
 
@@ -123,7 +124,7 @@
 		description: feature.description,
 		versionId: feature.versionId
 	}}
-	version = {feature.version}
+	version={feature.version}
 >
 </FeatureDialog>
 
@@ -136,16 +137,29 @@
 			<div class="w-full">
 				<div class="flex flex-row">
 					<div class="flex flex-col w-full ">
-						<h4><a href={`/project/${feature.version.project.code}`}>
-							<Button variant="outline">{feature.version.project.name.toUpperCase()}</Button>
-						</a> - {feature.version.name}</h4>
+						<div class="w-full flex flex-row justify-between items-center">
+							<div class="flex-1">
+								<h4><a href={`/project/${feature.version.project.code}`}>
+									<Button variant="outline">{feature.version.project.name.toUpperCase()}</Button>
+								</a> - {feature.version.name}</h4>
+							</div>
+							<div class="px-2 flex flex-row items-center gap-4">
+								<div>
+									<span class="opacity-70 text-sm">Copertura requisiti</span>
+									<div class="flex flex-row w-[200px] items-center gap-2">
+										<Progress value={feature.coverage} class="h-2" />
+										<span>{feature.coverage}%</span>
+									</div>
+								</div>
+								<Button size="icon" variant="outline" class=""
+												onclick={(e)=>{openFeatureDialog=true}}>
+									<Pencil></Pencil>
+								</Button>
+							</div>
+						</div>
 						<h1 class="text-2xl font-bold">{feature.name}</h1>
 						<span class="opacity-80 markdown">{@html marked(feature.description)}</span>
 					</div>
-					<Button size="icon" variant="outline" class=""
-									onclick={(e)=>{openFeatureDialog=true}}>
-						<Pencil></Pencil>
-					</Button>
 				</div>
 				<div class=" flex flex-1 items-center w-full pt-3">
 					<Button variant="outline" onclick={()=>openRequirementDialog = true} class="w-full">

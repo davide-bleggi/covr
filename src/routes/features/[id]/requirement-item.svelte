@@ -53,12 +53,12 @@
 			<span>{requirement.name}</span>
 		</div>
 		<div class="flex flex-col">
-			<span class="opacity-70 text-sm">Copertura</span>
+			<span class="opacity-70 text-sm">Copertura scenari</span>
 			<div class="flex flex-row w-[200px] items-center gap-2">
-				<Progress value={requirement.coverage} class="h-2"/>
-			<span>{requirement.coverage}%</span>
+				<Progress value={requirement.coverage} class="h-2" />
+				<span>{requirement.coverage}%</span>
 			</div>
-			</div>
+		</div>
 		<div class="flex flex-col">
 			<span class="opacity-70 text-sm">Stato</span>
 			<span class={`${currentRequirementStatus?.color??''} rounded-sm px-2 text-white`}>
@@ -81,7 +81,7 @@
 	</div>
 	<div class="flex flex-col py-2">
 		<span class="opacity-70 text-sm">Descrizione</span>
-		<span class="markdown">{@html marked(requirement.description??'')}</span>
+		<span class="markdown">{@html marked(requirement.description ?? '')}</span>
 	</div>
 	<Accordion.Root class="w-full" value={openScenarios}>
 		<Accordion.Item value="scenarios" class="w-full">
@@ -118,7 +118,8 @@
 									<Table.Cell>SCN-{scenario.id}</Table.Cell>
 									<Table.Cell>{scenario.name}</Table.Cell>
 									<Table.Cell class="flex"><span class={`border rounded-md p-2 w-full flex justify-center font-semibold
-										${scenario.testStatus==='PASS'?"border-green-500 text-green-500":scenario.testStatus==='FAIL'?"border-red-500 text-red-500":'border-none'}`}>{scenario.testStatus}</span></Table.Cell>
+										${scenario.testStatus==='PASS'?"border-green-500 text-green-500":scenario.testStatus==='FAIL'?"border-red-500 text-red-500":'border-none'}`}>{scenario.testStatus}</span>
+									</Table.Cell>
 								</Table.Row>
 							{/each}
 						</Table.Body>
