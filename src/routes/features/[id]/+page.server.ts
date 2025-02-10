@@ -239,6 +239,7 @@ export const actions: Actions = {
 				return fail(400, { form });
 			}
 		} else {
+			console.log('update manual test ',form.data)
 			try {
 				await prisma.manualTest.update({
 					data: {

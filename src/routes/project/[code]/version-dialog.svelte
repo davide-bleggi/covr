@@ -1,13 +1,19 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog/index';
 	import { Button } from '$lib/components/ui/button';
-	import { type Infer, superForm } from 'sveltekit-superforms';
-	import { versionFormSchema, type VersionFormSchema } from './schema';
+	import SuperDebug, { type Infer, superForm, type SuperValidated } from 'sveltekit-superforms';
+	import { type VersionFormSchema, versionFormSchema } from './schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Input } from '$lib/components/ui/input';
+	import * as Select from "$lib/components/ui/select/index.js";
 	import * as Form from '$lib/components/ui/form';
+	import type { Version } from '@prisma/client';
 
-	let {open = $bindable(false), formToValidate = $bindable()} = $props();
+	let {open = $bindable(false), formToValidate = $bindable(), versions}:{
+		open: boolean,
+		formToValidate: SuperValidated<Infer<VersionFormSchema>>,
+		versions: Version[]
+	} = $props();
 
 	let action = $state('?/createVersion');
 
@@ -32,9 +38,12 @@
 		submit();
 	}
 
+	const prevVersionName = $derived(versions.find((ver)=>$formData.prevVersion===ver.id)?.name)
+
 </script>
 <Dialog.Root bind:open={open}>
 	<Dialog.Content class="sm:max-w-[425px]">
+		<SuperDebug data={$formData}/>
 		<Dialog.Header>
 			<Dialog.Title>Aggiungi nuova versione</Dialog.Title>
 			<Dialog.Description>
@@ -53,6 +62,34 @@
 							<Input {...props} bind:value={$formData.name} />
 						{/snippet}
 					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+
+				<input type="hidden" name="prevVersion" bind:value={$formData.prevVersion} />
+				<Form.Field {form} name="prevVersion">
+					<Form.Control>
+						{#snippet children({props})}
+							<Form.Label>Nome Versione</Form.Label>
+							<Select.Root
+								allowDeselect={true}
+								type="single"
+								bind:value={$formData.prevVersion}
+								name={props.name}
+							>
+								<Select.Trigger {...props}>
+									{prevVersionName
+										? prevVersionName
+										: "Seleziona una versione"}
+								</Select.Trigger>
+								<Select.Content>
+									{#each versions as version }
+										<Select.Item value={version.id} label={version.name} />
+									{/each}
+								</Select.Content>
+							</Select.Root>
+						{/snippet}
+					</Form.Control>
+					<Form.Description>Selezionare una versione precedente come madre della versione corrente.</Form.Description>
 					<Form.FieldErrors />
 				</Form.Field>
 			</form>

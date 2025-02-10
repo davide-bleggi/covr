@@ -105,7 +105,14 @@ export const actions: Actions = {
 		const form = await superValidate(event, zod(versionFormSchema));
 		console.log('form: ', form);
 		try {
-			await prisma.version.create({ data: { ...form.data, id: undefined } });
+			await prisma.version.create({
+				data: {
+					name: form.data.name,
+					prevVersionId: form.data.prevVersion ? Number(form.data.prevVersion) : null,
+					projectId: form.data.projectId,
+					id: undefined
+				}
+			});
 		} catch (err) {
 			console.log(err);
 			setError(form, 'name', 'nome già esistente');
@@ -163,7 +170,7 @@ export const actions: Actions = {
 
 	saveFeature: async (event: RequestEvent) => {
 		const form = await superValidate(event, zod(featureFormSchema));
-		if(!form.data.id) {
+		if (!form.data.id) {
 			try {
 				await prisma.feature.create({ data: { ...form.data, id: undefined } });
 			} catch (err: any) {
@@ -174,10 +181,10 @@ export const actions: Actions = {
 				}
 				return fail(400, { form });
 			}
-		}else{
+		} else {
 			try {
 				await prisma.feature.update({
-					data: { ...form.data, id: undefined},
+					data: { ...form.data, id: undefined },
 					where: { id: form.data.id }
 				});
 			} catch (err: any) {
@@ -202,5 +209,5 @@ export const actions: Actions = {
 		} catch {
 			return fail(400);
 		}
-	},
+	}
 };

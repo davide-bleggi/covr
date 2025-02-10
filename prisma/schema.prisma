@@ -50,6 +50,7 @@ model Version {
   name          String
   createdAt     DateTime       @default(now())
   projectId     Int
+  prevVersionId Int? // Make prevId nullable (optional) if needed
   features      Feature[]
   installations Installation[]
   project       Project        @relation(fields: [projectId], references: [id])
@@ -57,6 +58,8 @@ model Version {
   updatedByUser User           @relation("UpdatedVersions", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   createdBy     Int            @default(1)
   updatedBy     Int            @default(1)
+  prevVersion   Version?       @relation("VersionToVersion", fields: [prevVersionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  nextVersions  Version[]      @relation("VersionToVersion") // Back-relation field
 
   @@unique([projectId, name])
 }

@@ -13,7 +13,7 @@
 </script>
 <ProjectDialog bind:open={openProjectDialog} form={data.projectForm}>
 </ProjectDialog>
-<VersionDialog bind:open={openVersionDialog} formToValidate={data.versionForm}>
+<VersionDialog bind:open={openVersionDialog} formToValidate={data.versionForm} versions={data.versions}>
 </VersionDialog>
 
 <div class="flex w-full flex-col">
