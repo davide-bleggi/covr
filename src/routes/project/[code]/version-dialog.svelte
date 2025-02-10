@@ -43,7 +43,6 @@
 </script>
 <Dialog.Root bind:open={open}>
 	<Dialog.Content class="sm:max-w-[425px]">
-		<SuperDebug data={$formData}/>
 		<Dialog.Header>
 			<Dialog.Title>Aggiungi nuova versione</Dialog.Title>
 			<Dialog.Description>

@@ -21,8 +21,6 @@
 
 	let openItems: string[] = $state([version.features.length > 0?'features':'', version.installations.length > 0?'installations':'']);
 
-
-
 </script>
 
 <InstallationDialog
@@ -40,7 +38,7 @@
 	formId={`new-feature-form-${version.id}`}>
 </FeatureDialog>
 
-<div class="w-full max-w-[700px] gap-2 items-center justify-between shadow-md p-5 rounded-md">
+<div class="w-full gap-2 items-center justify-between shadow-md p-5 rounded-md">
 	<h4 class="text-xl font-bold w-full">{version.name}</h4>
 	<Accordion.Root class="w-full" bind:value={openItems}>
 		<Accordion.Item value="installations" class="w-full">
