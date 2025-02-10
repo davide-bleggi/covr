@@ -14,16 +14,14 @@
 <CustomerDialog bind:open bind:data={selectedFormData}>
 </CustomerDialog>
 <div class="flex flex-col w-full">
-	<div class="flex flex-row p-4 w-full justify-end">
-		<Button onclick={()=>{
+	<div class="flex mx-auto flex-col justify-center w-[700px] py-5">
+		<Button variant="outline" class="w-full mb-2" onclick={()=>{
 			selectedFormData = newFormData;
 			open=true
 		}}>
 			Crea Cliente
 		</Button>
-	</div>
-	<div class="flex w-full flex-row justify-center">
-	<ul class="flex flex-col gap-5 px-5 w-[700px]">
+	<ul class="flex flex-col gap-5">
 		{#each data.customers as customer}
 			<li>
 				<CustomerItem edit={(event: {customer: Customer})=>{
