@@ -128,7 +128,7 @@ model Scenario {
   requirementId  Int
   testStatus     String?         @db.VarChar(10)
   manualTest     ManualTest?
-  requirement    Requirement     @relation(fields: [requirementId], references: [id])
+  requirement    Requirement     @relation(fields: [requirementId], references: [id], onDelete: Cascade)
   automaticTests AutomaticTest[] @relation("AutomaticTestToScenario")
   createdByUser  User            @relation("CreatedScenarios", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   updatedByUser  User            @relation("UpdatedScenarios", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)

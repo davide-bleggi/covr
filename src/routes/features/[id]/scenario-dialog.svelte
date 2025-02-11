@@ -144,19 +144,29 @@
 <Dialog.Root bind:open={openConfirmDeletionDialog}>
 	<Dialog.Content class="">
 		<Dialog.Header>
-			<Dialog.Title> Sei sicuro?</Dialog.Title>
+			<Dialog.Title>Eliminazione scenario SCN-{$formData.id}</Dialog.Title>
+			<Dialog.Description>Sei sicuro di vole procedere all'eliminazione?</Dialog.Description>
 		</Dialog.Header>
 		L'eliminazione dello scenario provvederà all'eliminazione dei test manuali ad esso associato.
 		<Dialog.Footer>
-			<form action="?/deleteScenario" method="POST" use:enhance>
-				<input type="hidden" name="id" value={$formData.id } />
+			<div class="w-full flex flex-row justify-between">
 				<Button
-					variant="destructive"
-					type="submit"
+					variant="secondary"
+					onclick={()=>openConfirmDeletionDialog = false}
 				>
-					Rimuovi
+					Annulla
 				</Button>
-			</form>
+				<form action="?/deleteScenario" method="POST" use:enhance>
+					<input type="hidden" name="id" value={$formData.id } />
+					<Button
+						variant="destructive"
+						type="submit"
+					>
+						Conferma
+					</Button>
+				</form>
+
+			</div>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
