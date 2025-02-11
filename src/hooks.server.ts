@@ -39,7 +39,7 @@ function initWss() {
 						console.log('change detected')
 						ws.send('change detected');
 					}
-
+					lastChecked = new Date();
 				}, 30000); // Replace with real DB notification
 			});
 		}catch(err){
