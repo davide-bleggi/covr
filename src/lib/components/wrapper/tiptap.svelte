@@ -6,14 +6,16 @@
 	import { Link } from '@tiptap/extension-link';
 	import Image from '@tiptap/extension-image';
 	import { ImagePlus, Code } from 'lucide-svelte';
+	import { cn } from "$lib/utils.js";
 
 
-	let { content = $bindable(), params } :
+	let { content = $bindable(), params, class: className} :
 		{content: string|undefined,
 			params:  {
-				gerkinsButtons: boolean|undefined;
-				imageButton: boolean|undefined;
-			}
+				gerkinsButtons?: boolean;
+				imageButton?: boolean;
+				class?: string;
+			},
 		} = $props();
 
 	let element;
@@ -77,8 +79,6 @@
 			uploadImage(file);
 		}
 	}
-
-
 </script>
 
 {#if editor}
@@ -119,7 +119,7 @@
 	</div>
 {/if}
 
-<div bind:this={element} class="resize-y overflow-auto h-[450px] border p-2 text-md rounded"> </div>
+<div bind:this={element} class={cn(`resize-y overflow-auto h-[450px] border p-2 text-md rounded`, className)}> </div>
 
 <style>
     :global(.tiptap.ProseMirror p) {
