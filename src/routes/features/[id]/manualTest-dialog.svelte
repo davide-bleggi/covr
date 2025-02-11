@@ -121,7 +121,7 @@
 						{#snippet children({ props })}
 							<Form.Label>Note</Form.Label>
 							<input hidden value={$formData.notes} name={props.name}/>
-							<Tiptap {...props}  bind:content={$formData.notes} params={{imageButton: true, gerkinsButtons: true}}></Tiptap>
+							<Tiptap class="h-[300px]" {...props}  bind:content={$formData.notes} params={{imageButton: true, gerkinsButtons: true, height: 1000}}></Tiptap>
 							<Form.Description>Aggiungi descrizione dei problemi riscontrati</Form.Description>
 						{/snippet}
 					</Form.Control>

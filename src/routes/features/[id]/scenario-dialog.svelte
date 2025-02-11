@@ -51,6 +51,7 @@
 
 	let cursorPosition = 0;
 	let descriptionTextArea: HTMLTextAreaElement | null = $state(null);
+	let openConfirmDeletionDialog = $state(false);
 
 	function handleInput(event: Event) {
 
@@ -113,7 +114,7 @@
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>Description</Form.Label>
-							<Tiptap bind:content={$formData.scenario} params={{imageButton: true, gerkinsButtons: true}}/>
+							<Tiptap bind:content={$formData.scenario} params={{imageButton: true, gerkinsButtons: true}} />
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />
@@ -125,20 +126,37 @@
 		<Dialog.Footer>
 			<div class={`flex flex-row w-full ${$formData.id?'justify-between':'justify-end'}`}>
 				{#if $formData.id }
-					<form action="?/deleteScenario" method="POST" use:enhance>
-						<Button
-							variant="destructive"
-							type="submit"
-						>
-							<input type="hidden" name="id" value={$formData.id } />
-							<!--{$formData.id}-->
-							Rimuovi
-						</Button>
-					</form>
+					<Button
+						variant="destructive"
+						type="submit"
+						onclick={()=>openConfirmDeletionDialog=true}
+					>
+						Rimuovi
+					</Button>
 				{/if}
 				<Button form="saveScenarioForm" type="submit">Salva
 				</Button>
 			</div>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<Dialog.Root bind:open={openConfirmDeletionDialog}>
+	<Dialog.Content class="">
+		<Dialog.Header>
+			<Dialog.Title> Sei sicuro?</Dialog.Title>
+		</Dialog.Header>
+		L'eliminazione dello scenario provvederà all'eliminazione dei test manuali ad esso associato.
+		<Dialog.Footer>
+			<form action="?/deleteScenario" method="POST" use:enhance>
+				<input type="hidden" name="id" value={$formData.id } />
+				<Button
+					variant="destructive"
+					type="submit"
+				>
+					Rimuovi
+				</Button>
+			</form>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

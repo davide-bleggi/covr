@@ -146,7 +146,7 @@ model ManualTest {
   notes         String?
   executionDate DateTime
   owner         User     @relation(fields: [ownerId], references: [id])
-  scenario      Scenario @relation(fields: [scenarioId], references: [id])
+  scenario      Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
   createdByUser User     @relation("CreatedManualTests", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   updatedByUser User     @relation("UpdatedManualTests", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   createdBy     Int      @default(1)
@@ -159,5 +159,6 @@ model AutomaticTest {
   status        String
   executionDate DateTime
   notes         String?
+  errorLog      String?
   scenarios     Scenario[] @relation("AutomaticTestToScenario")
 }
