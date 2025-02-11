@@ -88,7 +88,7 @@
 <Dialog.Root bind:open={open}>
 
 	<Dialog.Content class="sm:max-w-[600px]  ">
-		{$formId}
+		<!--{$formId}-->
 		<Dialog.Header>
 			<Dialog.Title>Gestione Scenario</Dialog.Title>
 			<Dialog.Description>
@@ -131,7 +131,7 @@
 							type="submit"
 						>
 							<input type="hidden" name="id" value={$formData.id } />
-							{$formData.id}
+							<!--{$formData.id}-->
 							Rimuovi
 						</Button>
 					</form>

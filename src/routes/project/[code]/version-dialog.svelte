@@ -68,7 +68,7 @@
 				<Form.Field {form} name="prevVersion">
 					<Form.Control>
 						{#snippet children({props})}
-							<Form.Label>Nome Versione</Form.Label>
+							<Form.Label>Versione precedente</Form.Label>
 							<Select.Root
 								allowDeselect={true}
 								type="single"
