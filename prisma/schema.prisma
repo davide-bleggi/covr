@@ -110,7 +110,7 @@ model Requirement {
   status        String
   priority      String
   featureId     Int
-  feature       Feature    @relation(fields: [featureId], references: [id])
+  feature       Feature    @relation(fields: [featureId], references: [id], onDelete: Cascade)
   scenarios     Scenario[]
   coverage      Int        @default(0)
   createdByUser User       @relation("CreatedRequirements", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)

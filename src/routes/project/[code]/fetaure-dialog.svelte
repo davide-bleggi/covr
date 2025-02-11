@@ -27,7 +27,7 @@
 
 	let projectId = $state(version ? version.project.id : null);
 	let versionsParams = $state(version ? { projectId: projectId } : {});
-
+	let openConfirmDeletionDialog = $state(false);
 
 	const form = $state(superForm<Infer<FeatureFormSchema>>(propFormData, {
 		validators: zodClient(featureFormSchema),
@@ -134,15 +134,12 @@
 		<Dialog.Footer>
 			<div class={`flex flex-row w-full ${$formData.id?'justify-between':'justify-end'}`}>
 				{#if $formData.id }
-					<form action="?/deleteFeature" method="POST" use:enhance>
-						<Button
-							variant="destructive"
-							type="submit"
-						>
-							<input type="hidden" name="id" value={$formData.id } />
-							Rimuovi
-						</Button>
-					</form>
+					<Button
+						variant="destructive"
+						onclick={()=>openConfirmDeletionDialog=true}
+					>
+						Rimuovi
+					</Button>
 				{/if}
 				<Button form="saveFeatureForm" type="submit">Salva
 				</Button>
@@ -150,3 +147,35 @@
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
+
+<Dialog.Root bind:open={openConfirmDeletionDialog}>
+	<Dialog.Content class="">
+		<Dialog.Header>
+			<Dialog.Title>Eliminazione feature FEAT-{$formData.id }</Dialog.Title>
+			<Dialog.Description>Sei sicuro di vole procedere all'eliminazione?</Dialog.Description>
+		</Dialog.Header>
+		L'eliminazione della feature provvederà all'eliminazione di tutti i requisiti (inclusi scenari e test) ad esso
+		asscoiati.
+		<Dialog.Footer>
+			<div class="w-full flex flex-row justify-between">
+				<Button
+					variant="secondary"
+					onclick={()=>openConfirmDeletionDialog = false}
+				>
+					Annulla
+				</Button>
+				<form action="?/deleteFeature" method="POST" use:enhance>
+					<input type="hidden" name="id" value={$formData.id } />
+					<Button
+						variant="destructive"
+						type="submit"
+					>
+						Conferma
+					</Button>
+				</form>
+
+			</div>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
