@@ -38,6 +38,12 @@
 			console.error('Failed to copy text: ', err);
 		}
 	}
+
+	const errorLog:{
+		errorType: string,
+		received: string,
+		expected: string
+	} | null= $derived(automaticTest.errorLog?JSON.parse(automaticTest.errorLog):null)
 </script>
 
 <AutomaticTestDialog
@@ -75,12 +81,22 @@
 			<CopyCheck></CopyCheck>
 		</Button>
 	</div>
-	
-	{#if automaticTest.notes?.length > 0}
+
+	{#if (automaticTest.notes && automaticTest.notes?.length > 0)}
 		<div>
 			<div class="flex flex-col flex-1">
 				<span class="text-sm opacity-60">Note</span>
 				{automaticTest.notes}
+			</div>
+		</div>
+	{/if}
+	{#if errorLog}
+		<div class="flex flex-col flex-1">
+			<span class="text-sm opacity-60">Errore</span>
+			<div class="flex flex-col">
+				<span>{errorLog.errorType}</span>
+				<span>{errorLog.expected}</span>
+				<span>{errorLog.received}</span>
 			</div>
 		</div>
 	{/if}
