@@ -24,9 +24,9 @@
 	direction="horizontal"
 	class="min-h-[200px] h-full w-full rounded-lg flex-1 flex flex-col"
 >
-	<Resizable.Pane class="flex flex-col" defaultSize={70} minSize={30}>
+	<Resizable.Pane class="flex flex-col" defaultSize={50} minSize={30}>
 		<div class="flex h-full w-full flex-col">
-			<div class="flex flex-row justify-between w-full p-4  h-fit items-center gap-4">
+			<div class="flex flex-row justify-between w-full p-4 h-fit items-center gap-4">
 				<div class="flex flex-1 justify-between">
 					<h1 class="font-bold text-lg">
 						{data.project.name.toUpperCase()}
@@ -44,7 +44,7 @@
 				</Button>
 			</div>
 
-			<div class="flex flex-col flex-1 h-0 min-h-0  w-full max-w-[700px] mx-auto gap-2">
+			<div class="flex flex-col flex-1 h-0 min-h-0 px-4 w-full max-w-[700px] mx-auto gap-2">
 				<Button class="p-4 w-full" variant="outline" onclick={()=>openVersionDialog=true}>
 					Aggiungi Versione
 				</Button>
@@ -64,7 +64,7 @@
 		</div>
 	</Resizable.Pane>
 	<Resizable.Handle />
-	<Resizable.Pane defaultSize={30} minSize={30}>
+	<Resizable.Pane defaultSize={50} minSize={30}>
 
 	</Resizable.Pane>
 </Resizable.PaneGroup>
