@@ -53,9 +53,9 @@
 
 </script>
 	<div class="flex flex-col w-80 h-full justify-center">
-		<div class="pb-8">
-			<span class="font-bold ">Database corrente</span>
-			<SuperDebug data={parseSqlServerConnectionString(data.databaseUrl)} />
+		<div class="pb-8 w-full flex justify-center">
+			<h1 class="font-bold text-[32px] font-bold ">COVR</h1>
+<!--			<SuperDebug data={parseSqlServerConnectionString(data.databaseUrl)} />-->
 		</div>
 		<form method="POST" use:enhance
 					action="?/login">
