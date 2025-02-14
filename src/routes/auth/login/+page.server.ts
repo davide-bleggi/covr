@@ -46,7 +46,7 @@ export const actions = {
 		}
 
 		// 3. Create a JWT and set it in a cookie
-		const token = jwt.sign({ userId: user.id, email: user.email, name: user.name }, SECRET, { expiresIn: '1h' });
+		const token = jwt.sign({ userId: user.id, email: user.email, name: user.name }, SECRET, { expiresIn: '24h' });
 		event.cookies.set('jwt', token, {
 			path: '/',
 			httpOnly: true,
