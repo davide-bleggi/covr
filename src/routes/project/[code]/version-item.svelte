@@ -43,9 +43,9 @@
 	formId={`new-feature-form-${version.id}`}>
 </FeatureDialog>
 
-<div id={version.name} class="w-full gap-2 items-center justify-between shadow-md p-5 rounded-md">
-	<div class="flex flex-row items-center gap-2">
-		<h4 class="text-xl font-bold ">{version.name}</h4>
+<div id={version.name} class="w-full gap-2 items-center justify-between shadow-md p-5 rounded-md ">
+	<div class="flex flex-row items-center gap-2 sticky bg-white z-20 w-full p-2 top-0">
+		<h4 class="text-xl font-bold">{version.name}</h4>
 		{#if version.prevVersion}
 			<Button variant="outline" onclick={()=>scrollToSection(version.prevVersion.name)}>
 				<div class="flex flex-row items-center gap-2">
