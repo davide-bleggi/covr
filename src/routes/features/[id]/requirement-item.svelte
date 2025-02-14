@@ -114,11 +114,11 @@
 									sidePanelStore.scenario = {...scenario}
 									console.log(	sidePanelStore.scenario)
 								}}
-													 class={`cursor-pointer ${sidePanelStore.scenario?.id === scenario?.id?'bg-gray-100':""}`}>
+													 class={cn(`cursor-pointer ${sidePanelStore.scenario?.id === scenario?.id?'bg-secondary/50':""}`)}>
 									<Table.Cell>SCN-{scenario.id}</Table.Cell>
 									<Table.Cell>{scenario.name}</Table.Cell>
-									<Table.Cell class="flex"><span class={`border rounded-md p-2 w-full flex justify-center font-semibold
-										${scenario.testStatus==='PASS'?"border-green-500 text-green-500":scenario.testStatus==='FAIL'?"border-red-500 text-red-500":'border-none'}`}>{scenario.testStatus}</span>
+									<Table.Cell class="flex"><span class={cn(`border rounded-md p-2 w-full flex justify-center font-semibold
+										${scenario.testStatus==='PASS'?"border-green-500 text-green-500":scenario.testStatus==='FAIL'?"border-red-500 text-red-500":'border-none'}`)}>{scenario.testStatus}</span>
 									</Table.Cell>
 								</Table.Row>
 							{/each}

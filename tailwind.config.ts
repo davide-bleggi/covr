@@ -49,6 +49,14 @@ const config: Config = {
 					DEFAULT: "hsl(var(--card) / <alpha-value>)",
 					foreground: "hsl(var(--card-foreground) / <alpha-value>)"
 				},
+				success: {
+					DEFAULT: "hsl(var(--success) / <alpha-value>)",
+					foreground: "hsl(var(--success-foreground) / <alpha-value>)"
+				},
+				fail: {
+					DEFAULT: "hsl(var(--fail) / <alpha-value>)",
+					foreground: "hsl(var(--fail-foreground) / <alpha-value>)"
+				},
 				sidebar: {
 					DEFAULT: "hsl(var(--sidebar-background))",
 					foreground: "hsl(var(--sidebar-foreground))",

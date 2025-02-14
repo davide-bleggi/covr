@@ -15,11 +15,11 @@
 	const colorClasses = {
 		FAIL: {
 			text: 'text-red-500',
-			bg: 'bg-red-100'
+			bg: 'bg-fail/20'
 		},
 		PASS: {
 			text: 'text-green-500',
-			bg: 'bg-green-100'
+			bg: 'bg-success/20'
 		},
 		TO_TEST: {
 			text: '',
