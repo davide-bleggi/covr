@@ -44,7 +44,7 @@
 </FeatureDialog>
 
 <div id={version.name} class="w-full gap-2 items-center justify-between p-5  border-b">
-	<div class="flex flex-row items-center gap-2 sticky bg-white z-20 w-full p-2 top-0">
+	<div class="flex flex-row items-center gap-2 sticky bg-background z-20 w-full p-2 top-0">
 		<h4 class="text-xl font-bold">{version.name}</h4>
 		{#if version.prevVersion}
 			<Button variant="outline" onclick={()=>scrollToSection(version.prevVersion.name)}>

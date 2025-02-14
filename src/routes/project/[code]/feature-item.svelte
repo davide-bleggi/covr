@@ -13,7 +13,8 @@
 	<div class="flex flex-row w-full gap-4 justify-between items-center">
 
 		<div class="w-full flex flex-col py-2 px-4 hover:bg-secondary/80 rounded">
-				<div class="w-full mb-2">
+				<div class="w-full mb-2 flex flex-row gap-2 items-center">
+					<span>{feature.coverage}%</span>
 					<Progress value={feature.coverage} class="h-[10px]"></Progress>
 				</div>
 

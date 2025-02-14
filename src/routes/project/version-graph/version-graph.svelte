@@ -180,7 +180,7 @@
 
 <div class="h-full m-auto px-4">
 	<div class="flex flex-col lg:flex-row gap-8">
-		<div class="flex-1 h-full bg-white p-6">
+		<div class="flex-1 h-full bg-background p-6">
 			<svg bind:this={svg} class="w-full h-full"></svg>
 		</div>
 	</div>
