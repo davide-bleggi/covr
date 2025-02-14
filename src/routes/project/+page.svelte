@@ -16,7 +16,7 @@
 			Crea Progetto
 		</Button>
 	</div>
-	<ul class="grid grid-cols-1 lg:grid-cols-3 gap-5 p-5">
+	<ul class="flex flex-wrap justify-center items-start  gap-5 p-5">
 		{#each data.projects as project}
 			<li>
 				<ProjectItem project={project}>
