@@ -1,15 +1,17 @@
 <script lang="ts">
-	import { Calendar, Pencil, Plus } from 'lucide-svelte';
+	import { ArrowLeft, Calendar, Pencil, Plus } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index';
 	import { FeatureDialog, FeatureItem, InstallationDialog, InstallationItem } from './index';
 	import * as Accordion from '$lib/components/ui/accordion/index';
 	import SuperDebug, { type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import type { InstallationFormSchema } from './schema';
-	import { type Customer, type Feature, type Installation, Prisma, type Version } from '@prisma/client';
+	import { type Customer, type Feature, type Installation, Prisma, type Project, type Version } from '@prisma/client';
 
 
 	let { version, customers }: {
-		version: Version & { installations: (Installation & { customer: Customer })[] } & { features: Feature[] } & {project: Project},
+		version: Version & { installations: (Installation & { customer: Customer })[] } & { features: Feature[] } & {
+			project: Project
+		} & { prevVersion: Version },
 		customers: Customer[],
 	} = $props();
 
@@ -19,8 +21,11 @@
 	let installationForm = { versionId: version.id };
 	let featureForm = { versionId: version.id };
 
-	let openItems: string[] = $state([version.features.length > 0?'features':'', version.installations.length > 0?'installations':'']);
+	let openItems: string[] = $state([version.features.length > 0 ? 'features' : '', version.installations.length > 0 ? 'installations' : '']);
 
+	function scrollToSection(anchor: string) {
+		document.getElementById(anchor).scrollIntoView({ behavior: "smooth" });
+	}
 </script>
 
 <InstallationDialog
@@ -34,12 +39,23 @@
 <FeatureDialog
 	bind:open={openFeatureDialog}
 	propFormData={featureForm}
-	version = {version}
+	version={version}
 	formId={`new-feature-form-${version.id}`}>
 </FeatureDialog>
 
-<div class="w-full gap-2 items-center justify-between shadow-md p-5 rounded-md">
-	<h4 class="text-xl font-bold w-full">{version.name}</h4>
+<div id={version.name} class="w-full gap-2 items-center justify-between shadow-md p-5 rounded-md">
+	<div class="flex flex-row items-center gap-2">
+		<h4 class="text-xl font-bold ">{version.name}</h4>
+		{#if version.prevVersion}
+			<Button variant="outline" onclick={()=>scrollToSection(version.prevVersion.name)}>
+				<div class="flex flex-row items-center gap-2">
+					<ArrowLeft />
+					{version.prevVersion.name}
+				</div>
+			</Button>
+		{/if}
+	</div>
+
 	<Accordion.Root class="w-full" bind:value={openItems}>
 		<Accordion.Item value="installations" class="w-full">
 			<div class="flex flex-row w-full justify-between items-center gap-2">
@@ -65,7 +81,7 @@
 			</Accordion.Content>
 		</Accordion.Item>
 
-		<Accordion.Item value="features" >
+		<Accordion.Item value="features">
 			<div class="flex flex-row w-full justify-between items-center gap-2">
 				<div class="flex flex-grow w-full">
 					<Accordion.Trigger class="flex border-b-0">Features</Accordion.Trigger>
@@ -76,7 +92,7 @@
 					<Plus></Plus>
 				</Button>
 			</div>
-			<Accordion.Content >
+			<Accordion.Content>
 				<ul class="gap-2 flex flex-col">
 					{#each version.features as feature}
 						<li>
