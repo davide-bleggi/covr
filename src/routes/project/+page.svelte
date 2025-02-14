@@ -3,6 +3,7 @@
 	import { ProjectDialog } from './index';
 	import type { PageData } from './$types.js';
 	import { ProjectItem } from './index.js';
+	import { VersionGraph } from './version-graph/index';
 
 	let open = $state(false);
 	let {data} = $props();
@@ -20,7 +21,6 @@
 		{#each data.projects as project}
 			<li>
 				<ProjectItem project={project}>
-
 				</ProjectItem>
 			</li>
 		{/each}

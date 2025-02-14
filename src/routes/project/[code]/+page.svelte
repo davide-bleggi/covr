@@ -8,11 +8,18 @@
 	import { Progress } from '$lib/components/ui/progress';
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
+	import { VersionGraph } from '../version-graph';
+	import { onMount } from 'svelte';
+	import { cn } from 'tailwind-variants';
 
 
 	let { data } = $props();
 	let openProjectDialog = $state(false);
 	let openVersionDialog = $state(false);
+
+	const versionNodes = $derived(data.versions.map(v=>({id:v.name, prev: v.prevVersion?.name??null})))
+
+	let selectedVersion : string|null = $state(null)
 
 </script>
 <ProjectDialog bind:open={openProjectDialog} form={data.projectForm}>
@@ -25,6 +32,7 @@
 	class="min-h-[200px] h-full w-full rounded-lg flex-1 flex flex-col"
 >
 	<Resizable.Pane class="flex flex-col" defaultSize={50} minSize={30}>
+		{selectedVersion}
 		<div class="flex h-full w-full flex-col">
 			<div class="flex flex-row justify-between w-full p-4 h-fit items-center gap-4">
 				<div class="flex flex-1 justify-between">
@@ -52,7 +60,7 @@
 					<ScrollArea class="w-full overflow-auto">
 						<ul class="w-full relative">
 							{#each data.versions as version}
-								<li class="w-full">
+								<li class={cn(`w-full `)}>
 									<VersionItem {version} customers={data.customers}></VersionItem>
 								</li>
 							{/each}
@@ -65,6 +73,6 @@
 	</Resizable.Pane>
 	<Resizable.Handle />
 	<Resizable.Pane defaultSize={50} minSize={30}>
-
+		<VersionGraph {versionNodes} ></VersionGraph>
 	</Resizable.Pane>
 </Resizable.PaneGroup>

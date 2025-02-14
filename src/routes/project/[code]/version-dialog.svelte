@@ -33,6 +33,8 @@
 
 	const { form: formData, enhance, submit, errors } = form;
 
+	$formData.prevVersion = 	$formData.prevVersion??null;
+
 	async function handleSubmit(actionValue: string) {
 		action = actionValue;
 		submit();
@@ -67,7 +69,7 @@
 				<input type="hidden" name="prevVersion" bind:value={$formData.prevVersion} />
 				<Form.Field {form} name="prevVersion">
 					<Form.Control>
-						{#snippet children({props})}
+						{#snippet children({ props })}
 							<Form.Label>Versione precedente</Form.Label>
 							<Select.Root
 								allowDeselect={true}

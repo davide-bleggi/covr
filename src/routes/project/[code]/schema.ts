@@ -4,7 +4,7 @@ import { ProjectStatusOptions } from '$lib/types';
 export const versionFormSchema = z.object({
     id: z.number().optional(),
     name: z.string().min(2).max(50),
-    prevVersion: z.number().optional(),
+    prevVersion: z.number().optional().nullable(),
     projectId: z.number()
 });
 
