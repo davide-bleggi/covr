@@ -25,7 +25,7 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import { invalidate, invalidateAll } from '$app/navigation';
 	import { Progress } from '$lib/components/ui/progress';
-
+	import { toast } from "svelte-sonner";
 
 	type FeatureWithDetails = Feature & {
 		requirements: (Requirement & {
@@ -91,6 +91,11 @@
 
 		socket.onmessage = async (event) => {
 			console.log('socket message: ', event);
+			if(event.data === 'change detected') {
+				toast.success("Aggiornamento Test", {
+					description: "Sono stati aggiornati i test",
+				});
+			}
 			await invalidateAll();
 		};
 
