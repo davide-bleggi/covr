@@ -10,9 +10,9 @@
 
 </script>
 <a href="{`project/${project.code}`}">
-	<div class="flex flex-col p-4 rounded-xl shadow-md border gap-2">
-		<div class="flex flex-row justify-between">
-			<div class="flex flex-row gap-1 items-center">
+	<div class="flex flex-col p-4 rounded-xl shadow-md border gap-2 h-full w-[400px] justify-between">
+		<div class="flex flex-row justify-between flex-wrap">
+			<div class="flex flex-row flex-wrap gap-1 items-center">
 				<h2 class="font-bold">
 					{project.name.toUpperCase()}
 				</h2>
