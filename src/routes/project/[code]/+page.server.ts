@@ -18,7 +18,10 @@ export async function load({ params }) {
 					installations: {
 						include: {
 							customer: true
-						}
+						},
+					},
+					prevVersion: {
+						include: true
 					},
 					project: true
 				}
