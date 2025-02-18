@@ -60,12 +60,16 @@
 			<Pencil></Pencil>
 		</Button>
 	</div>
-	{#if manualTest.notes?.length > 0 }
-		<div>
-			<div class="flex flex-col flex-1">
-				<span class="text-sm opacity-60">Note</span>
-				<span class="markdown">{@html marked(manualTest.notes)}</span>
-			</div>
+	{#if manualTest.notes?.length && manualTest.notes?.length > 0 }
+		<div class="flex flex-col flex-1">
+			<span class="text-sm opacity-60">Note</span>
+			<span class="markdown">{@html marked(manualTest.notes)}</span>
+		</div>
+	{/if}
+	{#if manualTest.testData?.length && manualTest.testData?.length > 0}
+		<div class="flex flex-col flex-1">
+			<span class="text-sm opacity-60">Test Data</span>
+			<span class="markdown">{@html marked(manualTest.testData)}</span>
 		</div>
 	{/if}
 </div>

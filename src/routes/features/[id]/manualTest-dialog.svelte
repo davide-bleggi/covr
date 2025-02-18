@@ -15,7 +15,7 @@
 	} from './schema';
 	import { DatePicker, Tiptap } from '$lib/components/wrapper';
 	import { getContext } from 'svelte';
-
+	import * as Accordion from "$lib/components/ui/accordion/index.js";
 	let {
 		open = $bindable(false),
 		propFormData = $bindable(),
@@ -53,7 +53,7 @@
 </script>
 
 <Dialog.Root bind:open={open}>
-	<Dialog.Content class="sm:max-w-[600px]  ">
+	<Dialog.Content class="sm:max-w-[600px] ">
 
 		<Dialog.Header>
 			<Dialog.Title>Aggiungi Test Manuale</Dialog.Title>
@@ -62,7 +62,7 @@
 			</Dialog.Description>
 		</Dialog.Header>
 <!--		<SuperDebug data={$formData} />-->
-		<div class="grid gap-4 py-4">
+		<div class="grid gap-4 py-4 max-h-[80vh] overflow-y-auto">
 			<form method="POST" action='?/saveManualTest' use:enhance id="saveManualTestForm">
 				<input hidden name="id" bind:value={$formData.id} />
 				<input hidden name="scenarioId" bind:value={$formData.scenarioId} />
@@ -116,17 +116,43 @@
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				<FormField {form} name="notes">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label>Note</Form.Label>
-							<input hidden value={$formData.notes} name={props.name}/>
-							<Tiptap class="h-[300px]" {...props}  bind:content={$formData.notes} params={{imageButton: true, gerkinsButtons: true, height: 1000}}></Tiptap>
-							<Form.Description>Aggiungi descrizione dei problemi riscontrati</Form.Description>
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors />
-				</FormField>
+				<Accordion.Root type="multiple" class="w-full" value="test-data">
+					<Accordion.Item value="test-data">
+						<div class="flex flex-grow w-full">
+						<Accordion.Trigger class="flex flex-row items-center">Dati usati</Accordion.Trigger>
+						</div>
+						<Accordion.Content>
+						<FormField {form} name="testData">
+							<Form.Control>
+								{#snippet children({ props })}
+									<input hidden value={$formData.testData} name={props.name}/>
+									<Tiptap class="h-[100px] w-full" {...props}  bind:content={$formData.testData} params={{imageButton: false, gerkinsButtons: false, height: 500}}></Tiptap>
+									<Form.Description>Dati utilizzati per l'esecuzione del test</Form.Description>
+								{/snippet}
+							</Form.Control>
+							<Form.FieldErrors />
+						</FormField>
+						</Accordion.Content>
+					</Accordion.Item>
+					<Accordion.Item value="notes">
+						<div class="flex flex-grow w-full">
+						<Accordion.Trigger class="flex flex-row items-center">Note</Accordion.Trigger>
+						</div>
+						<Accordion.Content>
+							<FormField {form} name="notes">
+								<Form.Control>
+									{#snippet children({ props })}
+										<input hidden value={$formData.notes} name={props.name}/>
+										<Tiptap class="h-[200px]" {...props}  bind:content={$formData.notes} params={{imageButton: true, gerkinsButtons: true, height: 1000}}></Tiptap>
+										<Form.Description>Descrizione dei problemi riscontrati</Form.Description>
+									{/snippet}
+								</Form.Control>
+								<Form.FieldErrors />
+							</FormField>
+						</Accordion.Content>
+					</Accordion.Item>
+				</Accordion.Root>
+
 			</form>
 
 		</div>

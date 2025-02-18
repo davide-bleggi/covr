@@ -31,7 +31,7 @@
 	direction="horizontal"
 	class="min-h-[200px] h-full w-full rounded-lg flex-1 flex flex-col"
 >
-	<Resizable.Pane class="flex flex-col" defaultSize={50} minSize={30}>
+	<Resizable.Pane class="flex flex-col" defaultSize={70} minSize={30}>
 		{selectedVersion}
 		<div class="flex h-full w-full flex-col">
 			<div class="flex flex-row justify-between w-full p-4 h-fit items-center gap-4">
@@ -72,7 +72,7 @@
 		</div>
 	</Resizable.Pane>
 	<Resizable.Handle />
-	<Resizable.Pane defaultSize={50} minSize={30}>
+	<Resizable.Pane defaultSize={30} minSize={30}>
 		<VersionGraph {versionNodes} ></VersionGraph>
 	</Resizable.Pane>
 </Resizable.PaneGroup>

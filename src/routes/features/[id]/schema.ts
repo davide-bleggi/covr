@@ -71,7 +71,8 @@ export const manualTestFormSchema = z.object({
 	ownerId: z.number(),
 	executionDate: z.date(),
 	status: z.enum([testStatusLabels[0].value, testStatusLabels[1].value, testStatusLabels[2].value]),
-	notes: z.string().max(5000).optional()
+	notes: z.string().max(5000).optional(),
+	testData: z.string().max(2000)
 });
 
 export const automaticTestFormSchema = z.object({

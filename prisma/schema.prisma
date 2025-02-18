@@ -151,6 +151,7 @@ model ManualTest {
   updatedByUser User     @relation("UpdatedManualTests", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   createdBy     Int      @default(1)
   updatedBy     Int      @default(1)
+  testData      String?
 }
 
 model AutomaticTest {
