@@ -14,6 +14,7 @@
 			params:  {
 				gerkinsButtons?: boolean;
 				imageButton?: boolean;
+				codeButton?: boolean;
 				class?: string;
 			},
 		} = $props();
@@ -113,9 +114,11 @@
 				</div>
 			</Button>
 		{/if}
+		{#if params.codeButton}
 		<Button variant="outline" size="sm" onclick={() => editor.chain().focus().toggleCodeBlock().run()}>
 			<div><Code /></div>
 		</Button>
+		{/if}
 	</div>
 {/if}
 
