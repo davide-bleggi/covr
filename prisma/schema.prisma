@@ -78,7 +78,7 @@ model Installation {
   installationDate DateTime
   createdAt        DateTime @default(now())
   customer         Customer @relation(fields: [customerId], references: [id])
-  version          Version  @relation(fields: [versionId], references: [id])
+  version          Version  @relation(fields: [versionId], references: [id], onDelete: Cascade)
   createdByUser    User     @relation("CreatedInstallations", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   updatedByUser    User     @relation("UpdatedInstallations", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   createdBy        Int      @default(1)
@@ -92,7 +92,7 @@ model Feature {
   name          String
   description   String
   versionId     Int
-  version       Version       @relation(fields: [versionId], references: [id])
+  version       Version       @relation(fields: [versionId], references: [id], onDelete: Cascade)
   requirements  Requirement[]
   createdByUser User          @relation("CreatedFeatures", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   updatedByUser User          @relation("UpdatedFeatures", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)

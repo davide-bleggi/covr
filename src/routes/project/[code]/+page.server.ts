@@ -18,7 +18,7 @@ export async function load({ params }) {
 					installations: {
 						include: {
 							customer: true
-						},
+						}
 					},
 					prevVersion: {
 						include: true
@@ -104,29 +104,76 @@ export const actions: Actions = {
 		throw redirect(301, `/project`);
 	},
 
-	createVersion: async (event) => {
+	saveVersion: async (event: RequestEvent) => {
 		const form = await superValidate(event, zod(versionFormSchema));
-		console.log('form: ', form);
-		try {
-			await prisma.version.create({
-				data: {
-					name: form.data.name,
-					prevVersionId: form.data.prevVersion ? Number(form.data.prevVersion) : null,
-					projectId: form.data.projectId,
-					id: undefined
+		console.log("Testing saveVersion")
+		if (!form.data.id) {
+			try {
+				await prisma.version.create({
+					data: {
+						...form.data,
+						id: undefined,
+						prevVersionId: form.data.prevVersion ? Number(form.data.prevVersion) : null,
+						prevVersion: undefined // explicitly remove it
+					}
+				});
+			} catch (err: any) {
+				console.log(err);
+				if (err.code === 'P2002') {
+					return setError(form, 'name', 'nome già utilizzato');
 				}
-			});
-		} catch (err) {
-			console.log(err);
-			setError(form, 'name', 'nome già esistente');
-			// Make sure to return the form with the error
-			return fail(400, { form });
+				// Make sure to return the form with the error
+				return fail(400, { form });
+			}
+		} else {
+			try {
+				await prisma.version.update({
+					data: {
+						...form.data,
+						id: undefined,
+						prevVersionId: form.data.prevVersion ? Number(form.data.prevVersion) : null,
+						prevVersion: undefined // explicitly remove it
+					},
+					where: { id: form.data.id }
+				});
+			} catch (err: any) {
+				console.log(err.code);
+				if (err.code === 'P2002') {
+					return setError(form, 'name', 'nome già assegnato');
+				}
+				// Make sure to return the form with the error
+				return fail(400, { form });
+			}
 		}
 
 		return {
 			form
 		};
 	},
+
+	deleteVersion: async ({ request }) =>{
+		const id = Number((await request.formData()).get('id'));
+
+		try {
+			// 1. Find all versions that reference this version as prevVersion
+			const referencingVersions = await prisma.version.findMany({
+				where: { prevVersionId: id }
+			});
+
+			// 2. Update those versions to set prevVersionId to null
+			if (referencingVersions.length > 0) {
+				await prisma.version.updateMany({
+					where: { prevVersionId: id },
+					data: { prevVersionId: null }
+				});
+			}
+			await prisma.version.delete({ where: { id: id ?? null } });
+		} catch(err) {
+			console.error(err)
+			return fail(400);
+		}
+	},
+
 
 	saveInstallation: async (event: RequestEvent) => {
 		const form = await superValidate(event, zod(installationFormSchema));

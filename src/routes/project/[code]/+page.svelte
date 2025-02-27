@@ -24,7 +24,11 @@
 </script>
 <ProjectDialog bind:open={openProjectDialog} form={data.projectForm}>
 </ProjectDialog>
-<VersionDialog bind:open={openVersionDialog} formToValidate={data.versionForm} versions={data.versions}>
+<VersionDialog bind:open={openVersionDialog}
+							 formToValidate={data.versionForm}
+							 versions={data.versions}
+								formId="new-version-form"
+>
 </VersionDialog>
 
 <Resizable.PaneGroup
@@ -52,7 +56,7 @@
 				</Button>
 			</div>
 
-			<div class="flex flex-col flex-1 h-0 min-h-0 px-4 w-full max-w-[700px] mx-auto gap-2">
+			<div class="flex flex-col flex-1 h-0 min-h-0 px-4 w-full  mx-auto gap-2">
 				<Button class="p-4 w-full" variant="outline" onclick={()=>openVersionDialog=true}>
 					Aggiungi Versione
 				</Button>
@@ -61,7 +65,7 @@
 						<ul class="w-full relative">
 							{#each data.versions as version}
 								<li class={cn(`w-full `)}>
-									<VersionItem {version} customers={data.customers}></VersionItem>
+									<VersionItem {version} customers={data.customers} versionForm={data.versionForm} versions={data.versions}></VersionItem>
 								</li>
 							{/each}
 						</ul>
@@ -73,6 +77,8 @@
 	</Resizable.Pane>
 	<Resizable.Handle />
 	<Resizable.Pane defaultSize={30} minSize={30}>
-		<VersionGraph {versionNodes} ></VersionGraph>
+		{#key JSON.stringify(versionNodes)}
+			<VersionGraph {versionNodes}></VersionGraph>
+		{/key}
 	</Resizable.Pane>
 </Resizable.PaneGroup>

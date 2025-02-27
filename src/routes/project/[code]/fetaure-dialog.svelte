@@ -23,6 +23,7 @@
 		open: boolean,
 		propFormData: any;
 		version: Version & { project: Project } | undefined;
+		formId: string
 	} = $props();
 
 	let projectId = $state(version ? version.project.id : null);
@@ -40,7 +41,7 @@
 		},
 		onUpdate: ({ form }) => {
 			$errors = form.errors;
-		}
+		},
 	}));
 
 	const { form: formData, enhance, errors, formId } = form;
@@ -173,7 +174,6 @@
 						Conferma
 					</Button>
 				</form>
-
 			</div>
 		</Dialog.Footer>
 	</Dialog.Content>
