@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as d3 from 'd3';
+
 	type VersionNode = {
 		id: string;
 		connections?: number;
@@ -8,21 +9,12 @@
 		order?: number
 	}
 
-	let {versionNodes} :{versionNodes: VersionNode[]} = $props();
+	let { versionNodes }: { versionNodes: VersionNode[] } = $props();
 
 	let svg;
 	let selectedCommit = null;
 
-	console.log(versionNodes)
-
-	// const versionNodes:VersionNode[] = [
-	// 		{ id: '0.0.0', connections: 1 },
-	// 		{ id: '0.0.1', prev: '0.0.0', connections: 2 },
-	// 		{ id: '0.0.2', prev: '0.0.1', connections: 1 },
-	// 		{ id: '0.0.2-ferrari', prev: '0.0.1', connections: 0 },
-	// 		{ id: '0.0.3', prev: '0.0.2', connections: 1 },
-	// 		{ id: '0.1.0', prev: '0.0.3', connections: 1 }
-	// 	];
+	console.log(versionNodes);
 
 	function addConnections(versionNodes: VersionNode[]): VersionNode[] {
 		const nodes = versionNodes;
@@ -86,15 +78,27 @@
 		const svgElement = d3.select(svg)
 			.attr('viewBox', [0, 0, width, height]);
 
-		// Calculate positions - root node at bottom
+		// Create a container group for all elements
+		const container = svgElement.append('g');
+
+		// Add zoom behavior
+		const zoom = d3.zoom()
+			.scaleExtent([0.1, 4])
+			.on('zoom', (event) => {
+				container.attr('transform', event.transform);
+			});
+
+		svgElement.call(zoom);
+
+		// Calculate positions - root node at top
 		versionNodes.forEach((node, i) => {
-			// Place first node at bottom and subsequent nodes moving up
-			node.y = height - margin - (i * nodeSpacing);
+			// Place first node at top and subsequent nodes moving down
+			node.y = margin + (i * nodeSpacing);
 			// Center the main branch and offset others
 			node.x = (width / 2) + ((node.order || 1) * branchSpacing);
 		});
 
-		// Create arrow marker (pointing up)
+		// Create arrow marker (pointing down)
 		svgElement.append('defs').append('marker')
 			.attr('id', 'arrowhead')
 			.attr('markerWidth', 10)
@@ -103,11 +107,11 @@
 			.attr('refY', 3.5)
 			.attr('orient', 'auto')
 			.append('polygon')
-			.attr('points', '0 7, 10 3.5, 0 0')  // Flipped points for upward arrow
+			.attr('points', '10 0, 0 3.5, 10 7')  // Points for downward arrow
 			.attr('fill', '#999');
 
 		// Draw links with curves
-		const links = svgElement
+		const links = container
 			.append('g')
 			.selectAll('path')
 			.data(versionNodes.filter(d => d.prev))
@@ -135,7 +139,7 @@
 			});
 
 		// Draw nodes
-		const nodes = svgElement
+		const nodes = container
 			.append('g')
 			.selectAll('a')
 			.data(versionNodes)
@@ -148,6 +152,7 @@
 				event.preventDefault();
 				scrollToSection(d.id);
 			});
+
 		// Add commit circles
 		nodes.append('circle')
 			.attr('r', 8)
@@ -171,15 +176,22 @@
 			.attr('font-size', '12px')
 			.attr('fill', '#666')
 			.text(d => d.id);
+
+		// Add double-click to reset zoom
+		svgElement.on('dblclick', () => {
+			svgElement.transition()
+				.duration(750)
+				.call(zoom.transform, d3.zoomIdentity);
+		});
 	});
 
 	function scrollToSection(anchor: string) {
-		document.getElementById(anchor).scrollIntoView({ behavior: "smooth" });
+		document.getElementById(anchor).scrollIntoView({ behavior: 'smooth' });
 	}
 </script>
 
-<div class="h-full m-auto px-4">
-	<div class="flex flex-col lg:flex-row gap-8">
+<div class="h-full m-auto ">
+	<div class="flex flex-col h-full lg:flex-row gap-8">
 		<div class="flex-1 h-full bg-background p-6">
 			<svg bind:this={svg} class="w-full h-full"></svg>
 		</div>
