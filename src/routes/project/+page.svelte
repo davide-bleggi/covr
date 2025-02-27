@@ -11,7 +11,7 @@
 
 <div class="flex flex-col w-full">
 	<div class="flex flex-row p-4 w-full justify-end">
-		<ProjectDialog bind:open form={data.form}>
+		<ProjectDialog bind:open bind:formToValidate={data.form}>
 		</ProjectDialog>
 		<Button onclick={()=>{open=true}}>
 			Crea Progetto

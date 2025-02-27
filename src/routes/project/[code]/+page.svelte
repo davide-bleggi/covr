@@ -22,7 +22,7 @@
 	let selectedVersion : string|null = $state(null)
 
 </script>
-<ProjectDialog bind:open={openProjectDialog} form={data.projectForm}>
+<ProjectDialog bind:open={openProjectDialog} bind:formToValidate={data.projectForm}>
 </ProjectDialog>
 <VersionDialog bind:open={openVersionDialog}
 							 formToValidate={data.versionForm}

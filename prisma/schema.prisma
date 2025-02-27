@@ -54,7 +54,7 @@ model Version {
   prevVersionId Int? // Make prevId nullable (optional) if needed
   features      Feature[]
   installations Installation[]
-  project       Project        @relation(fields: [projectId], references: [id])
+  project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdByUser User           @relation("CreatedVersions", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   updatedByUser User           @relation("UpdatedVersions", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   createdBy     Int            @default(1)

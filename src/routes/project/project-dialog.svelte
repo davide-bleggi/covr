@@ -4,21 +4,48 @@
 	} from '$lib/components/ui/button/index';
 	import * as Dialog from '$lib/components/ui/dialog/index';
 	import { ProjectForm } from './index';
-	import { type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import type { ProjectFormSchema } from './[code]/schema';
+	import { projectFormSchema, type ProjectFormSchema } from './[code]/schema';
 	import { tick } from 'svelte';
+	import { ProjectStatusOptions } from '$lib/types';
+	import { Input } from '$lib/components/ui/input';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import * as Form from '$lib/components/ui/form';
+	import SuperDebug, {
+		type Infer,
+		type SuperValidated,
+		superForm
+	} from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import * as Select from '$lib/components/ui/select';
 
-	let { open = $bindable(), form= $bindable()}= $props();
+	let openConfirmDeletionDialog = $state(false);
 
-	let submit: (()=>void)|undefined = $state();
-	let action = $state('createProject');
+	let { formToValidate = $bindable(), open = $bindable() }:{
+		open: boolean,
+		formToValidate: SuperValidated<Infer<ProjectFormSchema>> | Infer<ProjectFormSchema>
+	} = $props();
 
-	async function handleSubmit(actionValue: string) {
-		action =  actionValue;
-		await tick();
-		if(submit)
-			submit();
-	}
+	const form = superForm<Infer<ProjectFormSchema>>(formToValidate, {
+		validators: zodClient(projectFormSchema),
+		onResult: ({ result }) => {
+			if (result.type === 'failure' || result.type === 'error') {
+				return;
+			}
+			open = false;
+		},
+		onUpdate: ({ form }) => {
+			$errors = form.errors;
+		},
+	});
+	const { form: formData, enhance, errors } = form;
+
+	$effect(() => {
+		if (open && formToValidate?.data) {
+			$formData = {
+				...formToValidate.data
+			};
+		}
+	});
 </script>
 
 <Dialog.Root bind:open={open}>
@@ -30,31 +57,106 @@
 			</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
-			<ProjectForm data={form}
-									 bind:submit={submit}
-									 bind:open={open}
-									 bind:action="{action}"
-			></ProjectForm>
+			<form method="POST" use:enhance action='?/saveProject' id="saveProjectForm">
+				<input type="hidden" name="id" bind:value={$formData.id} />
+				<Form.Field {form} name="name">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>Nome</Form.Label>
+							<Input {...props} bind:value={$formData.name} />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="code">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>Codice Progetto</Form.Label>
+							<Input bind:value={$formData.code} {...props} placeholder="COD" />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="description">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>Descrizione</Form.Label>
+							<Textarea {...props} bind:value={$formData.description} placeholder="Descrizione progetto"></Textarea>
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+					<Form.Description>Descrivi brevemente di cosa si occupa il progetto.</Form.Description>
+				</Form.Field>
+
+				<Form.Field {form} name="status">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>Stato</Form.Label>
+							<Select.Root type="single"
+													 bind:value={$formData.status}
+													 name={props.name}>
+								<Select.Trigger {...props} class="w-full">
+									{$formData.status
+										? ProjectStatusOptions.find((opt)=>opt.value ===$formData.status)?.label??''
+										: "Stato attuale"}
+								</Select.Trigger>
+								<Select.Content>
+									{#each ProjectStatusOptions as { value, label }}
+										<Select.Item value={value} label={label}>
+											{label}
+										</Select.Item>
+									{/each}
+								</Select.Content>
+							</Select.Root>
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+
+			</form>
 		</div>
 		<Dialog.Footer>
-			<div class={`flex flex-row w-full ${form.data.id?'justify-between':'justify-end'}`}>
-				{#if form.data.id }
+			<div class={`flex flex-row w-full ${$formData.id?'justify-between':'justify-end'}`}>
+				{#if $formData.id }
 					<Button
 						variant="destructive"
-						onclick={()=>{
-							handleSubmit('/project/[code]?/deleteProject')
-							}}>
+						onclick={()=>openConfirmDeletionDialog=true}
+					>
 						Rimuovi
 					</Button>
 				{/if}
-				<Button onclick={()=>{
-					if(form.data.id){
-						handleSubmit('/project/[code]?/updateProject')
-					}else{
-						handleSubmit('project?/createProject')
-					}
-				}}>Salva
+				<Button form="saveProjectForm" type="submit">Salva
 				</Button>
+			</div>
+		</Dialog.Footer>
+	</Dialog.Content>
+
+</Dialog.Root>
+
+<Dialog.Root bind:open={openConfirmDeletionDialog}>
+	<Dialog.Content class="">
+		<Dialog.Header>
+			<Dialog.Title>Eliminazione progetto {$formData.name }</Dialog.Title>
+			<Dialog.Description>Sei sicuro di vole procedere all'eliminazione del progetto?</Dialog.Description>
+		</Dialog.Header>
+		L'eliminazione del progetto provvederà all'eliminazione di tutte le versioni e dipendenze ad essi associate.
+		<Dialog.Footer>
+			<div class="w-full flex flex-row justify-between">
+				<Button
+					variant="secondary"
+					onclick={()=>openConfirmDeletionDialog = false}
+				>
+					Annulla
+				</Button>
+				<form action="?/deleteProject" method="POST" use:enhance>
+					<input type="hidden" name="id" value={$formData.id } />
+					<Button
+						variant="destructive"
+						type="submit"
+					>
+						Conferma
+					</Button>
+				</form>
 			</div>
 		</Dialog.Footer>
 	</Dialog.Content>

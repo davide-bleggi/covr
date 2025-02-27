@@ -60,30 +60,42 @@ export async function load({ params }) {
 }
 
 export const actions: Actions = {
-	updateProject: async (event) => {
+	saveProject: async (event) => {
 		const form = await superValidate(event, zod(projectFormSchema));
-		if (!form.valid) {
-			return fail(400, {
-				form
-			});
-		}
-		if (form.data.id) {
-			let project;
+		console.log("saving Project")
+		if (!form.data.id) {
 			try {
-				project = await prisma.project.update({
-					where: {
-						id: form.data.id
-					},
-					data: { ...form.data, id: undefined }
+				await prisma.project.create({
+					data: {
+						...form.data,
+						id: undefined
+					}
 				});
-			} catch (err) {
-				console.log(err);
-				return setError(form, 'code', 'codice già in uso');
+			} catch (err: any) {
+				console.error(err);
+				if (err.code === 'P2002') {
+					return setError(form, 'name', 'nome già utilizzato');
+				}
+				// Make sure to return the form with the error
+				return fail(400, { form });
 			}
-
-			if (project) {
-				console.log(project);
-				throw redirect(303, `/project/${project.code}`);
+		} else {
+			try {
+				await prisma.project.update({
+					data: {
+						...form.data,
+						id: undefined,
+					},
+					where: { id: form.data.id }
+				});
+			} catch (err: any) {
+				console.log(err.code);
+				if (err.code === 'P2002') {
+					return setError(form, 'name', 'nome già assegnato');
+				}
+				console.error(err)
+				// Make sure to return the form with the error
+				return fail(400, { form });
 			}
 		}
 
