@@ -30,7 +30,10 @@ export async function load({ params }) {
 						include: true
 					},
 					project: true
-				}
+				},
+				orderBy: {
+					createdAt: 'desc'
+				},
 			}
 		}
 	});
@@ -326,7 +329,10 @@ export const actions: Actions = {
 							customer: true
 						}
 					}
-				}
+				},
+				orderBy: {
+					createdAt: 'desc'
+				},
 			});
 
 			console.log('versions has been found: ', versions)
