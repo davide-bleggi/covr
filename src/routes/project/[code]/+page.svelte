@@ -14,80 +14,20 @@
 	import { FormField } from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input';
 	import * as Form from '$lib/components/ui/form';
-	import Search from 'lucide-svelte/icons/search';
 	import { type Infer, superForm } from 'sveltekit-superforms';
 	import { featureFormSchema, type FeatureFormSchema, searchFormSchema, type SearchFormSchema } from './schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { SmartSearch } from '$lib/components/smart-search/index';
 
 
 	let { data } = $props();
 	let openProjectDialog = $state(false);
 	let openVersionDialog = $state(false);
-	let previousSearch = $state('');
-	let previousVersions = $state([]);
+	let versions = $state(data.versions);
 
 	const versionNodes = $derived(data.versions.map(v => ({ id: v.name, prev: v.prevVersion?.name ?? null })));
 
 	let selectedVersion: string | null = $state(null);
-	let versions: Version[] = $state(data.versions);
-
-	const searchForm = $state(superForm<Infer<SearchFormSchema>>({ searchValue: '' }, {
-		validators: zodClient(searchFormSchema),
-		applyAction: false, // Add this to prevent automatic page updates
-		onResult: ({ result }) => {
-			if (result.type === 'failure' || result.type === 'error') {
-				console.log('Form submission failed:', result);
-				versions = [];
-			}
-
-			if (result.type === 'success') {
-				versions = result.data ? result.data.versions : [];
-			}
-		},
-		onUpdate: ({ form }) => {
-			$errors = form.errors;
-		},
-		resetForm: false
-	}));
-
-	const { form: formData, enhance, errors, formId, submit } = searchForm;
-
-	let tempSearch: string;
-
-	const debouncedSubmit = debounce(() => {
-		submit();
-		tempSearch = $formData.searchValue;
-	}, 3000);
-
-	function debounce<T extends (...args: any[]) => any>(func: T, delay: number): (...args: Parameters<T>) => void {
-		let timer: NodeJS.Timeout;
-		return function(this: any, ...args: Parameters<T>): void {
-			clearTimeout(timer);
-			timer = setTimeout(() => func.apply(this, args), delay);
-		};
-	}
-
-	$effect(() => {
-		if (!$formData.searchValue || $formData.searchValue.length === 0) {
-			versions = data.versions;
-			previousSearch = '';
-			previousVersions = data.versions;
-		}
-	});
-
-	$effect(()=>{
-		const versionsChanged = JSON.stringify(data.versions) !== JSON.stringify(previousVersions);
-
-		if ($formData.searchValue &&
-			$formData.searchValue.length > 0 &&
-			data.versions &&
-			($formData.searchValue !== previousSearch || versionsChanged)) {
-			console.log('ricerca attiva')
-			previousSearch = $formData.searchValue;
-			previousVersions = data.versions;
-			debouncedSubmit();
-		}
-	})
 </script>
 <ProjectDialog bind:open={openProjectDialog} formToValidate={data.projectForm}>
 </ProjectDialog>
@@ -124,26 +64,13 @@
 			</div>
 
 			<div class="flex flex-col flex-1 h-0 min-h-0 px-4 w-full  mx-auto gap-2">
-				<form method="POST" class="flex flex-col gap-3" use:enhance action='?/searchVersion'>
-					<Form.Field form={searchForm} name="searchValue">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>Ricerca</Form.Label>
-								<div class="flex flex-row gap-2">
-									<Input {...props} type="text" bind:value={$formData.searchValue} />
-									<Button type="submit">
-										<Search />
-									</Button>
-								</div>
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-				</form>
+			<SmartSearch let:T={Version}
+									 bind:versions={data.versions}
+									 bind:filteredVersions={versions}
+									 searchApiString="?/searchVersion" />
 				<Button class="p-4 w-full" variant="outline" onclick={()=>openVersionDialog=true}>
 					Aggiungi Versione
 				</Button>
-
 				<div class="flex-1 flex h-0 min-h-0  mb-2 w-full">
 					<ScrollArea class="w-full overflow-auto">
 						<ul class="w-full relative">
