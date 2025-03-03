@@ -23,6 +23,8 @@
 	let { data } = $props();
 	let openProjectDialog = $state(false);
 	let openVersionDialog = $state(false);
+	let previousSearch = $state('');
+	let previousVersions = $state([]);
 
 	const versionNodes = $derived(data.versions.map(v => ({ id: v.name, prev: v.prevVersion?.name ?? null })));
 
@@ -50,16 +52,40 @@
 
 	const { form: formData, enhance, errors, formId, submit } = searchForm;
 
+	let tempSearch: string;
+
+	const debouncedSubmit = debounce(() => {
+		submit();
+		tempSearch = $formData.searchValue;
+	}, 3000);
+
+	function debounce<T extends (...args: any[]) => any>(func: T, delay: number): (...args: Parameters<T>) => void {
+		let timer: NodeJS.Timeout;
+		return function(this: any, ...args: Parameters<T>): void {
+			clearTimeout(timer);
+			timer = setTimeout(() => func.apply(this, args), delay);
+		};
+	}
+
 	$effect(() => {
 		if (!$formData.searchValue || $formData.searchValue.length === 0) {
 			versions = data.versions;
+			previousSearch = '';
+			previousVersions = data.versions;
 		}
 	});
 
 	$effect(()=>{
-		if ($formData.searchValue && $formData.searchValue.length > 0 && data.versions) {
+		const versionsChanged = JSON.stringify(data.versions) !== JSON.stringify(previousVersions);
+
+		if ($formData.searchValue &&
+			$formData.searchValue.length > 0 &&
+			data.versions &&
+			($formData.searchValue !== previousSearch || versionsChanged)) {
 			console.log('ricerca attiva')
-			submit()
+			previousSearch = $formData.searchValue;
+			previousVersions = data.versions;
+			debouncedSubmit();
 		}
 	})
 </script>
