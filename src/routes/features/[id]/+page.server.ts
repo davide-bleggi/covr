@@ -3,7 +3,7 @@ import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { automaticTestFormSchema, manualTestFormSchema, requirementFormSchema, scenarioFormSchema } from './schema';
 import { type Actions, error, fail, type RequestEvent } from '@sveltejs/kit';
-import { featureFormSchema } from '../../project/[code]/schema';
+import { featureFormSchema, searchFormSchema } from '../../project/[code]/schema';
 
 export async function load({ params, url }) {
 
@@ -11,7 +11,7 @@ export async function load({ params, url }) {
 	const page = Number(url.searchParams.get('page') || '1');
 	const limit = 5;
 	const skip = (page - 1) * limit;
-	console.log("loading new data")
+	console.log('loading new data');
 
 	const feature = await prisma.feature.findUnique({
 		where: {
@@ -68,7 +68,7 @@ export async function load({ params, url }) {
 		scenarioForm: await superValidate(zod(scenarioFormSchema), { errors: false }),
 		manualTestForm: await superValidate(zod(manualTestFormSchema), { errors: false }),
 		automaticTestForm: await superValidate(zod(automaticTestFormSchema), { errors: false }),
-		featureForm:await superValidate(feature, zod(featureFormSchema), { errors: false }),
+		featureForm: await superValidate(feature, zod(featureFormSchema), { errors: false }),
 		feature: feature,
 		users,
 		pagination: {
@@ -77,10 +77,11 @@ export async function load({ params, url }) {
 		}
 	};
 }
+
 export const actions: Actions = {
 	saveFeature: async (event: RequestEvent) => {
 		const form = await superValidate(event, zod(featureFormSchema));
-		if(!form.data.id) {
+		if (!form.data.id) {
 			try {
 				await prisma.feature.create({ data: { ...form.data, id: undefined } });
 			} catch (err: any) {
@@ -91,10 +92,10 @@ export const actions: Actions = {
 				}
 				return fail(400, { form });
 			}
-		}else{
+		} else {
 			try {
 				await prisma.feature.update({
-					data: { ...form.data, id: undefined},
+					data: { ...form.data, id: undefined },
 					where: { id: form.data.id }
 				});
 			} catch (err: any) {
@@ -239,7 +240,7 @@ export const actions: Actions = {
 				return fail(400, { form });
 			}
 		} else {
-			console.log('update manual test ',form.data)
+			console.log('update manual test ', form.data);
 			try {
 				await prisma.manualTest.update({
 					data: {
@@ -276,13 +277,13 @@ export const actions: Actions = {
 
 		if (!form.data.id) {
 			try {
-				console.log(form.data)
+				console.log(form.data);
 				await prisma.automaticTest.create({
 					data: {
 						...form.data,
 						id: undefined,
 						scenarios: {
-							connect: form.data.scenarioIds.map((id) => ({ id })),
+							connect: form.data.scenarioIds.map((id) => ({ id }))
 						},
 						scenarioIds: undefined
 					}
@@ -293,13 +294,13 @@ export const actions: Actions = {
 			}
 		} else {
 			try {
-				console.log("Trying to update automaticTest: ", form.data )
+				console.log('Trying to update automaticTest: ', form.data);
 				await prisma.automaticTest.update({
 					data: {
 						...form.data,
 						id: undefined,
 						scenarios: {
-							set: form.data.scenarioIds.map((id) => ({ id })),
+							set: form.data.scenarioIds.map((id) => ({ id }))
 						},
 						scenarioIds: undefined
 					},
@@ -326,6 +327,61 @@ export const actions: Actions = {
 		}
 
 		return { form, actionType: 'delete' };
+	},
+
+	searchRequirements: async (event: RequestEvent) => {
+		const page = Number(event.url.searchParams.get('page') || '1');
+		const limit = 5;
+		const skip = (page - 1) * limit;
+		const form = await superValidate(event, zod(searchFormSchema));
+		const searchValue = form.data.searchValue;
+		const { id } = event.params;
+
+		try {
+			const requirements = await prisma.requirement.findMany({
+				where: {
+					AND: [
+						{ feature: { id: {equals: !isNaN(Number.parseInt(id)) ? Number.parseInt(id) : 0 } } },
+						{
+							OR: [
+								{ name: { contains: searchValue } },
+								{ id: { equals: !isNaN(Number.parseInt(searchValue)) ? Number.parseInt(searchValue) : 0 } },
+								{ description: { contains: searchValue } }
+							]
+						}
+					]
+				},
+				skip,
+				take: limit,
+				include: {
+					scenarios: {
+						include: {
+							automaticTests: {
+								include: {
+									scenarios: true
+								}
+							},
+							manualTest: {
+								include: {
+									owner: true
+								}
+							}
+						}
+					}
+				}
+			});
+
+
+			console.log('requirements has been found: ', requirements);
+			return {
+				form,
+				items: requirements
+			};
+		} catch (err) {
+			console.error(err);
+			return fail(400, { form });
+		}
 	}
 };
+
 

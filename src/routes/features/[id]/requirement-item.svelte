@@ -21,7 +21,7 @@
 		requirement: (Requirement & { scenarios: Scenario[] })
 	} = $props();
 
-	let openScenarios = $derived(requirement.scenarios.length > 0 ? ['scenarios'] : ['']);
+	let openScenarios = $derived(requirement.scenarios?.length > 0 ? ['scenarios'] : ['']);
 
 	let currentRequirementStatus = $derived(requirementStatusLabels.find((item) => requirement.status === item.value));
 	let currentRequirementPriority = $derived(priorityLabels.find((item) => requirement.priority === item.value));

@@ -25,7 +25,8 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import { invalidate, invalidateAll } from '$app/navigation';
 	import { Progress } from '$lib/components/ui/progress';
-	import { toast } from "svelte-sonner";
+	import { toast } from 'svelte-sonner';
+	import { SmartSearch } from '$lib/components/smart-search';
 
 	type FeatureWithDetails = Feature & {
 		requirements: (Requirement & {
@@ -53,6 +54,7 @@
 	let openManualTestDialog = $state(false);
 	let openAutomaticTestDialog = $state(false);
 	let openFeatureDialog = $state(false);
+	let requirements = $state([]);
 
 	const sidePanelStore = $state<{
 		scenario: ScenarioFormData & { manualTest?: ManualTest } & { automaticTests: AutomaticTest[] } | undefined
@@ -91,9 +93,9 @@
 
 		socket.onmessage = async (event) => {
 			console.log('socket message: ', event);
-			if(event.data === 'change detected') {
-				toast.success("Aggiornamento Test", {
-					description: "Sono stati aggiornati i test",
+			if (event.data === 'change detected') {
+				toast.success('Aggiornamento Test', {
+					description: 'Sono stati aggiornati i test'
 				});
 			}
 			await invalidateAll();
@@ -167,14 +169,20 @@
 					</div>
 				</div>
 				<div class=" flex flex-1 items-center w-full pt-3">
-					<Button variant="outline" onclick={()=>openRequirementDialog = true} class="w-full">
-						Crea Requisito
-					</Button>
+					<div class="flex flex-col w-full">
+						<SmartSearch let:T={Requirement}
+												 bind:items={data.feature.requirements}
+												 bind:filteredItems={requirements}
+												 searchApiString="?/searchRequirements" />
+						<Button variant="outline" onclick={()=>openRequirementDialog = true} class="w-full">
+							Crea Requisito
+						</Button>
+					</div>
 				</div>
 			</div>
 			<ScrollArea class="h-full my-5">
 				<ul class="flex  flex-col gap-2">
-					{#each feature.requirements as requirement }
+					{#each requirements as requirement }
 						<li>
 							<RequirementItem {requirement} requirementForm={data.requirementForm}
 															 scenarioForm={data.scenarioForm.data} />
@@ -270,87 +278,5 @@
 				{/if}
 			</ScrollArea>
 		</div>
-		<!--					<div class="flex flex-row w-full items-stretch">-->
-		<!--						<h2 class="font-bold flex-1">-->
-		<!--							{currentScenario.name}-->
-		<!--						</h2>-->
-		<!--						<Button size="icon" variant="outline" class=""-->
-		<!--										onclick={(e)=>{-->
-		<!--						openScenarioDialog=true-->
-		<!--					}}>-->
-		<!--							<Pencil></Pencil>-->
-		<!--						</Button>-->
-		<!--					</div>-->
-		<!--					<div class="flex flex-col gap-2 py-4">-->
-		<!--						<div class="w-full p-4 rounded bg-gray-100">-->
-		<!--							<h2 class="font-bold text-sm opacity-50">GIVEN</h2>-->
-		<!--							{currentScenario.scenario?.given}-->
-		<!--						</div>-->
-		<!--						<div class="w-full p-4 rounded bg-gray-100">-->
-		<!--							<h2 class="font-bold text-sm opacity-50">WHEN</h2>-->
-		<!--							{currentScenario.scenario?.when}-->
-		<!--						</div>-->
-		<!--						<div class="w-full p-4 rounded bg-gray-100">-->
-		<!--							<h2 class="font-bold text-sm opacity-50">THEN</h2>-->
-		<!--							{currentScenario.scenario?.then}-->
-		<!--						</div>-->
-		<!--					</div>-->
-		<!--					<h2 class="font-bold pb-2">Test manuale</h2>-->
-
-		<!--					{#if !(currentScenario && currentScenario.manualTest)}-->
-		<!--						<div class="flex flex-row justify-between items-center w-full">-->
-		<!--							<span>Nessun test manuale</span>-->
-		<!--							<Button size="icon" variant="outline" class=""-->
-		<!--											onclick={(e)=>{-->
-		<!--													openNewManualTestDialog=true-->
-		<!--											}}>-->
-		<!--								<Pencil></Pencil>-->
-		<!--							</Button>-->
-
-		<!--						</div>-->
-
-		<!--					{:else if (currentScenario)}-->
-
-		<!--						<div class={`rounded ${colorClasses[currentScenario.manualTest.status].bg} p-4`}>-->
-		<!--						<div class="flex flex-row items-stretch">-->
-		<!--							<div class="flex flex-col flex-1">-->
-		<!--								<span class="text-sm opacity-60">Assegnatario</span>-->
-		<!--								{currentScenario.manualTest.owner.name}-->
-		<!--							</div>-->
-		<!--							<div class="flex flex-col flex-1">-->
-		<!--								<span class="text-sm opacity-60">Data</span>-->
-		<!--								{format(currentScenario.manualTest.executionDate, 'dd/MM/yyyy')}-->
-		<!--							</div>-->
-		<!--							<div class={`flex flex-col text-lg font-bold flex-1 h-full items-center justify-center-->
-		<!--								${colorClasses[currentScenario.manualTest.status].text}`-->
-		<!--							}>-->
-		<!--								<span class="">-->
-		<!--								{testStatusLabels.find((item)=>item.value===currentScenario?.manualTest.status).label}-->
-		<!--									</span>-->
-		<!--							</div>-->
-		<!--							<Button size="icon" variant="outline" class=""-->
-		<!--											onclick={(e)=>{-->
-		<!--													openEditManualTestDialog=true-->
-		<!--											}}>-->
-		<!--								<Pencil></Pencil>-->
-		<!--							</Button>-->
-		<!--						</div>-->
-		<!--							<div class="flex flex-col flex-1">-->
-		<!--								<span class="text-sm opacity-60">Note</span>-->
-		<!--								{currentScenario.manualTest.notes}-->
-		<!--							</div>-->
-		<!--						</div>-->
-
-		<!--					{/if}-->
-		<!--					<h2 class="font-bold py-4">Test automatici</h2>-->
-		<!--					{#if currentScenario.automaticTests.length > 0}-->
-
-		<!--						{:else}-->
-		<!--							<span>Nessun test automatico abbinato</span>-->
-		<!--					{/if}-->
-		<!--					<SuperDebug data={currentScenario} />-->
-		<!--				{/if}-->
-		<!--			</div>-->
-		<!--		</div>-->
 	</Resizable.Pane>
 </Resizable.PaneGroup>
