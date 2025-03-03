@@ -30,9 +30,13 @@ export const featureFormSchema = z.object({
     description: z.string().min(2).max(1000).optional(),
 });
 
+export const searchFormSchema = z.object({
+    searchValue: z.string().max(100),
+})
+
 
 export type InstallationFormSchema = typeof installationFormSchema;
 export type FeatureFormSchema = typeof featureFormSchema;
 export type ProjectFormSchema = typeof projectFormSchema;
 export type VersionFormSchema = typeof versionFormSchema;
-
+export type SearchFormSchema = typeof searchFormSchema;

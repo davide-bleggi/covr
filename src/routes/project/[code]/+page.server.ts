@@ -3,7 +3,13 @@ import { error, fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { Actions } from '../../../../.svelte-kit/types/src/routes/project/$types';
-import { featureFormSchema, installationFormSchema, projectFormSchema, versionFormSchema } from './schema';
+import {
+	featureFormSchema,
+	installationFormSchema,
+	projectFormSchema,
+	searchFormSchema,
+	versionFormSchema
+} from './schema';
 
 export async function load({ params }) {
 	const { code } = params;
@@ -62,7 +68,7 @@ export async function load({ params }) {
 export const actions: Actions = {
 	saveProject: async (event) => {
 		const form = await superValidate(event, zod(projectFormSchema));
-		console.log("saving Project")
+		console.log('saving Project');
 		if (!form.data.id) {
 			try {
 				await prisma.project.create({
@@ -84,7 +90,7 @@ export const actions: Actions = {
 				await prisma.project.update({
 					data: {
 						...form.data,
-						id: undefined,
+						id: undefined
 					},
 					where: { id: form.data.id }
 				});
@@ -93,7 +99,7 @@ export const actions: Actions = {
 				if (err.code === 'P2002') {
 					return setError(form, 'name', 'nome già assegnato');
 				}
-				console.error(err)
+				console.error(err);
 				// Make sure to return the form with the error
 				return fail(400, { form });
 			}
@@ -118,7 +124,7 @@ export const actions: Actions = {
 
 	saveVersion: async (event: RequestEvent) => {
 		const form = await superValidate(event, zod(versionFormSchema));
-		console.log("Testing saveVersion")
+		console.log('Testing saveVersion');
 		if (!form.data.id) {
 			try {
 				await prisma.version.create({
@@ -163,7 +169,7 @@ export const actions: Actions = {
 		};
 	},
 
-	deleteVersion: async ({ request }) =>{
+	deleteVersion: async ({ request }) => {
 		const id = Number((await request.formData()).get('id'));
 
 		try {
@@ -180,8 +186,8 @@ export const actions: Actions = {
 				});
 			}
 			await prisma.version.delete({ where: { id: id ?? null } });
-		} catch(err) {
-			console.error(err)
+		} catch (err) {
+			console.error(err);
 			return fail(400);
 		}
 	},
@@ -270,6 +276,67 @@ export const actions: Actions = {
 			await prisma.feature.delete({ where: { id: id ?? null } });
 		} catch {
 			return fail(400);
+		}
+	},
+
+	searchVersion: async (event:RequestEvent) => {
+		const form = await superValidate(event, zod(searchFormSchema));
+		const searchValue = form.data.searchValue;
+		const { code } = event.params;
+
+		try {
+			const versions = await prisma.version.findMany({
+				where: {
+					project: {
+						code: code
+					},
+					OR: [
+						{
+							features: {
+								some: {
+									name: {
+										contains: searchValue
+									}
+								}
+							}
+						},
+						{
+							name: {
+								contains: searchValue
+							}
+						},
+						{
+							installations: {
+								some: {
+									customer: {
+										name: {
+											contains: searchValue
+										}
+									}
+								}
+							}
+						}
+					]
+				},
+				include: {
+					features: true,
+					project: true,
+					installations: {
+						include: {
+							customer: true
+						}
+					}
+				}
+			});
+
+			console.log('versions has been found: ', versions)
+			return {
+					form,
+					versions
+			};
+		}catch(err){
+			console.error(err)
+			return fail(400, {form});
 		}
 	}
 };

@@ -24,7 +24,7 @@
 	let installationForm = { versionId: version.id };
 	let featureForm = { versionId: version.id };
 
-	let openItems: string[] = $state([version.features.length > 0 ? 'features' : '', version.installations.length > 0 ? 'installations' : '']);
+	let openItems: string[] = $state([version.features?.length > 0 ? 'features' : '', version.installations?.length > 0 ? 'installations' : '']);
 
 	function scrollToSection(anchor: string) {
 		document.getElementById(anchor).scrollIntoView({ behavior: 'smooth' });
@@ -96,7 +96,7 @@
 			</div>
 
 			<Accordion.Content>
-				{#if version.installations.length === 0 }
+				{#if version.installations?.length === 0 }
 					<Button
 						class="w-full"
 						variant="outline"

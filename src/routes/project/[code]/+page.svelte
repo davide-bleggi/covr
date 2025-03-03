@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Project } from '@prisma/client';
+	import type { Project, Version } from '@prisma/client';
 	import { Button } from '$lib/components/ui/button';
 	import { PencilIcon, Plus } from 'lucide-svelte';
 	import { ProjectDialog } from '../index';
@@ -11,23 +11,79 @@
 	import { VersionGraph } from '../version-graph';
 	import { onMount } from 'svelte';
 	import { cn } from 'tailwind-variants';
+	import { FormField } from '$lib/components/ui/form/index.js';
+	import { Input } from '$lib/components/ui/input';
+	import * as Form from '$lib/components/ui/form';
+	import Search from 'lucide-svelte/icons/search';
+	import { type Infer, superForm } from 'sveltekit-superforms';
+	import { featureFormSchema, type FeatureFormSchema, searchFormSchema, type SearchFormSchema } from './schema';
+	import { zodClient } from 'sveltekit-superforms/adapters';
 
 
 	let { data } = $props();
 	let openProjectDialog = $state(false);
 	let openVersionDialog = $state(false);
 
-	const versionNodes = $derived(data.versions.map(v=>({id:v.name, prev: v.prevVersion?.name??null})))
+	const versionNodes = $derived(data.versions.map(v => ({ id: v.name, prev: v.prevVersion?.name ?? null })));
 
-	let selectedVersion : string|null = $state(null)
+	let selectedVersion: string | null = $state(null);
+	let versions: Version[] = $state(data.versions);
 
+	const searchForm = $state(superForm<Infer<SearchFormSchema>>({ searchValue: '' }, {
+		validators: zodClient(searchFormSchema),
+		applyAction: false, // Add this to prevent automatic page updates
+		onResult: ({ result }) => {
+			if (result.type === 'failure' || result.type === 'error') {
+				console.log('Form submission failed:', result);
+				versions = [];
+			}
+
+			if (result.type === 'success') {
+				versions = result.data ? result.data.versions : [];
+			}
+		},
+		onUpdate: ({ form }) => {
+			$errors = form.errors;
+		},
+		resetForm: false
+	}));
+
+	const { form: formData, enhance, errors, formId, submit } = searchForm;
+
+	let tempSearch: string;
+
+	const debouncedSubmit = debounce(() => {
+		submit();
+		tempSearch = $formData.searchValue;
+	}, 3000);
+
+	function debounce<T extends (...args: any[]) => any>(func: T, delay: number): (...args: Parameters<T>) => void {
+		let timer: NodeJS.Timeout;
+		return function(this: any, ...args: Parameters<T>): void {
+			clearTimeout(timer);
+			timer = setTimeout(() => func.apply(this, args), delay);
+		};
+	}
+
+	// Watch for value changes instead of keydown
+	$effect(() => {
+		if ($formData.searchValue !== undefined && $formData.searchValue.length > 0 && $formData.searchValue !== tempSearch) {
+			debouncedSubmit();
+		}
+	});
+
+	$effect(() => {
+		if (!$formData.searchValue || $formData.searchValue.length === 0) {
+			versions = data.versions;
+		}
+	});
 </script>
-<ProjectDialog bind:open={openProjectDialog} bind:formToValidate={data.projectForm}>
+<ProjectDialog bind:open={openProjectDialog} formToValidate={data.projectForm}>
 </ProjectDialog>
 <VersionDialog bind:open={openVersionDialog}
 							 formToValidate={data.versionForm}
 							 versions={data.versions}
-								formId="new-version-form"
+							 formId="new-version-form"
 >
 </VersionDialog>
 
@@ -57,21 +113,40 @@
 			</div>
 
 			<div class="flex flex-col flex-1 h-0 min-h-0 px-4 w-full  mx-auto gap-2">
+				<form method="POST" class="flex flex-col gap-3" use:enhance action='?/searchVersion'>
+					<Form.Field form={searchForm} name="searchValue">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Ricerca</Form.Label>
+								<div class="flex flex-row gap-2">
+									<Input {...props} type="text" bind:value={$formData.searchValue} />
+									<Button type="submit">
+										<Search />
+									</Button>
+								</div>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+				</form>
 				<Button class="p-4 w-full" variant="outline" onclick={()=>openVersionDialog=true}>
 					Aggiungi Versione
 				</Button>
+
 				<div class="flex-1 flex h-0 min-h-0  mb-2 w-full">
 					<ScrollArea class="w-full overflow-auto">
 						<ul class="w-full relative">
-							{#each data.versions as version}
+							{#each versions as version}
 								<li class={cn(`w-full `)}>
-									<VersionItem {version} customers={data.customers} versionForm={data.versionForm} versions={data.versions}></VersionItem>
+									<VersionItem {version} customers={data.customers} versionForm={data.versionForm}
+															 versions={data.versions}></VersionItem>
 								</li>
 							{/each}
 						</ul>
 					</ScrollArea>
 				</div>
 			</div>
+
 
 		</div>
 	</Resizable.Pane>
