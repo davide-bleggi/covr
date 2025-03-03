@@ -50,33 +50,18 @@
 
 	const { form: formData, enhance, errors, formId, submit } = searchForm;
 
-	let tempSearch: string;
-
-	const debouncedSubmit = debounce(() => {
-		submit();
-		tempSearch = $formData.searchValue;
-	}, 3000);
-
-	function debounce<T extends (...args: any[]) => any>(func: T, delay: number): (...args: Parameters<T>) => void {
-		let timer: NodeJS.Timeout;
-		return function(this: any, ...args: Parameters<T>): void {
-			clearTimeout(timer);
-			timer = setTimeout(() => func.apply(this, args), delay);
-		};
-	}
-
-	// Watch for value changes instead of keydown
-	$effect(() => {
-		if ($formData.searchValue !== undefined && $formData.searchValue.length > 0 && $formData.searchValue !== tempSearch) {
-			debouncedSubmit();
-		}
-	});
-
 	$effect(() => {
 		if (!$formData.searchValue || $formData.searchValue.length === 0) {
 			versions = data.versions;
 		}
 	});
+
+	$effect(()=>{
+		if ($formData.searchValue && $formData.searchValue.length > 0 && data.versions) {
+			console.log('ricerca attiva')
+			submit()
+		}
+	})
 </script>
 <ProjectDialog bind:open={openProjectDialog} formToValidate={data.projectForm}>
 </ProjectDialog>
