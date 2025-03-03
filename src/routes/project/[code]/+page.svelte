@@ -65,8 +65,8 @@
 
 			<div class="flex flex-col flex-1 h-0 min-h-0 px-4 w-full  mx-auto gap-2">
 			<SmartSearch let:T={Version}
-									 bind:versions={data.versions}
-									 bind:filteredVersions={versions}
+									 bind:items={data.versions}
+									 bind:filteredItems={versions}
 									 searchApiString="?/searchVersion" />
 				<Button class="p-4 w-full" variant="outline" onclick={()=>openVersionDialog=true}>
 					Aggiungi Versione

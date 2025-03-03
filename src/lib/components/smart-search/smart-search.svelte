@@ -1,5 +1,4 @@
 <script lang="ts" generics="T">
-	import type { Version } from '@prisma/client';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import * as Form from '$lib/components/ui/form';
@@ -9,13 +8,13 @@
 	import Search from 'lucide-svelte/icons/search';
 	import { debounce } from './utils';
 
-	let { versions = $bindable(), filteredVersions = $bindable(), searchApiString}: {
-		versions: T[],
-		filteredVersions: T[],
+	let { items = $bindable(), filteredItems = $bindable(), searchApiString}: {
+		items: T[],
+		filteredItems: T[],
 		searchApiString: string
 	} = $props();
 
-	let previousVersions: T[] = $state([]);
+	let previousItems: T[] = $state([]);
 	let previousSearch = $state('');
 
 	const searchForm = $state(superForm<Infer<SearchFormSchema>>({ searchValue: '' }, {
@@ -24,11 +23,11 @@
 		onResult: ({ result }) => {
 			if (result.type === 'failure' || result.type === 'error') {
 				console.log('Form submission failed:', result);
-				filteredVersions = [];
+				filteredItems = [];
 			}
 
 			if (result.type === 'success') {
-				filteredVersions = result.data ? result.data.versions : [];
+				filteredItems = result.data ? result.data.items : [];
 			}
 		},
 		onUpdate: ({ form }) => {
@@ -45,22 +44,22 @@
 
 	$effect(() => {
 		if (!$formData.searchValue || $formData.searchValue.length === 0) {
-			filteredVersions = versions;
+			filteredItems = items;
 			previousSearch = '';
-			previousVersions = versions;
+			previousItems = items;
 		}
 	});
 
 	$effect(() => {
-		const versionsChanged = JSON.stringify(versions) !== JSON.stringify(previousVersions);
+		const itemsChanged = JSON.stringify(items) !== JSON.stringify(previousItems);
 
 		if ($formData.searchValue &&
 			$formData.searchValue.length > 0 &&
-			versions &&
-			($formData.searchValue !== previousSearch || versionsChanged)) {
+			items &&
+			($formData.searchValue !== previousSearch || itemsChanged)) {
 			console.log('ricerca attiva');
 			previousSearch = $formData.searchValue;
-			previousVersions = versions;
+			previousItems = items;
 			debouncedSubmit();
 		}
 	});

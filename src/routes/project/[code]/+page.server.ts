@@ -338,7 +338,7 @@ export const actions: Actions = {
 			console.log('versions has been found: ', versions)
 			return {
 					form,
-					versions
+					items: versions
 			};
 		}catch(err){
 			console.error(err)
