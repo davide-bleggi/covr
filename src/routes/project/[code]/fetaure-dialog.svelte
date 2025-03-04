@@ -41,7 +41,7 @@
 		},
 		onUpdate: ({ form }) => {
 			$errors = form.errors;
-		},
+		}
 	}));
 
 	const { form: formData, enhance, errors, formId } = form;
@@ -88,7 +88,7 @@
 						</DynamicSelector>
 					</div>
 
-					<Form.Field  {form} name="versionId">
+					<Form.Field {form} name="versionId">
 						<div class="grid col-span-1 w-full gap-3">
 							<Form.Control>
 								{#snippet children({ props })}
@@ -167,6 +167,7 @@
 				</Button>
 				<form action="?/deleteFeature" method="POST" use:enhance>
 					<input type="hidden" name="id" value={$formData.id } />
+					<input type="hidden" name="projectCode" value={version.project.code}/>
 					<Button
 						variant="destructive"
 						type="submit"

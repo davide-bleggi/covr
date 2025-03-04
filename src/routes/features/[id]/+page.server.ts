@@ -2,7 +2,7 @@ import prisma from '$lib/prisma';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { automaticTestFormSchema, manualTestFormSchema, requirementFormSchema, scenarioFormSchema } from './schema';
-import { type Actions, error, fail, type RequestEvent } from '@sveltejs/kit';
+import { type Actions, error, fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import { featureFormSchema, searchFormSchema } from '../../project/[code]/schema';
 
 export async function load({ params, url }) {
@@ -115,10 +115,15 @@ export const actions: Actions = {
 
 	deleteFeature: async ({ request }) => {
 		const id = Number((await request.formData()).get('id'));
+		const projectCode = Number((await request.formData()).get('projectCode'));
+
 		try {
 			await prisma.feature.delete({ where: { id: id ?? null } });
 		} catch {
 			return fail(400);
+		}
+		if (projectCode) {
+			throw redirect(200, `/project/${projectCode}`);
 		}
 	},
 
@@ -341,7 +346,7 @@ export const actions: Actions = {
 			const requirements = await prisma.requirement.findMany({
 				where: {
 					AND: [
-						{ feature: { id: {equals: !isNaN(Number.parseInt(id)) ? Number.parseInt(id) : 0 } } },
+						{ feature: { id: { equals: !isNaN(Number.parseInt(id)) ? Number.parseInt(id) : 0 } } },
 						{
 							OR: [
 								{ name: { contains: searchValue } },
