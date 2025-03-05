@@ -29,6 +29,7 @@ model User {
   updatedManualTest    ManualTest[]   @relation("UpdatedManualTests")
   createdScenario      Scenario[]     @relation("CreatedScenarios")
   updatedScenario      Scenario[]     @relation("UpdatedScenarios")
+  Activity             Activity[]
 }
 
 model Project {
@@ -162,4 +163,13 @@ model AutomaticTest {
   notes         String?
   errorLog      String?
   scenarios     Scenario[] @relation("AutomaticTestToScenario")
+}
+
+model Activity {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
 }

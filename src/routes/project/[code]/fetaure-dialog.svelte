@@ -167,7 +167,7 @@
 				</Button>
 				<form action="?/deleteFeature" method="POST" use:enhance>
 					<input type="hidden" name="id" value={$formData.id } />
-					<input type="hidden" name="projectCode" value={version.project.code}/>
+					<input type="hidden" name="projectCode" value={version.project.code??null}/>
 					<Button
 						variant="destructive"
 						type="submit"

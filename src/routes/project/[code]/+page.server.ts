@@ -10,6 +10,7 @@ import {
 	searchFormSchema,
 	versionFormSchema
 } from './schema';
+import { logActivity } from '$lib/dbUtils';
 
 export async function load({ params }) {
 	const { code } = params;
@@ -80,6 +81,7 @@ export const actions: Actions = {
 						id: undefined
 					}
 				});
+				logActivity(event.locals.user?.id, 'CREATE PROJECT', form.data);
 			} catch (err: any) {
 				console.error(err);
 				if (err.code === 'P2002') {
@@ -97,6 +99,7 @@ export const actions: Actions = {
 					},
 					where: { id: form.data.id }
 				});
+				logActivity(event.locals.user?.id, 'UPDATE PROJECT', form.data);
 			} catch (err: any) {
 				console.log(err.code);
 				if (err.code === 'P2002') {
@@ -116,7 +119,7 @@ export const actions: Actions = {
 
 	deleteProject: async (event) => {
 		const form = await superValidate(event, zod(projectFormSchema));
-
+		logActivity(event.locals.user?.id, 'DELETE PROJECT', form.data);
 		await prisma.project.delete({
 			where: {
 				id: form.data.id
@@ -138,6 +141,7 @@ export const actions: Actions = {
 						prevVersion: undefined // explicitly remove it
 					}
 				});
+				logActivity(event.locals.user?.id, 'CRETE VERSION', form.data);
 			} catch (err: any) {
 				console.log(err);
 				if (err.code === 'P2002') {
@@ -157,6 +161,7 @@ export const actions: Actions = {
 					},
 					where: { id: form.data.id }
 				});
+				logActivity(event.locals.user?.id, 'UPDATE VERSION', form.data);
 			} catch (err: any) {
 				console.log(err.code);
 				if (err.code === 'P2002') {
@@ -172,8 +177,8 @@ export const actions: Actions = {
 		};
 	},
 
-	deleteVersion: async ({ request }) => {
-		const id = Number((await request.formData()).get('id'));
+	deleteVersion: async ( event) => {
+		const id = Number((await event.request.formData()).get('id'));
 
 		try {
 			// 1. Find all versions that reference this version as prevVersion
@@ -189,6 +194,7 @@ export const actions: Actions = {
 				});
 			}
 			await prisma.version.delete({ where: { id: id ?? null } });
+			logActivity(event.locals.user?.id, 'DELETE VERSION', {id});
 		} catch (err) {
 			console.error(err);
 			return fail(400);
@@ -201,6 +207,7 @@ export const actions: Actions = {
 		if (!form.data.id) {
 			try {
 				await prisma.installation.create({ data: { ...form.data, id: undefined } });
+				logActivity(event.locals.user?.id, 'CREATE INSTALLATION', form.data);
 			} catch (err: any) {
 				console.log(err);
 				if (err.code === 'P2002') {
@@ -215,6 +222,7 @@ export const actions: Actions = {
 					data: { ...form.data, id: undefined },
 					where: { id: form.data.id }
 				});
+				logActivity(event.locals.user?.id, 'UPDATE INSTALLATION', form.data);
 			} catch (err: any) {
 				console.log(err.code);
 				if (err.code === 'P2002') {
@@ -230,10 +238,11 @@ export const actions: Actions = {
 		};
 	},
 
-	deleteInstallation: async ({ request }) => {
-		const id = Number((await request.formData()).get('id'));
+	deleteInstallation: async (event) => {
+		const id = Number((await event.request.formData()).get('id'));
 		try {
 			await prisma.installation.delete({ where: { id: id ?? null } });
+			logActivity(event.locals.user?.id, 'DELETE INSTALLATION', {id});
 		} catch {
 			return fail(400);
 		}
@@ -244,6 +253,7 @@ export const actions: Actions = {
 		if (!form.data.id) {
 			try {
 				await prisma.feature.create({ data: { ...form.data, id: undefined } });
+				logActivity(event.locals.user?.id, 'CREATE FEATURE', form.data);
 			} catch (err: any) {
 				console.log(err);
 				// Make sure to return the form with the error
@@ -258,6 +268,7 @@ export const actions: Actions = {
 					data: { ...form.data, id: undefined },
 					where: { id: form.data.id }
 				});
+				logActivity(event.locals.user?.id, 'UPDATE FEATURE', form.data);
 			} catch (err: any) {
 				console.log(err);
 				// Make sure to return the form with the error
@@ -273,10 +284,11 @@ export const actions: Actions = {
 		};
 	},
 
-	deleteFeature: async ({ request }) => {
-		const id = Number((await request.formData()).get('id'));
+	deleteFeature: async (event) => {
+		const id = Number((await event.request.formData()).get('id'));
 		try {
 			await prisma.feature.delete({ where: { id: id ?? null } });
+			logActivity(event.locals.user?.id, 'DELETE FEATURE', {id});
 		} catch {
 			return fail(400);
 		}

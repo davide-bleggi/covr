@@ -4,6 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { automaticTestFormSchema, manualTestFormSchema, requirementFormSchema, scenarioFormSchema } from './schema';
 import { type Actions, error, fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import { featureFormSchema, searchFormSchema } from '../../project/[code]/schema';
+import { activityLogger, logActivity } from '$lib/dbUtils';
 
 export async function load({ params, url }) {
 
@@ -84,6 +85,7 @@ export const actions: Actions = {
 		if (!form.data.id) {
 			try {
 				await prisma.feature.create({ data: { ...form.data, id: undefined } });
+				logActivity(event.locals.user?.id, 'CREATE FEATURE', form.data);
 			} catch (err: any) {
 				console.log(err);
 				// Make sure to return the form with the error
@@ -98,6 +100,7 @@ export const actions: Actions = {
 					data: { ...form.data, id: undefined },
 					where: { id: form.data.id }
 				});
+				logActivity(event.locals.user?.id, 'UPDATE FEATURE', form.data);
 			} catch (err: any) {
 				console.log(err);
 				// Make sure to return the form with the error
@@ -113,12 +116,13 @@ export const actions: Actions = {
 		};
 	},
 
-	deleteFeature: async ({ request }) => {
-		const id = Number((await request.formData()).get('id'));
-		const projectCode = Number((await request.formData()).get('projectCode'));
+	deleteFeature: async ( event ) => {
+		const id = Number((await event.request.formData()).get('id'));
+		const projectCode = Number((await event.request.formData()).get('projectCode'));
 
 		try {
 			await prisma.feature.delete({ where: { id: id ?? null } });
+			logActivity(event.locals.user?.id, 'DELETE FEATURE', {id});
 		} catch {
 			return fail(400);
 		}
@@ -132,6 +136,7 @@ export const actions: Actions = {
 		if (!form.data.id) {
 			try {
 				await prisma.requirement.create({ data: { ...form.data, id: undefined } });
+				logActivity(event.locals.user?.id, 'CREATE REQUIREMENT', form.data);
 			} catch (err: any) {
 				console.log(err);
 				// Make sure to return the form with the error
@@ -146,6 +151,7 @@ export const actions: Actions = {
 					data: { ...form.data, id: undefined },
 					where: { id: form.data.id }
 				});
+				logActivity(event.locals.user?.id, 'UPDATE REQUIREMENT', form.data);
 			} catch (err: any) {
 				console.log(err);
 				// Make sure to return the form with the error
@@ -160,10 +166,11 @@ export const actions: Actions = {
 			form
 		};
 	},
-	deleteRequirement: async ({ request }) => {
-		const id = Number((await request.formData()).get('id'));
+	deleteRequirement: async (event) => {
+		const id = Number((await event.request.formData()).get('id'));
 		console.log('key to delete: ', id);
 		try {
+			logActivity(event.locals.user?.id, 'DELETE REQUIREMENT', {id});
 			await prisma.requirement.delete({ where: { id: id ?? null } });
 		} catch (error) {
 			console.log(error);
@@ -172,6 +179,7 @@ export const actions: Actions = {
 	},
 	saveScenario: async (event: RequestEvent) => {
 		const form = await superValidate(event, zod(scenarioFormSchema));
+
 		if (!form.data.id) {
 			try {
 				await prisma.scenario.create({
@@ -182,6 +190,7 @@ export const actions: Actions = {
 						id: undefined
 					}
 				});
+				logActivity(event.locals.user?.id, 'CREATE SCENARIO', form.data);
 			} catch (err: any) {
 				console.log(err);
 				// Make sure to return the form with the error
@@ -201,6 +210,8 @@ export const actions: Actions = {
 					},
 					where: { id: form.data.id }
 				});
+				logActivity(event.locals.user?.id, 'UPDATE SCENARIO', form.data);
+
 			} catch (err: any) {
 				console.log(err);
 				// Make sure to return the form with the error
@@ -220,6 +231,7 @@ export const actions: Actions = {
 		const form = await superValidate(event, zod(scenarioFormSchema));
 		try {
 			await prisma.scenario.delete({ where: { id: form.data.id ?? null } });
+			logActivity(event.locals.user?.id, 'DELETE SCENARIO', form.data);
 		} catch (error) {
 			console.log(error);
 			return fail(400, { form });
@@ -240,6 +252,8 @@ export const actions: Actions = {
 						id: undefined
 					}
 				});
+				logActivity(event.locals.user?.id, 'CREATE MANUALTEST', form.data);
+
 			} catch (err: any) {
 				console.log(err);
 				return fail(400, { form });
@@ -254,6 +268,7 @@ export const actions: Actions = {
 					},
 					where: { id: form.data.id }
 				});
+				logActivity(event.locals.user?.id, 'UPDATE MANUALTEST', form.data);
 			} catch (err: any) {
 				console.log(err);
 				return fail(400, { form });
@@ -267,6 +282,7 @@ export const actions: Actions = {
 	},
 	deleteManualTest: async (event: RequestEvent) => {
 		const form = await superValidate(event, zod(manualTestFormSchema));
+		logActivity(event.locals.user?.id, 'DELETE MANUALTEST', form.data);
 		try {
 			await prisma.manualTest.delete({ where: { id: form.data.id ?? null } });
 		} catch (error) {
@@ -293,6 +309,8 @@ export const actions: Actions = {
 						scenarioIds: undefined
 					}
 				});
+				logActivity(event.locals.user?.id, 'CREATE AUTOMATICTEST', form.data);
+
 			} catch (err: any) {
 				console.log(err);
 				return fail(400, { form });
@@ -311,6 +329,7 @@ export const actions: Actions = {
 					},
 					where: { id: form.data.id }
 				});
+				logActivity(event.locals.user?.id, 'UPDATE AUTOMATICTEST', form.data);
 			} catch (err: any) {
 				console.log(err);
 				return fail(400, { form });
@@ -324,6 +343,7 @@ export const actions: Actions = {
 	},
 	deleteAutomaticTest: async (event: RequestEvent) => {
 		const form = await superValidate(event, zod(automaticTestFormSchema));
+		logActivity(event.locals.user?.id, 'DELETE AUTOMATICTEST', form.data);
 		try {
 			await prisma.automaticTest.delete({ where: { id: form.data.id ?? null } });
 		} catch (error) {
