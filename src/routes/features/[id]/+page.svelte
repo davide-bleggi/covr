@@ -10,7 +10,7 @@
 		Scenario,
 		Version,
 		User,
-		AutomaticTest
+		AutomaticTest, Activity
 	} from '@prisma/client';
 	import { Button } from '$lib/components/ui/button';
 	import { ManualTestDialog, RequirementDialog, RequirementItem, ScenarioDialog } from './index';
@@ -32,7 +32,7 @@
 		requirements: (Requirement & {
 			scenarios: (Scenario & (ManualTest & { owner: User } & { automaticTests: AutomaticTest[] }))[]
 		})[],
-		version: Version & { project: Project }
+		version: Version & { project: Project },
 	};
 
 	let { data } = $props<{
@@ -58,7 +58,8 @@
 
 	const sidePanelStore = $state<{
 		scenario: ScenarioFormData & { manualTest?: ManualTest } & { automaticTests: AutomaticTest[] } | undefined
-		users: User[]
+		users: User[],
+		activities?: { name: string, action: string, date: Date }[]
 	}>(
 		{
 			scenario: undefined,
@@ -68,6 +69,32 @@
 	setContext('sidePanelStore', sidePanelStore);
 
 	let feature: FeatureWithDetails = $derived<typeof data.feature>(data.feature);
+
+	async function loadActivityLogs(scenarioId: number) {
+		try {
+			if (scenarioId) {
+				const response = await fetch(`/api/activityLog?scenarioId=${scenarioId}`);
+				if (!response.ok) {
+					throw new Error('Failed to fetch activity log');
+				}
+				const activityLog: [] = await response?.json();
+				console.log('Activity Log:', activityLog);
+				sidePanelStore.activities = activityLog.map((activity) => ({
+					name: activity.user.name,
+					action: activity.action,
+					date: activity.createdAt
+				}));
+			}
+		} catch (error) {
+
+			console.error('Error fetching activity log:', error);
+		}
+	}
+
+	$effect(async () => {
+		await loadActivityLogs(currentScenario.id);
+	});
+
 
 	// Now the effect will trigger when either scenarioId or allScenarios changes
 	const currentScenario: ScenarioFormData & {
@@ -274,6 +301,15 @@
 								{/each}
 							</ul>
 						{/if}
+						<div class="p-2 bg-secondary/50 mt-2 rounded">
+							<h5 class="font-bold my-2">Attività</h5>
+							<ul class="flex flex-col gap-1 text-sm">
+								{#each sidePanelStore.activities as activity}
+									<li>{activity.name} <span
+										class="font-semibold">{activity.action}</span> {format(activity.date, 'dd-MM-yyyy HH:mm')}</li>
+								{/each}
+							</ul>
+						</div>
 					</div>
 				{/if}
 			</ScrollArea>
