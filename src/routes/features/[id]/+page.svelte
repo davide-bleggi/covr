@@ -92,7 +92,9 @@
 	}
 
 	$effect(async () => {
-		await loadActivityLogs(currentScenario.id);
+		if(currentScenario) {
+			await loadActivityLogs(currentScenario.id);
+		}
 	});
 
 
