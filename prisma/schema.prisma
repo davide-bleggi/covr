@@ -170,8 +170,6 @@ model Activity {
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
   action    String
-  model     String?
-  modelId   String?
   details   String?
   createdAt DateTime @default(now())
 }
