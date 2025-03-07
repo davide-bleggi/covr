@@ -63,15 +63,18 @@ export const GET: RequestHandler = async ({ url }) => {
 				createdAt: 'desc'
 			},
 			select: {
-				user: true,
+				user: {
+					select:{
+						name: true
+					}
+				},
 				createdAt: true,
-				action: true
+				action: true,
 			},
 			take: Number(limit)
 		});
 		console.log(activityLog);
-		return json(activityLog);
-		// return json(activityLog.map(({name, id})=>({label: name, value: id })));
+		return json(activityLog.map((activity)=>({...activity, userName: activity.user.name })));
 	} catch (error) {
 		return new Response('Failed to fetch activityLogs', { status: 500 });
 	}

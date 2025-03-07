@@ -59,7 +59,7 @@
 	const sidePanelStore = $state<{
 		scenario: ScenarioFormData & { manualTest?: ManualTest } & { automaticTests: AutomaticTest[] } | undefined
 		users: User[],
-		activities?: { name: string, action: string, date: Date }[]
+		activities?: { userName: string, action: string, createdAt: Date }[]
 	}>(
 		{
 			scenario: undefined,
@@ -77,13 +77,14 @@
 				if (!response.ok) {
 					throw new Error('Failed to fetch activity log');
 				}
-				const activityLog: [] = await response?.json();
+				const activityLog: {
+					userName: string,
+					action: string,
+					createdAt: Date,
+				}[] = await response?.json();
+				sidePanelStore.activities = activityLog;
+
 				console.log('Activity Log:', activityLog);
-				sidePanelStore.activities = activityLog.map((activity) => ({
-					name: activity.user.name,
-					action: activity.action,
-					date: activity.createdAt
-				}));
 			}
 		} catch (error) {
 
@@ -91,9 +92,9 @@
 		}
 	}
 
-	$effect(async () => {
-		if(currentScenario) {
-			await loadActivityLogs(currentScenario.id);
+	$effect(() => {
+		if (currentScenario?.id) {
+			loadActivityLogs(currentScenario.id);
 		}
 	});
 
@@ -306,10 +307,13 @@
 						<div class="p-2 bg-secondary/50 mt-2 rounded">
 							<h5 class="font-bold my-2">Attività</h5>
 							<ul class="flex flex-col gap-1 text-sm">
-								{#each sidePanelStore.activities as activity}
-									<li>{activity.name} <span
-										class="font-semibold">{activity.action}</span> {format(activity.date, 'dd-MM-yyyy HH:mm')}</li>
-								{/each}
+								{#if sidePanelStore.activities}
+									{#each sidePanelStore.activities as activity}
+										<li>{activity.userName} <span
+											class="font-semibold">{activity.action}</span> {format(activity.createdAt, 'dd-MM-yyyy HH:mm')}
+										</li>
+									{/each}
+								{/if}
 							</ul>
 						</div>
 					</div>
