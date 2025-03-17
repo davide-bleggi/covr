@@ -15,12 +15,12 @@
 
 	const colorClasses = {
 		FAIL: {
-			text: 'text-red-500',
-			bg: 'bg-red-100'
+			text: 'text-fail',
+			bg: 'bg-fail/20'
 		},
 		PASS: {
-			text: 'text-green-500',
-			bg: 'bg-green-100'
+			text: 'text-success',
+			bg: 'bg-success/20'
 		},
 		TO_TEST: {
 			text: '',
@@ -32,7 +32,16 @@
 
 	async function copyToClipboard(text: string) {
 		try {
-			await navigator.clipboard.writeText(text);
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				await navigator.clipboard.writeText(text);
+			} else {
+				const textarea = document.createElement('textarea');
+				textarea.value = text;
+				document.body.appendChild(textarea);
+				textarea.select();
+				document.execCommand('copy');
+				document.body.removeChild(textarea);
+			}
 			toast('Testo copiato');
 		} catch (err) {
 			console.error('Failed to copy text: ', err);
