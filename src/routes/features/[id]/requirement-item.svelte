@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Requirement, Scenario } from '@prisma/client';
-	import { Pencil, Plus } from 'lucide-svelte';
+	import { HandIcon, Pencil, Plus } from 'lucide-svelte';
 	import { InstallationItem } from '../../project/[code]';
 	import { Button } from '$lib/components/ui/button';
 	import * as Accordion from '$lib/components/ui/accordion/index';
@@ -12,6 +12,7 @@
 	import { cn } from '$lib/utils';
 	import { marked } from 'marked';
 	import { Progress } from '$lib/components/ui/progress';
+	import * as Tooltip from '$lib/components/ui/tooltip/index';
 
 	const sidePanelStore: any = getContext('sidePanelStore');
 
@@ -117,8 +118,23 @@
 													 class={cn(`cursor-pointer ${sidePanelStore.scenario?.id === scenario?.id?'bg-secondary/50':""}`)}>
 									<Table.Cell>SCN-{scenario.id}</Table.Cell>
 									<Table.Cell>{scenario.name}</Table.Cell>
-									<Table.Cell class="flex"><span class={cn(`border rounded-md p-2 w-full flex justify-center font-semibold
-										${scenario.testStatus==='PASS'?"border-green-500 text-green-500":scenario.testStatus==='FAIL'?"border-red-500 text-red-500":'border-none'}`)}>{scenario.testStatus}</span>
+									<Table.Cell class="flex gap-2 items-center">
+										{#if scenario.automaticTests.length === 0}
+											<Tooltip.Provider delayDuration="{0}">
+												<Tooltip.Root>
+													<Tooltip.Trigger>
+														<HandIcon class="opacity-50" />
+													</Tooltip.Trigger>
+													<Tooltip.Content>
+														<p>Esecuzione manuale</p>
+													</Tooltip.Content>
+												</Tooltip.Root>
+											</Tooltip.Provider>
+										{/if}
+										<span class={cn(`border rounded-md p-2 w-full flex justify-center font-semibold
+										${scenario.testStatus==='PASS'?"border-green-500 text-green-500":scenario.testStatus==='FAIL'?"border-red-500 text-red-500":'border-none'}`)}>
+										{scenario.testStatus}
+										</span>
 									</Table.Cell>
 								</Table.Row>
 							{/each}
