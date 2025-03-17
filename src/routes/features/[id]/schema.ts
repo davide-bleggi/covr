@@ -71,7 +71,7 @@ export const manualTestFormSchema = z.object({
 	ownerId: z.number(),
 	executionDate: z.date(),
 	status: z.enum([testStatusLabels[0].value, testStatusLabels[1].value, testStatusLabels[2].value]),
-	notes: z.string().max(5000).optional(),
+	notes: z.string().max(5000).optional().nullable(),
 	testData: z.string().max(2000)
 });
 
@@ -81,7 +81,7 @@ export const automaticTestFormSchema = z.object({
 	name: z.string().min(2),
 	executionDate: z.date(),
 	status: z.enum([testStatusLabels[0].value, testStatusLabels[1].value, testStatusLabels[2].value]),
-	notes: z.string().max(5000).optional()
+	notes: z.string().max(5000).optional().nullable()
 });
 
 export type ManualTestFormSchema = typeof manualTestFormSchema
