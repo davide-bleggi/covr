@@ -34,7 +34,7 @@ export async function load({ params }) {
 				},
 				orderBy: {
 					createdAt: 'desc'
-				},
+				}
 			}
 		}
 	});
@@ -177,7 +177,7 @@ export const actions: Actions = {
 		};
 	},
 
-	deleteVersion: async ( event) => {
+	deleteVersion: async (event) => {
 		const id = Number((await event.request.formData()).get('id'));
 
 		try {
@@ -194,7 +194,7 @@ export const actions: Actions = {
 				});
 			}
 			await prisma.version.delete({ where: { id: id ?? null } });
-			logActivity(event.locals.user?.id, 'DELETE VERSION', {id});
+			logActivity(event.locals.user?.id, 'DELETE VERSION', { id });
 		} catch (err) {
 			console.error(err);
 			return fail(400);
@@ -242,7 +242,7 @@ export const actions: Actions = {
 		const id = Number((await event.request.formData()).get('id'));
 		try {
 			await prisma.installation.delete({ where: { id: id ?? null } });
-			logActivity(event.locals.user?.id, 'DELETE INSTALLATION', {id});
+			logActivity(event.locals.user?.id, 'DELETE INSTALLATION', { id });
 		} catch {
 			return fail(400);
 		}
@@ -288,13 +288,13 @@ export const actions: Actions = {
 		const id = Number((await event.request.formData()).get('id'));
 		try {
 			await prisma.feature.delete({ where: { id: id ?? null } });
-			logActivity(event.locals.user?.id, 'DELETE FEATURE', {id});
+			logActivity(event.locals.user?.id, 'DELETE FEATURE', { id });
 		} catch {
 			return fail(400);
 		}
 	},
 
-	searchVersion: async (event:RequestEvent) => {
+	searchVersion: async (event: RequestEvent) => {
 		const form = await superValidate(event, zod(searchFormSchema));
 		const searchValue = form.data.searchValue;
 		const { code } = event.params;
@@ -309,9 +309,19 @@ export const actions: Actions = {
 						{
 							features: {
 								some: {
-									name: {
-										contains: searchValue
-									}
+									OR: [
+										{ name: { contains: searchValue } },
+										{ id: { equals: Number.parseInt(searchValue) ? Number.parseInt(searchValue) : 0 } },
+										{
+											requirements: {
+												some: {
+													OR: [
+														{ name: { contains: searchValue } },
+														{ id: { equals: Number.parseInt(searchValue) ? Number.parseInt(searchValue) : 0 } }]
+												}
+											}
+										}
+									]
 								}
 							}
 						},
@@ -344,17 +354,17 @@ export const actions: Actions = {
 				},
 				orderBy: {
 					createdAt: 'desc'
-				},
+				}
 			});
 
-			console.log('versions has been found: ', versions)
+			console.log('versions has been found: ', versions);
 			return {
-					form,
-					items: versions
+				form,
+				items: versions
 			};
-		}catch(err){
-			console.error(err)
-			return fail(400, {form});
+		} catch (err) {
+			console.error(err);
+			return fail(400, { form });
 		}
 	}
 };
