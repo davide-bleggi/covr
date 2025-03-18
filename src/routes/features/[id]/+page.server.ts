@@ -116,13 +116,13 @@ export const actions: Actions = {
 		};
 	},
 
-	deleteFeature: async ( event ) => {
+	deleteFeature: async (event) => {
 		const id = Number((await event.request.formData()).get('id'));
 		const projectCode = Number((await event.request.formData()).get('projectCode'));
 
 		try {
 			await prisma.feature.delete({ where: { id: id ?? null } });
-			logActivity(event.locals.user?.id, 'DELETE FEATURE', {id});
+			logActivity(event.locals.user?.id, 'DELETE FEATURE', { id });
 		} catch {
 			return fail(400);
 		}
@@ -170,7 +170,7 @@ export const actions: Actions = {
 		const id = Number((await event.request.formData()).get('id'));
 		console.log('key to delete: ', id);
 		try {
-			logActivity(event.locals.user?.id, 'DELETE REQUIREMENT', {id});
+			logActivity(event.locals.user?.id, 'DELETE REQUIREMENT', { id });
 			await prisma.requirement.delete({ where: { id: id ?? null } });
 		} catch (error) {
 			console.log(error);
@@ -371,7 +371,27 @@ export const actions: Actions = {
 							OR: [
 								{ name: { contains: searchValue } },
 								{ id: { equals: !isNaN(Number.parseInt(searchValue)) ? Number.parseInt(searchValue) : 0 } },
-								{ description: { contains: searchValue } }
+								{ description: { contains: searchValue } },
+								{
+									scenarios: {
+										some: {
+											OR: [
+												{ name: { contains: searchValue } },
+												{ id: { equals: Number.parseInt(searchValue) ? Number.parseInt(searchValue) : 0 } },
+												{
+													automaticTests: {
+														some: {
+															OR: [
+																{ name: { contains: searchValue } },
+																{ id: { equals: Number.parseInt(searchValue) ? Number.parseInt(searchValue) : 0 } }
+															]
+														}
+													}
+												}
+											]
+										}
+									}
+								}
 							]
 						}
 					]
