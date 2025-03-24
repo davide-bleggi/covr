@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Project, Version } from '@prisma/client';
 	import { Button } from '$lib/components/ui/button';
-	import { PencilIcon, Plus } from 'lucide-svelte';
+	import { PencilIcon, Plus, Download, HandIcon, BotIcon } from 'lucide-svelte';
 	import { ProjectDialog } from '../index';
 	import type { PageData } from './$types.js';
 	import { VersionDialog, VersionItem } from './index';
@@ -18,7 +18,8 @@
 	import { featureFormSchema, type FeatureFormSchema, searchFormSchema, type SearchFormSchema } from './schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { SmartSearch } from '$lib/components/smart-search/index';
-
+	import * as Tooltip from '$lib/components/ui/tooltip/index';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 
 	let { data } = $props();
 	let openProjectDialog = $state(false);
@@ -28,6 +29,29 @@
 	const versionNodes = $derived(data.versions.map(v => ({ id: v.name, prev: v.prevVersion?.name ?? null })));
 
 	let selectedVersion: string | null = $state(null);
+
+	async function downloadTests(testType: string) {
+		return fetch(`/api/download/${testType}?projectCode=${data.project.code}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+			.then(response => response.blob())
+			.then(blob => {
+				const url = window.URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = `${testType==='automaticTests'?'automatic-tests':'manual-tests'}-${data.project.code}`;
+				document.body.appendChild(a);
+				a.click();
+				window.URL.revokeObjectURL(url);
+				document.body.removeChild(a);
+			})
+			.catch(error => {
+				console.error('Error downloading file:', error);
+			});
+	}
 </script>
 <ProjectDialog bind:open={openProjectDialog} formToValidate={data.projectForm}>
 </ProjectDialog>
@@ -61,13 +85,34 @@
 				<Button variant="outline" class="" onclick={()=>openProjectDialog=true}>
 					<PencilIcon />
 				</Button>
+				<Tooltip.Provider delayDuration="{0}">
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							<DropdownMenu.Root>
+								<DropdownMenu.Trigger>
+									<Button variant="outline">
+										<Download />
+									</Button>
+								</DropdownMenu.Trigger>
+								<DropdownMenu.Content>
+									<DropdownMenu.Item class="p-4 cursor-pointer" onclick={()=>{downloadTests('manualTests')}}><HandIcon/> Test Manuali</DropdownMenu.Item>
+									<DropdownMenu.Item class="p-4 cursor-pointer" onclick={()=>{downloadTests('automaticTests')}}><BotIcon/>Test Automatici</DropdownMenu.Item>
+								</DropdownMenu.Content>
+							</DropdownMenu.Root>
+
+						</Tooltip.Trigger>
+						<Tooltip.Content>
+							<p>Scarica tutti i test di progetto</p>
+						</Tooltip.Content>
+					</Tooltip.Root>
+				</Tooltip.Provider>
 			</div>
 
 			<div class="flex flex-col flex-1 h-0 min-h-0 px-4 w-full  mx-auto gap-2">
-			<SmartSearch let:T={Version}
-									 bind:items={data.versions}
-									 bind:filteredItems={versions}
-									 searchApiString="?/searchVersion" />
+				<SmartSearch let:T={Version}
+										 bind:items={data.versions}
+										 bind:filteredItems={versions}
+										 searchApiString="?/searchVersion" />
 				<Button class="p-4 w-full" variant="outline" onclick={()=>openVersionDialog=true}>
 					Aggiungi Versione
 				</Button>
