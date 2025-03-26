@@ -31,7 +31,7 @@
 	let selectedVersion: string | null = $state(null);
 
 	async function downloadTests(testType: string) {
-		return fetch(`/api/download/${testType}?projectCode=${data.project.code}`, {
+		return fetch(`/api/download/${testType}?from=project&code=${data.project.code}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
@@ -42,7 +42,7 @@
 				const url = window.URL.createObjectURL(blob);
 				const a = document.createElement('a');
 				a.href = url;
-				a.download = `${testType==='automaticTests'?'automatic-tests':'manual-tests'}-${data.project.code}`;
+				a.download = `${testType==='automaticTests'?'automatic-tests-project':'manual-tests-project'}-${data.project.code}`;
 				document.body.appendChild(a);
 				a.click();
 				window.URL.revokeObjectURL(url);
@@ -85,7 +85,7 @@
 				<Button variant="outline" class="" onclick={()=>openProjectDialog=true}>
 					<PencilIcon />
 				</Button>
-				<Tooltip.Provider delayDuration="{0}">
+				<Tooltip.Provider>
 					<Tooltip.Root>
 						<Tooltip.Trigger>
 							<DropdownMenu.Root>

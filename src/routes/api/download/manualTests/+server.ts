@@ -3,22 +3,39 @@ import prisma from '$lib/prisma';
 import { format } from 'date-fns';
 
 export const GET: RequestHandler = async ({ url }) => {
-	const projectCode = url.searchParams.get('projectCode') || '';
-	try {
-		const tests = await prisma.manualTest.findMany({
-			where: {
-				scenario: {
-					requirement: {
-						feature: {
-							version: {
-								project: {
-									code: projectCode
-								}
+	const code = url.searchParams.get('code') || '';
+	const from = url.searchParams.get('from') || '';
+	let searchQuery = {};
+
+	if (from === 'project') {
+		searchQuery = {
+			scenario: {
+				requirement: {
+					feature: {
+						version: {
+							project: {
+								code: code
 							}
 						}
 					}
 				}
-			},
+			}
+		}
+	} else if (from === 'feature') {
+		searchQuery = {
+			scenario: {
+				requirement: {
+					feature: {
+						id: Number(code)
+					}
+				}
+			}
+		};
+	}
+
+	try {
+		const tests = await prisma.manualTest.findMany({
+			where: searchQuery,
 			include: {
 				scenario: {
 					include: {
@@ -36,19 +53,19 @@ export const GET: RequestHandler = async ({ url }) => {
 			}
 		});
 
-		const headers = ['Test Id', 'Status', 'Note', 'Data di esecuzione', 'Dati di test' , 'Scenario', 'Requirement', 'Feature', 'Version'];
+		const headers = ['Test Id', 'Status', 'Note', 'Data di esecuzione', 'Dati di test', 'Scenario', 'Requirement', 'Feature', 'Version'];
 		const csvRows = [
 			headers.join(','),
 			...tests.map(test => [
 				test.id,
-				test.status,
-				test.notes || '',
+				`"${test.status}"`,
+				`"${test.notes?.replace(/"/g, '""') || ''}"`,  // Escape quotes and wrap in quotes
 				`"${format(test.executionDate, 'yyyy-MM-dd')}"`,
-				test.testData || '',
-				test.scenario.name,
-				test.scenario.requirement.name,
-				test.scenario.requirement.feature.name,
-				test.scenario.requirement.feature.version.name
+				`"${test.testData?.replace(/"/g, '""') || ''}"`,  // Escape quotes and wrap in quotes
+				`"${test.scenario.name.replace(/"/g, '""')}"`,
+				`"${test.scenario.requirement.name.replace(/"/g, '""')}"`,
+				`"${test.scenario.requirement.feature.name.replace(/"/g, '""')}"`,
+				`"${test.scenario.requirement.feature.version.name.replace(/"/g, '""')}"`
 			].join(','))
 		];
 		const csvContent = csvRows.join('\n');
@@ -57,7 +74,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			status: 200,
 			headers: {
 				'Content-Type': 'text/csv',
-				'Content-Disposition': `attachment; filename="manual-tests-${projectCode}.csv"`
+				'Content-Disposition': `attachment; filename="manual-tests-${code}.csv"`
 			}
 		});
 	} catch (err) {

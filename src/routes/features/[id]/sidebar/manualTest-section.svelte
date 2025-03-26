@@ -36,7 +36,7 @@
 	propFormData={{...manualTest, owner: undefined}}
 />
 
-<div class={`rounded ${colorClasses[manualTest.status].bg} p-4`}>
+<div class={`rounded ${colorClasses[manualTest.status].bg} p-4 flex flex-col gap-2`}>
 	<div class="flex flex-row items-stretch">
 		<div class="flex flex-col flex-1">
 			<span class="text-sm opacity-60">Assegnatario</span>

@@ -3,24 +3,42 @@ import prisma from '$lib/prisma';
 import { format } from 'date-fns';
 
 export const GET: RequestHandler = async ({ url }) => {
-	const projectCode = url.searchParams.get('projectCode') || '';
-	try {
-		const tests = await prisma.automaticTest.findMany({
-			where: {
-				scenarios: {
-					some: {
-						requirement: {
-							feature: {
-								version: {
-									project: {
-										code: projectCode
-									}
+	const code = url.searchParams.get('code') || '';
+	const from = url.searchParams.get('from') || '';
+	let searchQuery = {};
+	if(from === 'project'){
+		searchQuery = {
+			scenarios: {
+				some: {
+					requirement: {
+						feature: {
+							version: {
+								project: {
+									code: code
 								}
 							}
 						}
 					}
 				}
-			},
+			}
+		}
+	} else if (from === 'feature'){
+		searchQuery = {
+			scenarios: {
+				some: {
+					requirement: {
+						feature: {
+							id: Number(code)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	try {
+		const tests = await prisma.automaticTest.findMany({
+			where: searchQuery,
 			include: {
 				scenarios: {
 					include: {
@@ -42,15 +60,15 @@ export const GET: RequestHandler = async ({ url }) => {
 		const csvRows = [
 			headers.join(','),
 			...tests.map(test => [
-				`"${test.name}"`,
-				`"${test.status}"`,
-				`"${format(test.executionDate,  'yyyy-MM-dd')}"`,
-				`"${test.notes || ''}"`,
-				`"${test.errorLog || ''}"`,
-				`"${test.scenarios.map(s => s.name).join(';')}"`,
-				`"${test.scenarios.map(s => s.requirement.name).join(';')}"`,
-				`"${test.scenarios.map(s => s.requirement.feature.name).join(';')}"`,
-				`"${test.scenarios.map(s => s.requirement.feature.version.name).join(';')}"`,
+				`"${test.name.replace(/"/g, '""')}"`,
+				`"${test.status.replace(/"/g, '""')}"`,
+				`"${format(test.executionDate, 'yyyy-MM-dd')}"`,
+				`"${(test.notes || '').replace(/"/g, '""')}"`,
+				`"${(test.errorLog || '').replace(/"/g, '""')}"`,
+				`"${test.scenarios.map(s => s.name.replace(/"/g, '""')).join(';')}"`,
+				`"${test.scenarios.map(s => s.requirement.name.replace(/"/g, '""')).join(';')}"`,
+				`"${test.scenarios.map(s => s.requirement.feature.name.replace(/"/g, '""')).join(';')}"`,
+				`"${test.scenarios.map(s => s.requirement.feature.version.name.replace(/"/g, '""')).join(';')}"`,
 			].join(','))
 		];
 		const csvContent = csvRows.join('\n');
@@ -59,7 +77,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			status: 200,
 			headers: {
 				'Content-Type': 'text/csv',
-				'Content-Disposition': `attachment; filename="automatic-tests-${projectCode}.csv"`
+				'Content-Disposition': `attachment; filename="automatic-tests-${code}.csv"`
 			}
 		});
 	} catch (err) {

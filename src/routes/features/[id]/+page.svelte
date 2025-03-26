@@ -15,7 +15,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { ManualTestDialog, RequirementDialog, RequirementItem, ScenarioDialog } from './index';
 	import { onMount, setContext } from 'svelte';
-	import { Pencil, Plus } from 'lucide-svelte';
+	import { BotIcon, Download, HandIcon, Pencil, Plus } from 'lucide-svelte';
 	import { type ScenarioFormData, testStatusLabels } from './schema';
 	import SuperDebug from 'sveltekit-superforms';
 	import { format } from 'date-fns';
@@ -27,6 +27,8 @@
 	import { Progress } from '$lib/components/ui/progress';
 	import { toast } from 'svelte-sonner';
 	import { SmartSearch } from '$lib/components/smart-search';
+	import * as Tooltip from '$lib/components/ui/tooltip/index';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 
 	type FeatureWithDetails = Feature & {
 		requirements: (Requirement & {
@@ -114,6 +116,29 @@
 	// aggiornamento in tempo reale
 	let socket: WebSocket;
 
+	async function downloadTests(testType: string) {
+		return fetch(`/api/download/${testType}?from=feature&code=${data.feature.id}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+			.then(response => response.blob())
+			.then(blob => {
+				const url = window.URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = `${testType==='automaticTests'?'automatic-tests-feature':'manual-tests-feature'}-${data.feature.id}`;
+				document.body.appendChild(a);
+				a.click();
+				window.URL.revokeObjectURL(url);
+				document.body.removeChild(a);
+			})
+			.catch(error => {
+				console.error('Error downloading file:', error);
+			});
+	}
+
 	onMount(() => {
 		const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 		const hostname = window.location.hostname; // Gets the correct domain
@@ -192,6 +217,27 @@
 												onclick={(e)=>{openFeatureDialog=true}}>
 									<Pencil></Pencil>
 								</Button>
+								<Tooltip.Provider delayDuration="{0}">
+									<Tooltip.Root>
+										<Tooltip.Trigger>
+											<DropdownMenu.Root>
+												<DropdownMenu.Trigger>
+													<Button variant="outline">
+														<Download />
+													</Button>
+												</DropdownMenu.Trigger>
+												<DropdownMenu.Content>
+													<DropdownMenu.Item class="p-4 cursor-pointer" onclick={()=>{downloadTests('manualTests')}}><HandIcon/> Test Manuali</DropdownMenu.Item>
+													<DropdownMenu.Item class="p-4 cursor-pointer" onclick={()=>{downloadTests('automaticTests')}}><BotIcon/>Test Automatici</DropdownMenu.Item>
+												</DropdownMenu.Content>
+											</DropdownMenu.Root>
+
+										</Tooltip.Trigger>
+										<Tooltip.Content>
+											<p>Scarica tutti i test di progetto</p>
+										</Tooltip.Content>
+									</Tooltip.Root>
+								</Tooltip.Provider>
 							</div>
 						</div>
 						<h1 class="text-2xl font-bold">{feature.name}</h1>
