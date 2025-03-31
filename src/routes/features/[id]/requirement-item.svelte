@@ -105,19 +105,25 @@
 							<Table.Row>
 								<Table.Head class="w-[110px]">ID Scenario</Table.Head>
 								<Table.Head class="">Nome scenario</Table.Head>
+								<Table.Head class="w-[140px]">Test automatici</Table.Head>
 								<Table.Head class="w-[110px]">Covered</Table.Head>
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
 							{#each requirement.scenarios as scenario}
 								<Table.Row on:click={()=>{
-									console.log(scenario)
 									sidePanelStore.scenario = {...scenario}
-									console.log(	sidePanelStore.scenario)
 								}}
 													 class={cn(`cursor-pointer ${sidePanelStore.scenario?.id === scenario?.id?'bg-secondary/50':""}`)}>
 									<Table.Cell>SCN-{scenario.id}</Table.Cell>
 									<Table.Cell>{scenario.name}</Table.Cell>
+									<Table.Cell>
+										<ul class="flex flex-wrap gap-2 justify-center">
+											{#each scenario.automaticTests as test }
+											<li class="px-4 py-1 bg-secondary rounded-full">	E2E-{test.id}</li>
+											{/each}
+										</ul>
+									</Table.Cell>
 									<Table.Cell class="flex gap-2 items-center">
 										{#if scenario.automaticTests.length === 0}
 											<Tooltip.Provider delayDuration="{0}">
