@@ -61,7 +61,17 @@ COVR is built around the following core entities:
 
 4. Initialize the database:
    ```bash
-   npx prisma migrate dev
+   # Generate the Prisma client
+   npx prisma generate
+   
+   # Create and apply migrations to set up the database schema
+   npx prisma migrate dev --name init
+   # or
+   npx prisma db push
+   
+   # If working with an existing database schema, use:
+   # npx prisma db pull
+   # npx prisma generate
    ```
 
 5. Start the development server:
