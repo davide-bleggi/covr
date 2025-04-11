@@ -78,7 +78,6 @@ COVR is built around the following core entities:
    ```bash
    npm run dev
    ```
-
 6. Build for production:
    ```bash
    npm run build
@@ -141,7 +140,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Screenshots
 
-(Add screenshots here when available)
+![Screenshot 2025-04-11 133728.png](screenshots/Screenshot%202025-04-11%20133728.png)
+![Screenshot 2025-04-11 133757.png](screenshots/Screenshot%202025-04-11%20133757.png)
+![Screenshot 2025-04-11 133850.png](screenshots/Screenshot%202025-04-11%20133850.png)
+![Screenshot 2025-04-11 1322222.png](screenshots/Screenshot%202025-04-11%201322222.png)
+
 
 ## Contact
 
