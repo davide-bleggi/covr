@@ -23,7 +23,6 @@
 		}
 	});
 
-	let action = $state('?/createCustomer');
 
 	const { form: formData, enhance, submit, errors } = form;
 
@@ -51,10 +50,7 @@
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
 			<form method="POST" use:enhance
-						onsubmit={()=>
-							handleSubmit($formData.id? 'updateCustomer': 'createCustomer')
-						}
-						action={action}>
+						action="?/saveCustomer">
 				<input type="hidden" name="id" bind:value={$formData.id} />
 				<Form.Field {form} name="name">
 					<Form.Control>
@@ -70,16 +66,17 @@
 		<Dialog.Footer>
 			<div class={`flex flex-row w-full ${$formData.id?'justify-between':'justify-end'}`}>
 				{#if $formData.id }
-					<Button
-						onclick={()=>{
-							handleSubmit('deleteCustomer')}}
-						variant="destructive">
-						Rimuovi
-					</Button>
+					<form method="POST" action="?/deleteCustomer" use:enhance>
+						<input hidden name="id" value="{$formData.id}">
+						<Button
+							type="submit"
+							variant="destructive">
+							Rimuovi
+						</Button>
+					</form>
 				{/if}
 				<Button
-					onclick={()=>{
-							handleSubmit($formData.id? 'updateCustomer': 'createCustomer')}}>
+					onclick={submit}>
 					Salva
 				</Button>
 			</div>

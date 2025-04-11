@@ -57,7 +57,7 @@
 			</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4 py-4">
-			<form method="POST" use:enhance action='?/saveProject' id="saveProjectForm">
+			<form method="POST" use:enhance action='?/createProject' id="saveProjectForm">
 				<input type="hidden" name="id" bind:value={$formData.id} />
 				<Form.Field {form} name="name">
 					<Form.Control>
